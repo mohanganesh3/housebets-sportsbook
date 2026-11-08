@@ -33,6 +33,7 @@ export interface EngineEvent {
   scorer?: string;
   newScore?: [number, number];
   resumeDelay?: number;
+  reason?: string;
 }
 
 interface EngineState {
@@ -131,6 +132,7 @@ export const useEngine = create<EngineState>()(
 );
 
 // Apply an engine event to the world — mutates seed data + notifies stores.
+import { useBets } from "./store/bets";
 import { useOdds } from "./store/odds";
 import { useSlip } from "./store/slip";
 import { useWorld } from "./store/world";
@@ -146,18 +148,71 @@ function applyEvent(e: EngineEvent) {
     useSlip.getState().onOddsChange(e.outcomeId, e.newPrice);
   }
   if (e.kind === "suspend" && e.marketId) {
-    world.setMarketStatus(e.matchId, e.marketId, "suspended");
+    world.setMarketStatus(
+      e.matchId,
+      e.marketId,
+      "suspended",
+      e.reason ?? "Dangerous attack",
+    );
     useSlip.getState().onMarketSuspended(e.marketId);
+    // cash-out locks in lockstep with the market — always
+    useBets.getState().suspendCashout(e.matchId);
     if (e.resumeDelay) {
       setTimeout(() => {
         useWorld.getState().setMarketStatus(e.matchId, e.marketId!, "open");
         useSlip.getState().onMarketResumed(e.marketId!);
+        useBets.getState().resumeCashout(e.matchId);
       }, e.resumeDelay);
     }
   }
   if (e.kind === "goal" && e.newScore) {
+    // trader sequence: score lands → a beat → every open market suspends →
+    // reprices → reopens. Cash-out locks for the whole window.
+    const prev = useWorld
+      .getState()
+      .matches.find((m) => m.id === e.matchId)?.score;
+    const homeScored = prev ? e.newScore[0] > prev.home : true;
     world.setScore(e.matchId, e.newScore);
     world.goalFlash(e.matchId);
+    useBets.getState().suspendCashout(e.matchId);
+    setTimeout(() => {
+      const mt = useWorld.getState().matches.find((m) => m.id === e.matchId);
+      if (!mt) return;
+      const open = mt.markets.filter((mk) => mk.status === "open");
+      for (const mk of open) {
+        useWorld
+          .getState()
+          .setMarketStatus(e.matchId, mk.id, "suspended", "Goal");
+        useSlip.getState().onMarketSuspended(mk.id);
+      }
+      setTimeout(() => {
+        const mt2 = useWorld.getState().matches.find((m) => m.id === e.matchId);
+        if (!mt2) return;
+        // reprice h2h toward the scoring side before reopening
+        const h2h = mt2.markets.find((mk) => mk.key === "h2h");
+        if (h2h) {
+          for (const oc of h2h.outcomes) {
+            const isScorer =
+              (oc.name === mt2.home.name && homeScored) ||
+              (oc.name === mt2.away.name && !homeScored);
+            const np = isScorer
+              ? Math.max(1.01, +(oc.price * 0.72).toFixed(2))
+              : oc.name === "Draw"
+                ? +(oc.price * 1.15).toFixed(2)
+                : +(oc.price * 1.4).toFixed(2);
+            useOdds
+              .getState()
+              .applyChange(oc.id, np, np > oc.price ? "up" : "down");
+            useSlip.getState().onOddsChange(oc.id, np);
+          }
+        }
+        for (const mk of mt2.markets.filter((m) => m.status === "suspended")) {
+          useWorld.getState().setMarketStatus(e.matchId, mk.id, "open");
+          useSlip.getState().onMarketResumed(mk.id);
+        }
+        useBets.getState().resumeCashout(e.matchId);
+      }, 8_000);
+    }, 600);
   }
   if (e.kind === "minute") world.bumpMinute(e.matchId);
 }

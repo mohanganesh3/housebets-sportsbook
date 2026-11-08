@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, Lock, Volleyball } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   FollowStar,
   LiveBadge,
   OddsCell,
   TeamLogo,
 } from "../components/primitives";
+import { type EngineEvent, useEngine } from "../lib/engine";
 import { compById, matchById } from "../lib/seed";
 import { useWorld } from "../lib/store/world";
 import type { Market, MarketGroupKey } from "../lib/types";
@@ -31,6 +32,7 @@ const GROUPS: { key: MarketGroupKey | "all"; label: string }[] = [
 
 function MarketCard({ market }: { market: Market }) {
   const susp = market.status === "suspended";
+  const reason = useWorld((s) => s.suspReasons[market.id]);
   const cols = market.outcomes.length > 4 ? 2 : market.outcomes.length;
   return (
     <section
@@ -44,7 +46,7 @@ function MarketCard({ market }: { market: Market }) {
         </h3>
         {susp && (
           <span className="suspend-in flex items-center gap-1.5 rounded-md bg-warning-a15 px-2 py-1 text-[11px] font-bold text-warning-400">
-            <Lock size={11} /> SUSPENDED
+            <Lock size={11} /> SUSPENDED{reason ? ` · ${reason}` : ""}
           </span>
         )}
       </header>
@@ -73,6 +75,18 @@ function MatchPage() {
   const { matchId } = Route.useParams();
   const mt = useWorld((s) => s.matches.find((x) => x.id === matchId));
   const goalFlash = useWorld((s) => s.goalFlashes[matchId]);
+  const goalEvent = useEngine((s) =>
+    [...s.feed]
+      .reverse()
+      .find((e) => e.kind === "goal" && e.matchId === matchId),
+  );
+  const [goalBanner, setGoalBanner] = useState<EngineEvent | null>(null);
+  useEffect(() => {
+    if (!goalEvent) return;
+    setGoalBanner(goalEvent);
+    const t = setTimeout(() => setGoalBanner(null), 7000);
+    return () => clearTimeout(t);
+  }, [goalEvent]);
   const [group, setGroup] = useState<(typeof GROUPS)[number]["key"]>("all");
   const allMatches = useWorld((s) => s.matches);
   const match = mt ?? matchById(matchId);
@@ -148,10 +162,11 @@ function MatchPage() {
           <FollowStar id={match.id} />
         </div>
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 pb-4 pt-3 sm:gap-6 sm:px-8">
-          <div className="flex flex-col items-center gap-2 text-center">
+          <div className="flex flex-col items-center gap-1.5 text-center">
             <TeamLogo team={match.home} size={52} />
-            <span className="text-[13px] font-semibold leading-tight sm:text-[14px]">
+            <span className="flex items-center gap-1 text-[13px] font-semibold leading-tight sm:text-[14px]">
               {match.home.name}
+              <FollowStar id={match.home.id} size={13} />
             </span>
           </div>
           <div className="flex flex-col items-center gap-1">
@@ -196,17 +211,34 @@ function MatchPage() {
               </>
             )}
           </div>
-          <div className="flex flex-col items-center gap-2 text-center">
+          <div className="flex flex-col items-center gap-1.5 text-center">
             <TeamLogo team={match.away} size={52} />
-            <span className="text-[13px] font-semibold leading-tight sm:text-[14px]">
+            <span className="flex items-center gap-1 text-[13px] font-semibold leading-tight sm:text-[14px]">
               {match.away.name}
+              <FollowStar id={match.away.id} size={13} />
             </span>
           </div>
         </div>
+        {/* GOAL banner — transient, names the scorer */}
+        <AnimatePresence>
+          {goalBanner && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden border-t border-warning-a30 bg-warning-a15/40"
+            >
+              <p className="flex items-center justify-center gap-2 py-2 font-odds text-[12px] font-bold text-warning-400">
+                <Volleyball size={13} />
+                GOAL · {goalBanner.scorer} {match.minute}′
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
         {live && (
           <div className="flex items-center justify-center gap-1.5 border-t border-border-soft py-2 text-[11px] text-text-tertiary">
             <span className="live-dot size-1.5 rounded-full bg-error-400" />
-            Live pricing — markets may suspend during dangerous attacks
+            Live scores may be delayed — markets can suspend at any time
           </div>
         )}
       </motion.header>

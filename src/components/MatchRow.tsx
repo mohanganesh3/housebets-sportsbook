@@ -12,9 +12,6 @@ export function MatchRow({ match }: { match: Match }) {
   const mt = useWorld((s) => s.matches.find((x) => x.id === match.id)) ?? match;
   const goalFlash = useWorld((s) => s.goalFlashes[mt.id]);
   const h2h = mt.markets.find((mk) => mk.key === "h2h");
-  const more = mt.markets.filter(
-    (mk) => !mk.popular && mk.key !== "h2h",
-  ).length;
   const live = mt.status === "live";
 
   return (
@@ -67,10 +64,10 @@ export function MatchRow({ match }: { match: Match }) {
         <Link
           to="/match/$matchId"
           params={{ matchId: mt.id }}
-          className="hidden items-center gap-0.5 rounded-lg px-2 py-2 text-[12px] font-medium text-text-tertiary transition-colors hover:bg-surface-tertiary hover:text-text-primary lg:flex"
+          className="hidden items-center gap-1 rounded-lg px-2 py-1.5 font-odds text-[12px] font-semibold text-text-tertiary transition-colors hover:bg-surface-tertiary hover:text-brand-300 lg:flex"
         >
-          +{more}
-          <ChevronRight size={14} />
+          +{mt.markets.length}
+          <ChevronRight size={13} />
         </Link>
         <span className="hidden sm:block">
           <FollowStar id={mt.id} />

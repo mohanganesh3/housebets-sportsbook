@@ -22,9 +22,24 @@ interface UIState {
   setScenarioOpen: (v: boolean) => void;
   follows: Set<string>;
   toggleFollow: (id: string) => void;
+  oddsPref: "ask" | "higher" | "any";
+  setOddsPref: (p: "ask" | "higher" | "any") => void;
   toasts: { id: number; msg: string; kind: "info" | "success" | "error" }[];
   toast: (msg: string, kind?: "info" | "success" | "error") => void;
 }
+
+const loadFollows = (): Set<string> => {
+  try {
+    const raw = localStorage.getItem("hb-follows");
+    if (raw) return new Set(JSON.parse(raw) as string[]);
+  } catch {}
+  return new Set(["epl"]);
+};
+const saveFollows = (f: Set<string>) => {
+  try {
+    localStorage.setItem("hb-follows", JSON.stringify([...f]));
+  } catch {}
+};
 
 let tid = 0;
 export const useUI = create<UIState>()((set, get) => ({
@@ -34,7 +49,7 @@ export const useUI = create<UIState>()((set, get) => ({
   setPanelTab: (t) => set({ panelTab: t }),
   setScenario: (s) => set({ scenario: s }),
   setScenarioOpen: (v) => set({ scenarioOpen: v }),
-  follows: new Set(["epl"]),
+  follows: typeof window !== "undefined" ? loadFollows() : new Set(["epl"]),
   toggleFollow: (id) => {
     const f = new Set(get().follows);
     if (f.has(id)) {
@@ -44,8 +59,11 @@ export const useUI = create<UIState>()((set, get) => ({
       f.add(id);
       get().toast("Added to favourites", "success");
     }
+    saveFollows(f);
     set({ follows: f });
   },
+  oddsPref: "ask",
+  setOddsPref: (p) => set({ oddsPref: p }),
   toasts: [],
   toast: (msg, kind = "info") => {
     const id = ++tid;

@@ -4,24 +4,10 @@ import { useOdds } from "../lib/store/odds";
 import { useSlip } from "../lib/store/slip";
 import { useUI } from "../lib/store/ui";
 import type { Market, Outcome, Team } from "../lib/types";
+import { TeamCrest } from "./Crest";
 
 export function TeamLogo({ team, size = 28 }: { team: Team; size?: number }) {
-  return (
-    <span
-      className="grid shrink-0 place-items-center rounded-full font-odds font-semibold text-white/95"
-      style={{
-        width: size,
-        height: size,
-        fontSize: size * 0.36,
-        background: `linear-gradient(135deg, hsl(${team.hue} 72% 42%), hsl(${team.hue + 24} 68% 28%))`,
-        boxShadow:
-          "inset 0 0 0 1.5px rgba(255,255,255,0.14), 0 1px 3px rgba(0,0,0,0.4)",
-      }}
-      aria-hidden
-    >
-      {team.short.slice(0, 2)}
-    </span>
-  );
+  return <TeamCrest team={team} size={size} />;
 }
 
 export function LiveBadge({
@@ -84,6 +70,11 @@ export function OddsCell({
   const suspended =
     market.status === "suspended" || outcome.status === "suspended";
   const price = override ?? outcome.price;
+  // 1X2 cells carry the industry label so every price has a name
+  const tag =
+    market.key === "h2h"
+      ? (["1", "X", "2"] as const)[market.outcomes.indexOf(outcome)]
+      : undefined;
 
   return (
     <motion.button
@@ -112,6 +103,13 @@ export function OddsCell({
         <Lock size={15} className="text-warning-400" aria-label="Suspended" />
       ) : (
         <>
+          {tag && (
+            <span
+              className={`font-sans text-[10px] font-bold ${selected ? "text-text-inverse/70" : "text-text-tertiary"}`}
+            >
+              {tag}
+            </span>
+          )}
           <span>{fmt(price)}</span>
           <AnimatePresence>
             {flash?.dir === "up" && (

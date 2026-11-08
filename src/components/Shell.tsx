@@ -7,6 +7,7 @@ import {
   RadioTower,
   ReceiptText,
   Search,
+  Star,
   Ticket,
   Volleyball,
   Wallet,
@@ -16,43 +17,13 @@ import { AnimatePresence, motion } from "motion/react";
 import { useSlip } from "../lib/store/slip";
 import { useUI } from "../lib/store/ui";
 import { BetSlipBody } from "./BetSlip";
+import { HousebetsLogo } from "./HousebetsLogo";
 import { MyBetsBody } from "./MyBets";
 
 export function Logo() {
   return (
-    <Link
-      to="/"
-      className="flex items-center gap-2"
-      aria-label="Housebets home"
-    >
-      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden>
-        <path
-          d="M3 14.5 13 5l10 9.5"
-          stroke="#02f8f8"
-          strokeWidth="2.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        <path
-          d="M6.5 13v8h13v-8"
-          stroke="#02f8f8"
-          strokeWidth="2.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        <path
-          d="M10 21v-4.5h6V21"
-          stroke="#02f8f8"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          fill="none"
-        />
-      </svg>
-      <span className="font-display text-[19px] font-bold tracking-tight">
-        house<span className="text-brand-400">bets</span>
-      </span>
+    <Link to="/" className="flex items-center" aria-label="Housebets home">
+      <HousebetsLogo height={21} />
     </Link>
   );
 }
@@ -97,7 +68,7 @@ export function TopBar({ onSearch }: { onSearch: () => void }) {
 }
 
 const RAIL: {
-  to: "/" | "/live" | "/football";
+  to: "/" | "/live" | "/football" | "/following";
   icon: typeof House;
   label: string;
   badge?: boolean;
@@ -105,11 +76,13 @@ const RAIL: {
   { to: "/", icon: House, label: "Home" },
   { to: "/live", icon: RadioTower, label: "Live", badge: true },
   { to: "/football", icon: Volleyball, label: "Football" },
+  { to: "/following", icon: Star, label: "Following" },
 ];
 
 export function LeftRail() {
   const loc = useLocation();
   const liveCount = 6;
+  const followCount = useUI((s) => s.follows.size);
   return (
     <nav
       className="fixed bottom-0 left-0 top-[var(--shell-header-h)] z-30 hidden w-[var(--shell-rail-w)] flex-col items-center gap-1 border-r border-border-soft bg-bg-primary py-3 lg:flex"
@@ -117,6 +90,7 @@ export function LeftRail() {
     >
       {RAIL.map(({ to, icon: Icon, label, badge }) => {
         const active = loc.pathname === to;
+        const n = to === "/following" ? followCount : liveCount;
         return (
           <Link
             key={to}
@@ -127,7 +101,12 @@ export function LeftRail() {
             {label}
             {badge && (
               <span className="absolute right-1 top-1.5 grid min-w-4 place-items-center rounded-full bg-error-500 px-1 font-odds text-[9px] font-bold text-white">
-                {liveCount}
+                {n}
+              </span>
+            )}
+            {to === "/following" && followCount > 0 && (
+              <span className="absolute right-1 top-1.5 grid min-w-4 place-items-center rounded-full bg-warning-400 px-1 font-odds text-[9px] font-bold text-text-inverse">
+                {followCount}
               </span>
             )}
           </Link>
@@ -221,6 +200,7 @@ export function BottomBar({ onSearch }: { onSearch: () => void }) {
   const items = [
     { to: "/", icon: House, label: "Home" },
     { to: "/live", icon: RadioTower, label: "Live" },
+    { to: "/following", icon: Star, label: "Following" },
     { to: "/football", icon: Volleyball, label: "Football" },
   ] as const;
   return (

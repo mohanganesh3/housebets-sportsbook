@@ -1,0 +1,145 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Star } from "lucide-react";
+import { groupByComp, LeagueSection, MatchRow } from "../components/MatchRow";
+import { FollowStar, TeamLogo } from "../components/primitives";
+import { compById, type MATCHES, TEAMS } from "../lib/seed";
+import { useUI } from "../lib/store/ui";
+import { useWorld } from "../lib/store/world";
+
+export const Route = createFileRoute("/following")({
+  component: FollowingPage,
+});
+
+function isFollowed(m: (typeof MATCHES)[number], f: Set<string>) {
+  return (
+    f.has(m.id) ||
+    f.has(m.competitionId) ||
+    f.has(m.home.id) ||
+    f.has(m.away.id)
+  );
+}
+
+function FollowingPage() {
+  const matches = useWorld((s) => s.matches);
+  const follows = useUI((s) => s.follows);
+  const mine = matches.filter((m) => isFollowed(m, follows));
+  const live = mine.filter((m) => m.status === "live");
+  const upcoming = mine
+    .filter((m) => m.status === "scheduled")
+    .sort((a, b) => a.kickoffAt - b.kickoffAt);
+  const teams = Object.values(TEAMS).filter((t) => follows.has(t.id));
+  const comps = Object.keys(
+    matches.reduce<Record<string, true>>((a, m) => {
+      if (follows.has(m.competitionId)) a[m.competitionId] = true;
+      return a;
+    }, {}),
+  );
+
+  return (
+    <div className="mx-auto max-w-4xl px-3 py-4 lg:px-5">
+      <div className="mb-4 flex items-center gap-3">
+        <h1 className="font-display text-[20px] font-bold">Following</h1>
+        <span className="rounded-full bg-warning-a15 px-2 py-0.5 font-odds text-[11px] font-bold text-warning-400">
+          {follows.size}
+        </span>
+        <p className="ml-auto hidden text-[12px] text-text-tertiary sm:block">
+          Star teams, matches or leagues — they live here
+        </p>
+      </div>
+
+      {follows.size === 0 ? (
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border-very-strong px-6 py-16 text-center">
+          <Star size={30} className="text-warning-400/60" />
+          <p className="text-[15px] font-semibold">Nothing followed yet</p>
+          <p className="max-w-xs text-[13px] leading-relaxed text-text-tertiary">
+            Tap the star on any match, team or league. Your picks collect here —
+            live first, kickoffs next — so you never hunt for your bet twice.
+          </p>
+          <Link
+            to="/football"
+            className="mt-1 rounded-lg bg-brand-500 px-4 py-2 text-[13px] font-bold text-text-inverse"
+          >
+            Browse football
+          </Link>
+        </div>
+      ) : (
+        <div className="space-y-5">
+          {teams.length > 0 && (
+            <section>
+              <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+                Teams
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {teams.map((t) => (
+                  <span
+                    key={t.id}
+                    className="flex items-center gap-2 rounded-xl border border-border-soft bg-surface-secondary px-2.5 py-1.5"
+                  >
+                    <TeamLogo team={t} size={18} />
+                    <span className="text-[13px] font-medium">{t.name}</span>
+                    <FollowStar id={t.id} size={14} />
+                  </span>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {live.length > 0 && (
+            <section>
+              <h2 className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+                <span className="size-1.5 animate-pulse rounded-full bg-error-400" />
+                Live now · {live.length}
+              </h2>
+              <div className="space-y-1 rounded-xl border border-border-soft bg-surface-primary p-1.5">
+                {live.map((m) => (
+                  <MatchRow key={m.id} match={m} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {upcoming.length > 0 && (
+            <section>
+              <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+                Coming up · {upcoming.length}
+              </h2>
+              <div className="space-y-3">
+                {groupByComp(upcoming).map(([cid, ms]) => (
+                  <LeagueSection key={cid} compId={cid} matches={ms} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {comps.length > 0 && (
+            <section>
+              <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+                Leagues
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {comps.map((cid) => {
+                  const c = compById(cid);
+                  return c ? (
+                    <span
+                      key={cid}
+                      className="flex items-center gap-2 rounded-xl border border-border-soft bg-surface-secondary px-3 py-1.5 text-[13px] font-medium"
+                    >
+                      {c.name}
+                      <FollowStar id={c.id} size={14} />
+                    </span>
+                  ) : null;
+                })}
+              </div>
+            </section>
+          )}
+
+          {mine.length === 0 && (
+            <p className="rounded-xl border border-dashed border-border-very-strong px-4 py-8 text-center text-[13px] text-text-tertiary">
+              Your followed teams and leagues have no fixtures in this window.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

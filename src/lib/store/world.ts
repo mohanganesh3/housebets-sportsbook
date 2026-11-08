@@ -6,10 +6,12 @@ import type { MarketStatus, Match } from "../types";
 interface WorldState {
   matches: Match[];
   goalFlashes: Record<string, number>;
+  suspReasons: Record<string, string>;
   setMarketStatus: (
     matchId: string,
     marketId: string,
     status: MarketStatus,
+    reason?: string,
   ) => void;
   setScore: (matchId: string, score: [number, number]) => void;
   goalFlash: (matchId: string) => void;
@@ -20,8 +22,17 @@ export const useWorld = create<WorldState>()(
   subscribeWithSelector((set) => ({
     matches: MATCHES,
     goalFlashes: {},
-    setMarketStatus: (matchId, marketId, status) =>
+    suspReasons: {},
+    setMarketStatus: (matchId, marketId, status, reason) =>
       set((s) => ({
+        suspReasons:
+          status === "suspended" && reason
+            ? { ...s.suspReasons, [marketId]: reason }
+            : status === "open"
+              ? Object.fromEntries(
+                  Object.entries(s.suspReasons).filter(([k]) => k !== marketId),
+                )
+              : s.suspReasons,
         matches: s.matches.map((mt) =>
           mt.id !== matchId
             ? mt

@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
+  ChevronLeft,
   ChevronRight,
   CircleDot,
   Dumbbell,
@@ -7,12 +8,15 @@ import {
   Gamepad2,
   Medal,
   RadioTower,
+  Star,
   Trophy,
   Volleyball,
 } from "lucide-react";
-import { motion } from "motion/react";
-import { groupByComp, LeagueSection } from "../components/MatchRow";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useState } from "react";
+import { groupByComp, LeagueSection, MatchRow } from "../components/MatchRow";
 import { LiveBadge, OddsCell, TeamLogo } from "../components/primitives";
+import { useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
 import type { Match } from "../lib/types";
 
@@ -27,6 +31,224 @@ const PILLS = [
   { key: "cricket", label: "Cricket", icon: Trophy, to: "/football" },
   { key: "hockey", label: "Ice hockey", icon: Medal, to: "/football" },
 ] as const;
+
+// Wave motif — Housebets' aquatic promo language, quiet version
+function WaveArt() {
+  return (
+    <svg
+      className="pointer-events-none absolute inset-0 h-full w-full"
+      viewBox="0 0 800 240"
+      preserveAspectRatio="none"
+      aria-hidden
+    >
+      <defs>
+        <linearGradient id="wv" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#02f8f8" stopOpacity="0" />
+          <stop offset="1" stopColor="#02f8f8" stopOpacity="0.10" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M0 190 Q100 160 200 190 T400 190 T800 190 V240 H0 Z"
+        fill="url(#wv)"
+      />
+      <path
+        d="M0 210 Q100 185 200 210 T400 210 T800 210"
+        fill="none"
+        stroke="#02f8f8"
+        strokeOpacity="0.12"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M0 176 Q150 150 300 176 T700 176 T800 176"
+        fill="none"
+        stroke="#02f8f8"
+        strokeOpacity="0.06"
+        strokeWidth="1.5"
+      />
+      {/* roofline notch top-left — the house glyph echo */}
+      <path
+        d="M24 40 L60 14 L96 40"
+        fill="none"
+        stroke="#02f8f8"
+        strokeOpacity="0.18"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+// Grain — the craft tell that kills banding + reads "handmade"
+function Grain({ opacity = 0.05 }: { opacity?: number }) {
+  return (
+    <svg
+      className="pointer-events-none absolute inset-0 h-full w-full"
+      style={{ opacity }}
+      aria-hidden
+    >
+      <filter id="gr">
+        <feTurbulence
+          type="fractalNoise"
+          baseFrequency="0.8"
+          numOctaves="2"
+          stitchTiles="stitch"
+        />
+        <feColorMatrix type="saturate" values="0" />
+      </filter>
+      <rect width="100%" height="100%" filter="url(#gr)" />
+    </svg>
+  );
+}
+
+const fmtDay = (ts: number) =>
+  new Date(ts).toLocaleTimeString([], {
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+// Auto-rotating featured spotlight — the slideshow, but content-first
+function HeroSpotlight({ matches }: { matches: Match[] }) {
+  const [i, setI] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const all = useWorld((s) => s.matches);
+  const slides = matches
+    .map((m) => all.find((x) => x.id === m.id) ?? m)
+    .slice(0, 4);
+  const n = slides.length;
+  useEffect(() => {
+    if (paused || n < 2) return;
+    const t = setInterval(() => setI((v) => (v + 1) % n), 6000);
+    return () => clearInterval(t);
+  }, [paused, n]);
+  const mt = slides[i % n];
+  const h2h = mt.markets.find((m) => m.key === "h2h");
+
+  return (
+    <section
+      aria-label="Featured"
+      aria-roledescription="carousel"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      className="relative overflow-hidden rounded-2xl border border-border-soft bg-gradient-to-br from-[#0e2530] via-[#0b1920] to-[#0e202a]"
+    >
+      <WaveArt />
+      <Grain />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={mt.id}
+          initial={{ opacity: 0, x: 32 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -32 }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          className="relative grid grid-cols-1 gap-4 p-5 sm:grid-cols-[1fr_auto] sm:p-6"
+        >
+          <div className="min-w-0">
+            <div className="mb-3 flex items-center gap-2.5">
+              {mt.status === "live" ? (
+                <LiveBadge minute={mt.minute} period={mt.period} />
+              ) : (
+                <span className="rounded-full bg-warning-a15 px-2.5 py-1 font-odds text-[11px] font-bold text-warning-400">
+                  {fmtDay(mt.kickoffAt)}
+                </span>
+              )}
+              <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-text-tertiary">
+                {mt.competitionId === "epl"
+                  ? "Premier League"
+                  : "Champions League"}
+              </span>
+              <span className="rounded bg-secondary-a20 px-1.5 py-0.5 text-[10px] font-semibold text-secondary-25">
+                Match of the day
+              </span>
+            </div>
+            <Link
+              to="/match/$matchId"
+              params={{ matchId: mt.id }}
+              className="group block"
+            >
+              {[
+                { t: mt.home, s: mt.score.home },
+                { t: mt.away, s: mt.score.away },
+              ].map(({ t, s }) => (
+                <div key={t.id} className="flex items-center gap-3 py-1">
+                  <TeamLogo team={t} size={34} />
+                  <span className="truncate font-display text-[19px] font-bold group-hover:text-brand-200 sm:text-[22px]">
+                    {t.name}
+                  </span>
+                  {mt.status === "live" && (
+                    <span className="tnum ml-auto font-odds text-[26px] font-bold sm:text-[30px]">
+                      {s}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </Link>
+          </div>
+          <div className="flex flex-col justify-end gap-2.5 sm:w-56">
+            {h2h && (
+              <div className="grid grid-cols-3 gap-1.5">
+                {h2h.outcomes.map((o) => (
+                  <OddsCell key={o.id} outcome={o} market={h2h} compact />
+                ))}
+              </div>
+            )}
+            <Link
+              to="/match/$matchId"
+              params={{ matchId: mt.id }}
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-brand-500 py-2.5 text-[13px] font-bold text-text-inverse transition-colors hover:bg-brand-400"
+            >
+              View match · {mt.markets.length} markets
+              <ChevronRight size={15} />
+            </Link>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+      {/* controls */}
+      <div className="relative flex items-center justify-between px-5 pb-4 sm:px-6">
+        <div className="flex gap-1.5">
+          {slides.map((_, j) => (
+            <button
+              key={j}
+              type="button"
+              aria-label={`Slide ${j + 1}`}
+              onClick={() => setI(j)}
+              className="group relative h-4 w-8"
+            >
+              <span
+                className={`absolute inset-x-0 top-1.5 h-1 rounded-full transition-colors ${j === i % n ? "bg-brand-500" : "bg-border-very-strong group-hover:bg-text-tertiary"}`}
+              />
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-1">
+          {[
+            {
+              icon: ChevronLeft,
+              fn: () => setI((v) => (v - 1 + n) % n),
+              l: "Previous",
+            },
+            {
+              icon: ChevronRight,
+              fn: () => setI((v) => (v + 1) % n),
+              l: "Next",
+            },
+          ].map(({ icon: Icon, fn, l }) => (
+            <button
+              key={l}
+              type="button"
+              aria-label={l}
+              onClick={fn}
+              className="grid size-7 place-items-center rounded-lg border border-border-soft text-text-tertiary transition-colors hover:border-border-very-strong hover:text-text-primary"
+            >
+              <Icon size={15} />
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function FeaturedCard({ match }: { match: Match }) {
   const mt = useWorld((s) => s.matches.find((x) => x.id === match.id)) ?? match;
@@ -76,6 +298,46 @@ function FeaturedCard({ match }: { match: Match }) {
   );
 }
 
+// "For You" strip — followed teams' next matches, one tap to the hub
+function FollowingStrip() {
+  const follows = useUI((s) => s.follows);
+  const matches = useWorld((s) => s.matches);
+  const mine = matches
+    .filter(
+      (m) =>
+        follows.has(m.id) ||
+        follows.has(m.competitionId) ||
+        follows.has(m.home.id) ||
+        follows.has(m.away.id),
+    )
+    .sort(
+      (a, b) => (a.status === "live" ? -1 : 1) - (b.status === "live" ? -1 : 1),
+    )
+    .slice(0, 4);
+  if (mine.length === 0) return null;
+  return (
+    <section aria-label="Your follows">
+      <div className="mb-2.5 flex items-center justify-between px-1">
+        <h2 className="flex items-center gap-2 text-[15px] font-bold">
+          <Star size={15} className="fill-warning-400 text-warning-400" /> Your
+          follows
+        </h2>
+        <Link
+          to="/following"
+          className="flex items-center gap-0.5 text-[12px] font-semibold text-brand-300 hover:text-brand-200"
+        >
+          All <ChevronRight size={14} />
+        </Link>
+      </div>
+      <div className="space-y-1 rounded-xl border border-warning-a15 bg-surface-primary p-1.5">
+        {mine.map((m) => (
+          <MatchRow key={m.id} match={m} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function Home() {
   const matches = useWorld((s) => s.matches);
   const live = matches.filter((m) => m.status === "live");
@@ -110,6 +372,10 @@ function Home() {
           </Link>
         ))}
       </div>
+
+      <HeroSpotlight matches={featured.length ? featured : live} />
+
+      <FollowingStrip />
 
       {/* Featured rail */}
       <section aria-label="Featured matches">
