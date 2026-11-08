@@ -1,0 +1,522 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - banner [ref=e5]:
+          - generic [ref=e6]:
+            - generic [ref=e7]:
+              - button "Toggle menu" [ref=e8] [cursor=pointer]
+              - link [ref=e13] [cursor=pointer]:
+                - /url: /
+                - img "Housebets" [ref=e14]
+            - generic [ref=e16]:
+              - link "Leaderboard prize Weekly Prize Monthly Prize $50,000.00 $100,000.00" [ref=e18] [cursor=pointer]:
+                - /url: /leaderboard?leaderboardPeriod=weekly&leaderboardPage=1
+                - img "Leaderboard prize" [ref=e20]
+                - generic [ref=e21]:
+                  - generic [ref=e24]:
+                    - generic [ref=e25]: Weekly Prize
+                    - generic [ref=e26]: Monthly Prize
+                  - generic [ref=e29]:
+                    - generic [ref=e30]: $50,000.00
+                    - generic [ref=e31]: $100,000.00
+              - button "Rewards" [ref=e32] [cursor=pointer]
+            - generic [ref=e35]:
+              - button "Search" [ref=e36] [cursor=pointer]
+              - button "Chat" [ref=e40] [cursor=pointer]
+              - button "Log In" [ref=e47] [cursor=pointer]
+              - button "Register" [ref=e48] [cursor=pointer]
+        - generic [ref=e49]:
+          - complementary "Main navigation" [ref=e52]:
+            - navigation [ref=e54]:
+              - generic [ref=e56]:
+                - button "Casino" [ref=e57] [cursor=pointer]
+                - button "Sports" [ref=e60] [cursor=pointer]
+              - generic [ref=e63]:
+                - link "Rewards" [ref=e66] [cursor=pointer]:
+                  - /url: /rewards
+                - generic [ref=e71]:
+                  - link "Casino Lobby" [ref=e72] [cursor=pointer]:
+                    - /url: /casino
+                  - link "House Games" [ref=e77] [cursor=pointer]:
+                    - /url: /house-games
+                  - link "New Releases" [ref=e83] [cursor=pointer]:
+                    - /url: /games/new-releases
+                  - link "Slots" [ref=e87] [cursor=pointer]:
+                    - /url: /games/slots
+                  - link "Live Casino" [ref=e91] [cursor=pointer]:
+                    - /url: /games/live-casino
+                  - link "House Studios" [ref=e95] [cursor=pointer]:
+                    - /url: /providers/house-engine
+                  - link "Game Shows" [ref=e99] [cursor=pointer]:
+                    - /url: /games/game-shows
+                  - link "Blackjack" [ref=e103] [cursor=pointer]:
+                    - /url: /games/blackjack
+                  - link "Roulette" [ref=e107] [cursor=pointer]:
+                    - /url: /games/roulette
+                  - link "Baccarat" [ref=e111] [cursor=pointer]:
+                    - /url: /games/baccarat
+                  - link "Providers" [ref=e115] [cursor=pointer]:
+                    - /url: /providers
+                - generic [ref=e120]:
+                  - link "Promotions" [ref=e121] [cursor=pointer]:
+                    - /url: /promotions
+                  - link "Leaderboard" [ref=e125] [cursor=pointer]:
+                    - /url: /leaderboard
+                  - link "XP Race" [ref=e129] [cursor=pointer]:
+                    - /url: /xp-race
+                  - link "Contest Labs" [ref=e136] [cursor=pointer]:
+                    - /url: /contests
+                  - link "Affiliate" [ref=e140] [cursor=pointer]:
+                    - /url: /affiliate
+                  - link "Blog" [ref=e144] [cursor=pointer]:
+                    - /url: /blog
+              - generic [ref=e150]:
+                - link "Help Center" [ref=e151] [cursor=pointer]:
+                  - /url: https://help.housebets.com/en/
+                - link "Responsible Gambling" [ref=e156] [cursor=pointer]:
+                  - /url: /legal/responsible-gambling
+                - button "Live Support" [ref=e160] [cursor=pointer]
+          - main [ref=e164]:
+            - generic [ref=e165]:
+              - generic [ref=e167]:
+                - navigation "Breadcrumb" [ref=e168]:
+                  - list [ref=e169]:
+                    - listitem [ref=e170]:
+                      - link "Housebets Contest Labs" [ref=e171] [cursor=pointer]:
+                        - /url: /contests
+                    - listitem [ref=e172]:
+                      - generic [ref=e176]: Design
+                - generic [ref=e177]:
+                  - generic [ref=e178]:
+                    - generic [ref=e179]:
+                      - generic [ref=e181]:
+                        - generic [ref=e182]: Design
+                        - generic [ref=e183]: Ends in 6 days
+                      - generic [ref=e184]: Open
+                    - generic [ref=e187]:
+                      - heading "Housebets Sportsbook is coming" [level=1] [ref=e188]
+                      - paragraph [ref=e189]: "Design it. A clickable prototype: 5 pages, singles only."
+                    - list "Contest stages" [ref=e191]:
+                      - listitem [ref=e192]:
+                        - generic [ref=e193]: Upcoming
+                      - listitem [ref=e194]:
+                        - generic [ref=e195]: Open
+                      - listitem [ref=e197]:
+                        - generic [ref=e198]: Judging
+                      - listitem [ref=e199]:
+                        - generic [ref=e200]: Results
+                  - generic [ref=e201]:
+                    - generic [ref=e202]:
+                      - generic [ref=e203]:
+                        - generic [ref=e204]: Prizes
+                        - generic [ref=e205]: $15,000
+                      - generic [ref=e206]: 119 entered
+                    - generic [ref=e212]:
+                      - generic [ref=e213]: Ends in
+                      - generic [ref=e214]:
+                        - generic [ref=e215]:
+                          - generic [ref=e216]: "05"
+                          - generic [ref=e217]: Days
+                        - generic [ref=e218]:
+                          - generic [ref=e219]: "21"
+                          - generic [ref=e220]: Hours
+                        - generic [ref=e221]:
+                          - generic [ref=e222]: "46"
+                          - generic [ref=e223]: Mins
+                    - generic [ref=e225]:
+                      - paragraph [ref=e226]: Sign in with your Housebets account to enter.
+                      - button "Log In" [ref=e227] [cursor=pointer]
+                - generic [ref=e228]:
+                  - generic [ref=e229]:
+                    - term [ref=e230]: Starts
+                    - definition [ref=e231]: Nov 4, 2026
+                  - generic [ref=e232]:
+                    - term [ref=e233]: Ends
+                    - definition [ref=e234]: Nov 14, 2026
+                  - generic [ref=e235]:
+                    - term [ref=e236]: Submit
+                    - definition [ref=e237]: A link
+                  - generic [ref=e238]:
+                    - term [ref=e239]: Ranked by
+                    - definition [ref=e240]: Judges
+                  - generic [ref=e241]:
+                    - term [ref=e242]: Daily submissions
+                    - definition [ref=e243]: "3"
+                - generic [ref=e244]:
+                  - generic [ref=e246]:
+                    - tablist [ref=e247]:
+                      - tab "Task" [selected] [ref=e248] [cursor=pointer]
+                      - tab "Rules" [ref=e249] [cursor=pointer]
+                    - tabpanel [ref=e251]:
+                      - generic [ref=e252]:
+                        - generic [ref=e253]:
+                          - generic [ref=e254]:
+                            - generic [ref=e255]: How to win
+                            - paragraph [ref=e256]: The sportsbook we'd ship tomorrow wins.
+                          - generic [ref=e257]:
+                            - generic [ref=e258]:
+                              - generic [ref=e259]: Scorecard
+                              - generic [ref=e260]: 100 pts
+                            - list [ref=e261]:
+                              - listitem [ref=e262]:
+                                - generic [ref=e263]:
+                                  - generic [ref=e264]: Sports home
+                                  - generic [ref=e265]: 15 pts
+                                - progressbar [ref=e267]
+                              - listitem [ref=e269]:
+                                - generic [ref=e270]:
+                                  - generic [ref=e271]: Live
+                                  - generic [ref=e272]: 10 pts
+                                - progressbar [ref=e274]
+                              - listitem [ref=e276]:
+                                - generic [ref=e277]:
+                                  - generic [ref=e278]: Football
+                                  - generic [ref=e279]: 10 pts
+                                - progressbar [ref=e281]
+                              - listitem [ref=e283]:
+                                - generic [ref=e284]:
+                                  - generic [ref=e285]: Match page
+                                  - generic [ref=e286]: 20 pts
+                                - progressbar [ref=e288]
+                              - listitem [ref=e290]:
+                                - generic [ref=e291]:
+                                  - generic [ref=e292]: Bet slip + My bets
+                                  - generic [ref=e293]: 20 pts
+                                - progressbar [ref=e295]
+                              - listitem [ref=e297]:
+                                - generic [ref=e298]:
+                                  - generic [ref=e299]: Feels like Housebets
+                                  - generic [ref=e300]: 15 pts
+                                - progressbar [ref=e302]
+                              - listitem [ref=e304]:
+                                - generic [ref=e305]:
+                                  - generic [ref=e306]: "Every state: suspended, changed, failed"
+                                  - generic [ref=e307]: 10 pts
+                                - progressbar [ref=e309]
+                            - paragraph [ref=e311]: "Ties: the higher Match page score wins, then Feels like Housebets."
+                        - generic [ref=e312]:
+                          - generic [ref=e313]:
+                            - generic [ref=e314]:
+                              - generic [ref=e315]: Minimum bar
+                              - paragraph [ref=e316]: Your prototype should be at least this good.
+                              - paragraph [ref=e317]: Our wireframes. Match them, then beat them. Pages 5 and 6 here are one page in your entry.
+                            - radiogroup [ref=e318]:
+                              - generic [ref=e319] [cursor=pointer]:
+                                - radio "Desktop" [checked] [ref=e320]
+                                - text: Desktop
+                              - generic [ref=e321] [cursor=pointer]:
+                                - radio "Phone" [ref=e322]
+                                - text: Phone
+                          - link "Open Sports home full size" [ref=e323] [cursor=pointer]:
+                            - /url: /_next/static/media/desk-home.36rrct0bzj7df.webp?dpl=bc2cf611c643906136819b91126c445027213a70
+                            - img "Sports home" [ref=e324]
+                          - list [ref=e325]:
+                            - listitem [ref=e326]:
+                              - button "1 Sports home" [pressed] [ref=e327] [cursor=pointer]:
+                                - generic [ref=e328]: "1"
+                                - text: Sports home
+                            - listitem [ref=e329]:
+                              - button "2 Live" [ref=e330] [cursor=pointer]:
+                                - generic [ref=e331]: "2"
+                                - text: Live
+                            - listitem [ref=e332]:
+                              - button "3 Football" [ref=e333] [cursor=pointer]:
+                                - generic [ref=e334]: "3"
+                                - text: Football
+                            - listitem [ref=e335]:
+                              - button "4 Match page" [ref=e336] [cursor=pointer]:
+                                - generic [ref=e337]: "4"
+                                - text: Match page
+                            - listitem [ref=e338]:
+                              - button "5 Bet slip" [ref=e339] [cursor=pointer]:
+                                - generic [ref=e340]: "5"
+                                - text: Bet slip
+                            - listitem [ref=e341]:
+                              - button "6 My bets" [ref=e342] [cursor=pointer]:
+                                - generic [ref=e343]: "6"
+                                - text: My bets
+                        - generic [ref=e344]:
+                          - paragraph [ref=e345]: We're building a sportsbook. Design the five pages players will use most.
+                          - paragraph [ref=e346]: "Build a clickable prototype: 5 pages, phone and desktop, in our site shell (top bar, left nav, side panel). The shell and the brand pack are in the starter files."
+                          - heading "1. Sports home" [level=4] [ref=e347]
+                          - list [ref=e348]:
+                            - listitem [ref=e349]: Live now
+                            - listitem [ref=e350]: Starting soon
+                            - listitem [ref=e351]: Top competitions
+                            - listitem [ref=e352]: Sports nav
+                            - listitem [ref=e353]: "Search: teams, players, competitions, markets"
+                          - heading "2. Live" [level=4] [ref=e354]
+                          - list [ref=e355]:
+                            - listitem [ref=e356]: Every match in play
+                            - listitem [ref=e357]: Filter by sport and competition
+                            - listitem [ref=e358]: Live score and clock
+                            - listitem [ref=e359]: "Nothing live: show Starting soon"
+                          - heading "3. Football" [level=4] [ref=e360]
+                          - list [ref=e361]:
+                            - listitem [ref=e362]: Premier League, Champions League, LaLiga, Serie A, Bundesliga
+                            - listitem [ref=e363]: Match result odds on each row
+                            - listitem [ref=e364]: Follow a team or competition
+                          - heading "4. Match page" [level=4] [ref=e365]
+                          - list [ref=e366]:
+                            - listitem [ref=e367]: "Example: Arsenal v Brighton, live"
+                            - listitem [ref=e368]: "Scoreboard: score, clock"
+                            - listitem [ref=e369]: "Market groups: Popular, Goals, Halves, Handicaps, Goalscorers, Corners & cards"
+                            - listitem [ref=e370]: Odds moving, markets suspended
+                          - heading "5. Bet slip + My bets" [level=4] [ref=e371]
+                          - list [ref=e372]:
+                            - listitem [ref=e373]: Tap odds, add to slip
+                            - listitem [ref=e374]: Singles only
+                            - listitem [ref=e375]: Decimal odds, stakes in USDT
+                            - listitem [ref=e376]: Stake, odds, potential return
+                            - listitem [ref=e377]: "Odds changed: player must accept"
+                            - listitem [ref=e378]: Selection suspended
+                            - listitem [ref=e379]: Bet placed, bet failed
+                            - listitem [ref=e380]: "My bets: open, settled, cash out"
+                            - listitem [ref=e381]: Bet slip and My bets share one page
+                          - heading "Out of scope" [level=4] [ref=e382]
+                          - list [ref=e383]:
+                            - listitem [ref=e384]: Multis, accumulators, bet builder
+                            - listitem [ref=e385]: Boosts, free bets, promos
+                            - listitem [ref=e386]: Outrights, specials
+                            - listitem [ref=e387]: Stats widgets, match trackers
+                            - listitem [ref=e388]: AI search
+                          - heading "What to deliver" [level=4] [ref=e389]
+                          - list [ref=e390]:
+                            - listitem [ref=e391]: All 5 pages, linked.
+                            - listitem [ref=e392]: Works at 390px (phone) and 1440px (desktop).
+                            - listitem [ref=e393]: "Bet slip on phones: a bar at the bottom."
+                            - listitem [ref=e394]: A clickable prototype. Front end only.
+                            - listitem [ref=e395]: "Share a public link that opens without a login: Vercel, Netlify, GitHub Pages or similar."
+                            - listitem [ref=e396]: "Sample data only: no real players, no real money."
+                        - generic [ref=e397]:
+                          - generic [ref=e398]:
+                            - heading "What you'll send" [level=2] [ref=e399]
+                            - paragraph [ref=e400]: Takes about 2 min once you start.
+                          - list [ref=e401]:
+                            - listitem [ref=e402]:
+                              - generic [ref=e403]: "1"
+                              - generic [ref=e404]:
+                                - generic [ref=e405]: Link to your clickable prototype
+                                - generic [ref=e406]: "A public link: Vercel, Netlify, GitHub Pages or similar."
+                            - listitem [ref=e407]:
+                              - generic [ref=e408]: "2"
+                              - generic [ref=e409]:
+                                - generic [ref=e410]: Pages in your prototype
+                                - generic [ref=e411]: Tick all five. Your prototype must have every one.
+                            - listitem [ref=e412]:
+                              - generic [ref=e413]: "3"
+                              - generic [ref=e414]:
+                                - generic [ref=e415]: Your big idea
+                                - generic [ref=e416]: What makes it Housebets? 80 to 800 characters.
+                            - listitem [ref=e417]:
+                              - generic [ref=e418]: "4"
+                              - generic [ref=e419]:
+                                - generic [ref=e420]: Tools and templates you usedOptional
+                                - generic [ref=e421]: Figma, v0, Claude, a UI kit. Name them all.
+                          - generic [ref=e422]:
+                            - generic [ref=e423]: You'll confirm
+                            - list [ref=e424]:
+                              - listitem [ref=e425]:
+                                - generic [ref=e428]: My bet slip takes singles only. No multis, boosts or free bets.
+                              - listitem [ref=e429]:
+                                - generic [ref=e432]: No real player data and no real money anywhere in it.
+                              - listitem [ref=e433]:
+                                - generic [ref=e436]: It's my own work. I've named any tools, templates or kits I used in this form.
+                              - listitem [ref=e437]:
+                                - generic [ref=e440]: Housebets can share my entry publicly.
+                              - listitem [ref=e441]:
+                                - generic [ref=e444]: If I win, the prize is the full payment and Housebets owns the winning code, designs and rights.
+                          - button "Start your entry" [ref=e446] [cursor=pointer]
+                        - generic [ref=e447]:
+                          - heading "News" [level=2] [ref=e448]
+                          - article [ref=e449]:
+                            - generic [ref=e450]: Nov 7, 2026, 07:58 PM UTC
+                            - generic [ref=e451]: Send every idea
+                            - paragraph [ref=e453]: Got more than one idea? Send each one as its own submission, up to 3 a day until the deadline. We judge every submission, and your best one counts. A new submission never replaces an earlier one.
+                          - article [ref=e454]:
+                            - generic [ref=e455]: Nov 5, 2026, 12:56 AM UTC
+                            - generic [ref=e456]: "New closing date: 14 November 2026, 18:00 UTC"
+                            - paragraph [ref=e458]: The closing date of Housebets Sportsbook is coming is now 14 November 2026, 18:00 UTC. Send your final entry before then; everything else stays the same.
+                  - complementary [ref=e459]:
+                    - generic [ref=e460]:
+                      - heading "Prize ladder" [level=2] [ref=e461]
+                      - list [ref=e462]:
+                        - listitem [ref=e463]:
+                          - generic [ref=e464]: Place 1
+                          - generic [ref=e465]: $9,000
+                        - listitem [ref=e466]:
+                          - generic [ref=e467]: Place 2
+                          - generic [ref=e468]: $4,000
+                        - listitem [ref=e469]:
+                          - generic [ref=e470]: Place 3
+                          - generic [ref=e471]: $2,000
+              - generic [ref=e472]:
+                - generic [ref=e473]:
+                  - img "Housebets" [ref=e475]
+                  - combobox [ref=e478] [cursor=pointer]:
+                    - generic [ref=e479]: 🇬🇧
+                    - generic [ref=e480]: English
+                - navigation "Footer navigation" [ref=e483]:
+                  - generic [ref=e484]:
+                    - heading "Play" [level=3] [ref=e485]
+                    - list [ref=e486]:
+                      - listitem [ref=e487]:
+                        - link "Casino Home" [ref=e488] [cursor=pointer]:
+                          - /url: /casino
+                      - listitem [ref=e489]:
+                        - link "House Games" [ref=e490] [cursor=pointer]:
+                          - /url: /house-games
+                      - listitem [ref=e491]:
+                        - link "Slots" [ref=e492] [cursor=pointer]:
+                          - /url: /games/slots
+                      - listitem [ref=e493]:
+                        - link "Live Casino" [ref=e494] [cursor=pointer]:
+                          - /url: /games/live-casino
+                      - listitem [ref=e495]:
+                        - link "Sportsbook" [ref=e496] [cursor=pointer]:
+                          - /url: /sports
+                      - listitem [ref=e497]:
+                        - link "Live Sports" [ref=e498] [cursor=pointer]:
+                          - /url: /sports/live
+                      - listitem [ref=e499]:
+                        - link "Sportsbook Rules" [ref=e500] [cursor=pointer]:
+                          - /url: /legal/sportsbook-rules
+                  - generic [ref=e501]:
+                    - heading "Rewards" [level=3] [ref=e502]
+                    - list [ref=e503]:
+                      - listitem [ref=e504]:
+                        - link "Rewards" [ref=e505] [cursor=pointer]:
+                          - /url: /rewards
+                      - listitem [ref=e506]:
+                        - link "How Rewards Work" [ref=e507] [cursor=pointer]:
+                          - /url: https://help.housebets.com/en/articles/842909-rewards-overview
+                      - listitem [ref=e508]:
+                        - link "Promotions" [ref=e509] [cursor=pointer]:
+                          - /url: /promotions
+                      - listitem [ref=e510]:
+                        - link "Bonus Terms" [ref=e511] [cursor=pointer]:
+                          - /url: /legal/bonus-and-promotion-requirements
+                  - generic [ref=e512]:
+                    - heading "Payments" [level=3] [ref=e513]
+                    - list [ref=e514]:
+                      - listitem [ref=e515]:
+                        - link "How to Deposit" [ref=e516] [cursor=pointer]:
+                          - /url: https://help.housebets.com/en/articles/819704-how-to-deposit-crypto-choose-a-currency-and-network
+                      - listitem [ref=e517]:
+                        - link "How to Withdraw" [ref=e518] [cursor=pointer]:
+                          - /url: https://help.housebets.com/en/articles/819708-how-to-withdraw-crypto-to-your-wallet-or-exchange
+                      - listitem [ref=e519]:
+                        - link "Coins & Networks" [ref=e520] [cursor=pointer]:
+                          - /url: https://help.housebets.com/en/articles/822145-which-currencies-and-networks-can-i-use
+                      - listitem [ref=e521]:
+                        - link "Minimums & Fees" [ref=e522] [cursor=pointer]:
+                          - /url: https://help.housebets.com/en/articles/822146-what-are-the-deposit-and-withdrawal-minimums-and-fees
+                      - listitem [ref=e523]:
+                        - link "Withdrawal Times" [ref=e524] [cursor=pointer]:
+                          - /url: https://help.housebets.com/en/articles/819710-how-long-do-withdrawals-take
+                  - generic [ref=e525]:
+                    - heading "Support" [level=3] [ref=e526]
+                    - list [ref=e527]:
+                      - listitem [ref=e528]:
+                        - link "Help Center" [ref=e529] [cursor=pointer]:
+                          - /url: https://help.housebets.com/en/
+                      - listitem [ref=e530]:
+                        - link "Provably Fair" [ref=e531] [cursor=pointer]:
+                          - /url: /provably-fair
+                      - listitem [ref=e532]:
+                        - link "Account Verification" [ref=e533] [cursor=pointer]:
+                          - /url: https://help.housebets.com/en/collections/827275-account-verification
+                      - listitem [ref=e534]:
+                        - link "Responsible Gambling" [ref=e535] [cursor=pointer]:
+                          - /url: /legal/responsible-gambling
+                      - listitem [ref=e536]:
+                        - link "Self-Exclusion" [ref=e537] [cursor=pointer]:
+                          - /url: /legal/self-exclusion
+                      - listitem [ref=e538]:
+                        - link "Independent Gambling Support" [ref=e539] [cursor=pointer]:
+                          - /url: https://help.housebets.com/en/articles/822178-where-can-i-find-independent-gambling-support-and-blocking-tools
+                      - listitem [ref=e540]:
+                        - link "Complaints & Disputes" [ref=e541] [cursor=pointer]:
+                          - /url: /legal/dispute-resolution
+                  - generic [ref=e542]:
+                    - heading "Housebets" [level=3] [ref=e543]
+                    - list [ref=e544]:
+                      - listitem [ref=e545]:
+                        - link "About Housebets" [ref=e546] [cursor=pointer]:
+                          - /url: /about-us/why-housebets
+                      - listitem [ref=e547]:
+                        - link "Affiliate Program" [ref=e548] [cursor=pointer]:
+                          - /url: /affiliate
+                      - listitem [ref=e549]:
+                        - link "Affiliate Terms" [ref=e550] [cursor=pointer]:
+                          - /url: /legal/affiliate-terms
+                      - listitem [ref=e551]:
+                        - link "Community Guidelines" [ref=e552] [cursor=pointer]:
+                          - /url: /legal/community-conduct
+                  - generic [ref=e553]:
+                    - heading "Legal" [level=3] [ref=e554]
+                    - list [ref=e555]:
+                      - listitem [ref=e556]:
+                        - link "Terms of Service" [ref=e557] [cursor=pointer]:
+                          - /url: /legal/terms-of-service
+                      - listitem [ref=e558]:
+                        - link "Privacy Policy" [ref=e559] [cursor=pointer]:
+                          - /url: /legal/privacy-policy
+                      - listitem [ref=e560]:
+                        - link "Cookies Policy" [ref=e561] [cursor=pointer]:
+                          - /url: /legal/cookies-policy
+                      - listitem [ref=e562]:
+                        - link "KYC & Anti-Money Laundering" [ref=e563] [cursor=pointer]:
+                          - /url: /legal/anti-money-laundering
+                      - listitem [ref=e564]:
+                        - link "Payment Terms" [ref=e565] [cursor=pointer]:
+                          - /url: /legal/accounts-payouts-bonuses
+                      - listitem [ref=e566]:
+                        - link "Fairness Policy" [ref=e567] [cursor=pointer]:
+                          - /url: /legal/fairness-rng
+                      - listitem [ref=e568]:
+                        - link "All Policies" [ref=e569] [cursor=pointer]:
+                          - /url: /legal
+                - generic [ref=e570]:
+                  - generic [ref=e571]:
+                    - generic [ref=e572]:
+                      - heading "Our Community" [level=3] [ref=e573]
+                      - generic [ref=e574]:
+                        - link "X (Twitter)" [ref=e575] [cursor=pointer]:
+                          - /url: https://x.com/housebets
+                        - link "Telegram" [ref=e579] [cursor=pointer]:
+                          - /url: https://t.me/housebetscom
+                    - link "support @ housebets.com" [ref=e583] [cursor=pointer]:
+                      - /url: mailto:support%40housebets.com
+                      - generic [ref=e584]: support
+                      - generic [ref=e585]: "@"
+                      - generic [ref=e586]: housebets.com
+                  - generic [ref=e587]:
+                    - link [ref=e588] [cursor=pointer]:
+                      - /url: https://cert.cga.cw/certificate?id=ZXlKcGRpSTZJaXR5WmpnMFdHWXdMM1k0U0dOUk1XMUJhR2REYTJjOVBTSXNJblpoYkhWbElqb2libTh5WnlzNFkzWlhhSGM1ZVhCaVlWcDNVVlZYUVQwOUlpd2liV0ZqSWpvaU1EQXdZamRoTkRKa1pXVTNZalF5TlRFeVpHWTNNelJsT0dKa01USmhZVEJoTW1ReVlqQTVORFF4T1dJeFlqQTNNR0ZoT1RVd1l6UTBaVFprTVRFME1TSXNJblJoWnlJNklpSjk=
+                      - img "GCB cert.gcb.cw" [ref=e589]
+                    - img "Gamble Responsibly" [ref=e590]
+                    - img "18 plus age restriction" [ref=e591]
+                - generic [ref=e593]:
+                  - paragraph [ref=e594]: Housebets is operated by Bridge Technologies B.V. (Reg. No. 160264(0)), Dr. M.J. Hugenholtzweg 25, Willemstad, Curaçao. Licensed by the Curaçao Gaming Control Board (OGL/2024/431/0231). Payments may be processed by Bridge Technologies (Cyprus) Limited (HE 440867), Aigyptou 12, Nicosia, Cyprus.
+                  - button "Cookie settings" [ref=e595] [cursor=pointer]
+                - generic [ref=e596]:
+                  - paragraph [ref=e597]: ©2026 Housebets. All rights reserved.
+                  - button "Return to Top" [ref=e598] [cursor=pointer]
+      - region [ref=e602]:
+        - generic [ref=e603]:
+          - generic [ref=e608]:
+            - heading "Cookies" [level=2] [ref=e609]
+            - paragraph [ref=e610]:
+              - text: We use cookies to enhance your experience and analyse product usage. See our
+              - link "Privacy Policy" [ref=e611] [cursor=pointer]:
+                - /url: /legal/privacy-policy
+              - text: for details.
+          - generic [ref=e612]:
+            - button "Reject" [ref=e613] [cursor=pointer]
+            - button "Accept" [ref=e614] [cursor=pointer]
+    - generic:
+      - generic:
+        - region "Notifications alt+T"
+  - alert [ref=e615]

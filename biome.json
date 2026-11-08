@@ -1,0 +1,14 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.6.6/schema.json",
+  "files": {
+    "includes": ["src/**", "!src/routeTree.gen.ts", "!src/index.css"]
+  },
+  "linter": {
+    "rules": {
+      "style": { "noNonNullAssertion": "off" },
+      "suspicious": { "noArrayIndexKey": "off" },
+      "complexity": { "noImportantStyles": "off" }
+    }
+  },
+  "formatter": { "indentStyle": "space", "indentWidth": 2 }
+}
