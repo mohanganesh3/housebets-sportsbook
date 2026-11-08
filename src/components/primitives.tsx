@@ -1,4 +1,4 @@
-import { Lock, Star, TrendingDown, TrendingUp } from "lucide-react";
+import { House, Lock, Star, TrendingDown, TrendingUp } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useOdds } from "../lib/store/odds";
 import { useSlip } from "../lib/store/slip";
@@ -39,7 +39,7 @@ export function FollowStar({ id, size = 16 }: { id: string; size?: number }) {
       }}
       aria-pressed={on}
       aria-label={on ? "Unfollow" : "Follow"}
-      className="grid size-7 place-items-center rounded-md text-text-tertiary transition-colors hover:text-gold-500"
+      className="-m-1.5 grid size-10 place-items-center rounded-md text-text-tertiary transition-colors hover:text-gold-500"
     >
       <Star
         size={size}
@@ -79,7 +79,6 @@ export function OddsCell({
   return (
     <motion.button
       type="button"
-      layout
       onClick={() => !suspended && toggle(outcome.id)}
       disabled={suspended}
       whileTap={suspended ? undefined : { scale: 0.94 }}
@@ -167,15 +166,17 @@ export function EmptyState({
   title,
   hint,
   action,
+  icon,
 }: {
   title: string;
   hint?: string;
   action?: React.ReactNode;
+  icon?: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border-very-strong px-6 py-12 text-center">
       <div className="grid size-12 place-items-center rounded-full bg-surface-secondary text-text-tertiary">
-        <Lock size={20} />
+        {icon ?? <House size={20} />}
       </div>
       <p className="text-[15px] font-semibold text-text-primary">{title}</p>
       {hint && (

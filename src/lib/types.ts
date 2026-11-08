@@ -91,14 +91,18 @@ export interface Bet {
   id: string;
   placedAt: number;
   matchId: string;
+  marketId: string;
+  outcomeId: string;
   pick: string;
   marketName: string;
   odds: number;
   stake: number;
   returns: number;
-  result: "open" | "won" | "lost" | "void";
+  result: "open" | "won" | "lost" | "void" | "cashedout";
   cashout?: {
     value: number;
+    was: number;
+    factor: number;
     status: "available" | "suspended" | "unavailable";
   };
   settledNote?: string;

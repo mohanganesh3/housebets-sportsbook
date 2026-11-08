@@ -146,6 +146,7 @@ function applyEvent(e: EngineEvent) {
     e.dir = e.newPrice > found.outcome.price ? "up" : "down";
     useOdds.getState().applyChange(e.outcomeId, e.newPrice, e.dir);
     useSlip.getState().onOddsChange(e.outcomeId, e.newPrice);
+    useBets.getState().tickCashout(e.outcomeId, e.newPrice);
   }
   if (e.kind === "suspend" && e.marketId) {
     world.setMarketStatus(
@@ -204,6 +205,7 @@ function applyEvent(e: EngineEvent) {
               .getState()
               .applyChange(oc.id, np, np > oc.price ? "up" : "down");
             useSlip.getState().onOddsChange(oc.id, np);
+            useBets.getState().tickCashout(oc.id, np);
           }
         }
         for (const mk of mt2.markets.filter((m) => m.status === "suspended")) {

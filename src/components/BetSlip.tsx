@@ -1,13 +1,22 @@
-import { Lock, Trash2, TriangleAlert, X } from "lucide-react";
+import {
+  Lock,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
+  TriangleAlert,
+  X,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { matchById } from "../lib/seed";
 import { useBets } from "../lib/store/bets";
 import { armFailOnce, useSlip } from "../lib/store/slip";
 import { useUI } from "../lib/store/ui";
+import { useWorld } from "../lib/store/world";
 import { LiveBadge, TeamLogo } from "./primitives";
 
-const QUICK_STAKES = [5, 10, 25];
+const QUICK_STAKES = [1, 10, 50, 100];
+const SESSION_START = Date.now();
 
 // the house glyph — roofline h, echoes the brand mark
 export function HouseGlyph({
@@ -68,6 +77,7 @@ function SlipItem({
 }) {
   const { remove, setStake, accept } = useSlip();
   const mt = matchById(sel.matchId);
+  const suspReason = useWorld((s) => s.suspReasons[sel.marketId]);
   const changed = sel.status === "changed";
   const susp = sel.status === "suspended";
   const diff = sel.livePrice - sel.priceAtPick;
@@ -120,16 +130,26 @@ function SlipItem({
 
       {susp && (
         <div className="mt-2 flex items-center gap-2 rounded-lg bg-warning-a15 px-2.5 py-2 text-[12px] font-medium text-warning-400">
-          <Lock size={13} /> Selection suspended — waiting for market to reopen
+          <Lock size={13} /> Selection suspended
+          {suspReason ? ` · ${suspReason}` : " — waiting for market to reopen"}
         </div>
       )}
       {changed && !susp && (
         <div className="mt-2 flex items-center justify-between gap-2 rounded-lg bg-secondary-a20 px-2.5 py-2">
-          <span className="text-[12px] text-text-secondary">
+          <span className="flex items-center gap-1 text-[12px] text-text-secondary">
             Odds {diff > 0 ? "rose" : "dropped"} from{" "}
             <span className="tnum line-through">
               {sel.priceAtPick.toFixed(2)}
             </span>
+            {diff > 0 ? (
+              <TrendingUp size={12} className="text-tick-up" aria-hidden />
+            ) : (
+              <TrendingDown
+                size={12}
+                className="text-tick-down-text"
+                aria-hidden
+              />
+            )}
           </span>
           <button
             type="button"
@@ -160,9 +180,12 @@ function SlipItem({
         </div>
         <div className="text-right">
           <div className="text-[10px] uppercase tracking-wide text-text-tertiary">
-            Payout
+            Returns
           </div>
-          <div className="tnum font-odds text-[13px] font-semibold text-text-primary">
+          <div
+            className="tnum font-odds text-[13px] font-semibold text-text-primary"
+            title={`≈ ${(100 / sel.livePrice).toFixed(0)}% implied`}
+          >
             {((parseFloat(sel.stake) || 0) * sel.livePrice).toFixed(2)}
           </div>
         </div>
@@ -174,22 +197,17 @@ function SlipItem({
               key={q}
               type="button"
               onClick={() => setStake(sel.outcomeId, String(q))}
-              className={`h-6 flex-1 rounded-md font-odds text-[11px] font-semibold transition-colors ${
+              className={`h-7 flex-1 rounded-md font-odds text-[11px] font-semibold transition-colors ${
                 parseFloat(sel.stake) === q
                   ? "bg-brand-500/25 text-brand-300 ring-1 ring-brand-500/50"
-                  : "bg-secondary-a15 text-text-secondary hover:bg-secondary-a30 hover:text-text-primary"
+                  : q === 50
+                    ? "bg-secondary-a20 text-text-secondary ring-1 ring-secondary-a30 hover:bg-secondary-a30 hover:text-text-primary"
+                    : "bg-secondary-a15 text-text-secondary hover:bg-secondary-a30 hover:text-text-primary"
               }`}
             >
               {q}
             </button>
           ))}
-          <button
-            type="button"
-            onClick={() => setStake(sel.outcomeId, "50")}
-            className="h-6 flex-1 rounded-md bg-secondary-a15 font-odds text-[11px] font-semibold text-text-secondary transition-colors hover:bg-secondary-a30 hover:text-text-primary"
-          >
-            MAX
-          </button>
         </div>
       )}
       {changed && (
@@ -210,6 +228,7 @@ export function BetSlipBody() {
     selections,
     status,
     failReason,
+    lastReceipt,
     clear,
     acceptAll,
     place,
@@ -218,6 +237,18 @@ export function BetSlipBody() {
   const toast = useUI((s) => s.toast);
   const oddsPref = useUI((s) => s.oddsPref);
   const [taps, setTaps] = useState(0);
+  const netPL = useBets((s) =>
+    s.bets.reduce((a, b) => {
+      if (b.result === "won" || b.result === "cashedout")
+        return a + b.returns - b.stake;
+      if (b.result === "lost") return a - b.stake;
+      return a;
+    }, 0),
+  );
+  const sessionMins = Math.max(
+    1,
+    Math.floor((Date.now() - SESSION_START) / 60_000),
+  );
   const changed = selections.filter((s) => s.status === "changed");
   const suspended = selections.filter((s) => s.status === "suspended");
   const totalStake = selections.reduce(
@@ -273,32 +304,42 @@ export function BetSlipBody() {
         </motion.svg>
         <p className="text-[16px] font-bold">Bet placed</p>
         <p className="text-[13px] text-text-secondary">
-          {selections.length} single{selections.length > 1 ? "s" : ""} ·{" "}
-          {totalStake.toFixed(2)} USDT staked
+          {lastReceipt?.bets.length ?? 0} single
+          {(lastReceipt?.bets.length ?? 0) > 1 ? "s" : ""} ·{" "}
+          {(lastReceipt?.stake ?? 0).toFixed(2)} USDT staked
         </p>
         {/* receipt: every accepted leg, priced and referenced */}
         <div className="w-full max-w-72 space-y-1.5 rounded-xl border border-border-soft bg-surface-secondary p-2.5 text-left">
-          {useBets
-            .getState()
-            .bets.slice(0, selections.length)
-            .map((b) => (
-              <div
-                key={b.id}
-                className="flex items-baseline justify-between gap-2 text-[11.5px]"
+          {lastReceipt?.bets.map((b) => (
+            <div
+              key={b.id}
+              className="flex items-baseline justify-between gap-2 text-[11.5px]"
+            >
+              <span className="truncate text-text-secondary">
+                {b.pick}{" "}
+                <span className="text-text-tertiary">
+                  @{b.odds.toFixed(2)}
+                  {b.acceptedFrom && (
+                    <s className="ml-1">{b.acceptedFrom.toFixed(2)}</s>
+                  )}
+                </span>
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard?.writeText(b.id).catch(() => {});
+                  toast(`Copied ${b.id}`, "info");
+                }}
+                title="Copy bet ref"
+                className="tnum shrink-0 font-odds text-[10px] text-text-tertiary transition-colors hover:text-brand-300"
               >
-                <span className="truncate text-text-secondary">
-                  {b.pick}{" "}
-                  <span className="text-text-tertiary">
-                    @{b.odds.toFixed(2)}
-                  </span>
-                </span>
-                <span className="tnum shrink-0 font-odds text-[10px] text-text-tertiary">
-                  {b.id}
-                </span>
-              </div>
-            ))}
+                {b.id}
+              </button>
+            </div>
+          ))}
           <p className="border-t border-border-soft pt-1.5 text-[10px] text-text-tertiary">
-            Accepted at live odds · payout {totalReturn.toFixed(2)} USDT
+            Accepted at live odds · payout{" "}
+            {(lastReceipt?.payout ?? 0).toFixed(2)} USDT
           </p>
         </div>
         <div className="mt-1 flex gap-2">
@@ -306,6 +347,7 @@ export function BetSlipBody() {
             type="button"
             onClick={() => {
               resetStatus();
+              clear();
             }}
             className="rounded-lg bg-secondary-a30 px-4 py-2 text-[13px] font-semibold transition-colors hover:bg-secondary-a30/70"
           >
@@ -398,7 +440,7 @@ export function BetSlipBody() {
             </AnimatePresence>
           </div>
           <div className="border-t border-border-soft bg-surface-primary/80 px-3 pb-3 pt-2.5 backdrop-blur">
-            <div className="mb-2 flex items-center justify-between text-[13px]">
+            <div className="mb-1 flex items-center justify-between text-[13px]">
               <span className="text-text-secondary">
                 Total stake{" "}
                 <span className="tnum font-odds font-semibold text-text-primary">
@@ -406,18 +448,47 @@ export function BetSlipBody() {
                 </span>
               </span>
               <span className="text-text-secondary">
-                Returns{" "}
+                Payout{" "}
                 <span className="tnum font-odds font-semibold text-brand-400">
                   {totalReturn.toFixed(2)}
                 </span>
               </span>
             </div>
+            {totalStake > 0 && (
+              <div className="mb-2 flex items-center justify-between text-[11px]">
+                <span className="text-text-tertiary">
+                  Profit if it lands{" "}
+                  <span className="tnum text-text-secondary">
+                    +{(totalReturn - totalStake).toFixed(2)}
+                  </span>
+                </span>
+                <span className="text-text-tertiary">
+                  Balance after bet{" "}
+                  <span className="tnum text-text-secondary">
+                    {(1250 - totalStake).toFixed(2)}
+                  </span>
+                </span>
+              </div>
+            )}
+            {suspended.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  for (const x of suspended)
+                    useSlip.getState().remove(x.outcomeId);
+                  toast("Suspended selection removed", "info");
+                }}
+                className="mb-2 w-full rounded-lg border border-warning-a40 bg-warning-a15/60 py-1.5 text-[12px] font-semibold text-warning-400 transition-colors hover:bg-warning-a15"
+              >
+                Remove suspended · keep the rest
+              </button>
+            )}
             <motion.button
               type="button"
               whileTap={ready ? { scale: 0.97 } : undefined}
               onClick={place}
               disabled={!ready || suspended.length > 0 || status === "placing"}
-              className={`flex h-11 w-full items-center justify-center gap-2 rounded-xl text-[14px] font-bold transition-all ${
+              className={`relative flex h-11 w-full items-center justify-center gap-2 overflow-hidden rounded-xl text-[14px] font-bold transition-all ${
                 status === "failed"
                   ? "fail-shake bg-error-500 text-white"
                   : suspended.length > 0
@@ -427,6 +498,16 @@ export function BetSlipBody() {
                       : "cursor-not-allowed bg-surface-tertiary text-text-disabled"
               }`}
             >
+              {status === "placing" && (
+                <motion.span
+                  className="absolute inset-y-0 left-0 bg-white/15"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: 2.9, ease: "linear" }}
+                  style={{ transformOrigin: "left" }}
+                  aria-hidden
+                />
+              )}
               {status === "placing" ? (
                 <>
                   <motion.span
@@ -463,6 +544,24 @@ export function BetSlipBody() {
                 Accept the new odds before placing
               </p>
             )}
+            <p className="mt-2 text-center text-[10.5px] text-text-tertiary">
+              Session {sessionMins} min · Net {netPL >= 0 ? "+" : "−"}
+              {Math.abs(netPL).toFixed(2)} USDT ·{" "}
+              <button
+                type="button"
+                onClick={() =>
+                  useUI
+                    .getState()
+                    .toast(
+                      "Session reminder — take a break anytime. Bets never expire in demo.",
+                      "info",
+                    )
+                }
+                className="underline decoration-dotted underline-offset-2 hover:text-text-secondary"
+              >
+                Take a break
+              </button>
+            </p>
           </div>
         </>
       )}

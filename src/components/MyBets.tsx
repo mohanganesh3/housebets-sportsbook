@@ -1,13 +1,44 @@
-import { CheckCircle2, Lock, XCircle } from "lucide-react";
+import {
+  CheckCircle2,
+  CircleDollarSign,
+  Lock,
+  TrendingDown,
+  TrendingUp,
+  XCircle,
+} from "lucide-react";
 import { motion } from "motion/react";
+import { useState } from "react";
 import { matchById, useBets } from "../lib/store/bets";
+import { useWorld } from "../lib/store/world";
 import { TeamLogo } from "./primitives";
+
+function NetLine({ b }: { b: import("../lib/types").Bet }) {
+  if (b.result === "open" || b.result === "void") return null;
+  const net = +(b.returns - b.stake).toFixed(2);
+  if (b.result === "lost")
+    return (
+      <span className="tnum font-semibold text-text-secondary">
+        −{b.stake.toFixed(2)}
+      </span>
+    );
+  return (
+    <span
+      className={`tnum font-semibold ${net >= 0 ? "text-tick-up" : "text-error-300"}`}
+    >
+      {net >= 0 ? "+" : "−"}
+      {Math.abs(net).toFixed(2)}
+    </span>
+  );
+}
 
 function BetCard({ b }: { b: import("../lib/types").Bet }) {
   const mt = matchById(b.matchId);
   const cashOut = useBets((s) => s.cashOut);
+  const suspReason = useWorld((s) => s.suspReasons[b.marketId]);
+  const [confirming, setConfirming] = useState(false);
   const open = b.result === "open";
   const co = b.cashout;
+  const moved = co && co.value !== co.was;
   return (
     <motion.div
       layout
@@ -45,38 +76,116 @@ function BetCard({ b }: { b: import("../lib/types").Bet }) {
           </span>
         </span>
         <span className="text-text-secondary">
-          {open ? "To return" : "Returned"}{" "}
+          {open
+            ? "To return"
+            : b.result === "cashedout"
+              ? "Cashed out"
+              : "Returned"}{" "}
           <span
-            className={`tnum font-semibold ${b.result === "won" ? "text-tick-up" : "text-text-primary"}`}
+            className={`tnum font-semibold ${
+              b.result === "won"
+                ? "text-tick-up"
+                : b.result === "lost"
+                  ? "text-text-secondary"
+                  : "text-text-primary"
+            }`}
           >
-            {b.returns.toFixed(2)} USDT
+            {b.result === "lost" ? "0.00" : b.returns.toFixed(2)} USDT
           </span>
+          {" · Net "}
+          <NetLine b={b} />
         </span>
       </div>
       {open && co && (
         <div className="mt-2.5">
           {co.status === "available" ? (
-            <button
-              type="button"
-              onClick={() => cashOut(b.id)}
-              className="w-full rounded-lg bg-secondary-a30 py-2 text-[13px] font-semibold text-secondary-25 transition-colors hover:bg-secondary-a30/80 active:scale-[0.98]"
-            >
-              Cash out ·{" "}
-              <span className="tnum font-odds">{co.value.toFixed(2)} USDT</span>
-            </button>
+            confirming ? (
+              <div className="flex items-center gap-2">
+                <p className="min-w-0 flex-1 text-[11px] leading-tight text-text-secondary">
+                  Lock in{" "}
+                  <span className="tnum font-odds font-semibold text-text-primary">
+                    {co.value.toFixed(2)}
+                  </span>{" "}
+                  now?
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    cashOut(b.id);
+                    setConfirming(false);
+                  }}
+                  className="h-8 shrink-0 rounded-lg bg-brand-500 px-3 text-[12px] font-bold text-text-inverse transition-transform active:scale-95"
+                >
+                  Confirm
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirming(false)}
+                  className="h-8 shrink-0 rounded-lg bg-secondary-a20 px-3 text-[12px] font-semibold text-text-secondary transition-colors hover:bg-secondary-a30"
+                >
+                  Wait
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirming(true)}
+                className="w-full rounded-lg bg-secondary-a30 py-2 text-[13px] font-semibold text-secondary-25 transition-colors hover:bg-secondary-a30/80 active:scale-[0.98]"
+              >
+                <span className="flex items-center justify-center gap-1.5">
+                  Cash out ·{" "}
+                  <span className="tnum font-odds">
+                    {co.value.toFixed(2)} USDT
+                  </span>
+                  {moved &&
+                    (co.value > co.was ? (
+                      <TrendingUp
+                        size={12}
+                        className="text-tick-up"
+                        aria-label="Value rose"
+                      />
+                    ) : (
+                      <TrendingDown
+                        size={12}
+                        className="text-error-300"
+                        aria-label="Value dropped"
+                      />
+                    ))}
+                </span>
+                {moved && (
+                  <span className="mt-0.5 block text-[10px] font-normal text-text-tertiary">
+                    was {co.was.toFixed(2)}
+                  </span>
+                )}
+                {co.value < b.stake && (
+                  <span className="mt-0.5 block text-[10px] font-normal text-text-tertiary">
+                    Below stake {b.stake.toFixed(2)} — settles immediately
+                  </span>
+                )}
+              </button>
+            )
           ) : (
             <div className="suspend-in flex items-center justify-center gap-1.5 rounded-lg bg-surface-tertiary py-2 text-[13px] font-medium text-text-disabled">
               <Lock size={12} className="text-warning-400" /> Cash out suspended
+              {suspReason ? ` · ${suspReason}` : ""}
             </div>
           )}
         </div>
       )}
       {!open && (
         <div
-          className={`mt-2.5 flex items-center gap-1.5 text-[12px] font-medium ${b.result === "won" ? "text-tick-up" : "text-error-300"}`}
+          className={`mt-2.5 flex items-center gap-1.5 text-[12px] font-medium ${
+            b.result === "won"
+              ? "text-tick-up"
+              : b.result === "cashedout"
+                ? "text-text-secondary"
+                : "text-error-300"
+          }`}
         >
           {b.result === "won" ? (
             <CheckCircle2 size={13} />
+          ) : b.result === "cashedout" ? (
+            <CircleDollarSign size={13} />
           ) : (
             <XCircle size={13} />
           )}
@@ -111,7 +220,8 @@ export function MyBetsBody() {
       </section>
       {coAvail.length > 0 && (
         <p className="px-1 text-[11px] text-text-tertiary">
-          Cash-out values update with live odds. Values are sample data.
+          Cash-out values track live odds — they can fall as well as rise.
+          Sample data.
         </p>
       )}
       <section>

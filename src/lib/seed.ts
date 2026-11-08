@@ -453,7 +453,7 @@ export const MATCHES: Match[] = [
     null,
     null,
     [0, 0],
-    120,
+    2,
   ),
   m(
     "benf-est",

@@ -16,6 +16,7 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { useSlip } from "../lib/store/slip";
 import { useUI } from "../lib/store/ui";
+import { useWorld } from "../lib/store/world";
 import { BetSlipBody } from "./BetSlip";
 import { HousebetsLogo } from "./HousebetsLogo";
 import { MyBetsBody } from "./MyBets";
@@ -81,7 +82,9 @@ const RAIL: {
 
 export function LeftRail() {
   const loc = useLocation();
-  const liveCount = 6;
+  const liveCount = useWorld(
+    (s) => s.matches.filter((m) => m.status === "live").length,
+  );
   const followCount = useUI((s) => s.follows.size);
   return (
     <nav

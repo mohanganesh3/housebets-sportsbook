@@ -65,6 +65,7 @@ function Live() {
 
       {filtered.length === 0 ? (
         <EmptyState
+          icon={<Clock size={20} />}
           title={`No live ${f === "All" ? "matches" : `${f} matches`} right now`}
           hint="New events go in-play continuously. Here's what's teeing up next."
         />

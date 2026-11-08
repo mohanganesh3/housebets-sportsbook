@@ -4,6 +4,7 @@ import { useState } from "react";
 import { groupByComp, LeagueSection } from "../components/MatchRow";
 import { FollowStar } from "../components/primitives";
 import { COMPS } from "../lib/seed";
+import { isMatchFollowed } from "../lib/selectors";
 import { useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
 
@@ -21,9 +22,7 @@ function Football() {
       : tab === "upcoming"
         ? soccer.filter((m) => m.status === "scheduled")
         : tab === "favs"
-          ? soccer.filter(
-              (m) => follows.has(m.competitionId) || follows.has(m.id),
-            )
+          ? soccer.filter((m) => isMatchFollowed(m, follows))
           : soccer;
 
   const soccerComps = Object.values(COMPS).filter((c) => c.sport === "soccer");

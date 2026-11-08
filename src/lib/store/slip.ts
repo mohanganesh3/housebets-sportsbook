@@ -8,11 +8,18 @@ import { useWorld } from "./world";
 
 export type FailReason = "suspended" | "odds-moved" | "network";
 
+export interface PlacedReceipt {
+  bets: { id: string; pick: string; odds: number; acceptedFrom?: number }[];
+  stake: number;
+  payout: number;
+}
+
 interface SlipState {
   selections: SlipSelection[];
   status: SlipStatus;
   failReason: FailReason | null;
   mobileOpen: boolean;
+  lastReceipt: PlacedReceipt | null;
   acceptAll: () => void;
   accept: (outcomeId: string) => void;
   toggle: (outcomeId: string) => void;
@@ -33,6 +40,7 @@ export const useSlip = create<SlipState>()(
     status: "idle",
     failReason: null,
     mobileOpen: false,
+    lastReceipt: null,
     setMobileOpen: (v) => set({ mobileOpen: v }),
     toggle: (outcomeId) => {
       const s = get();
@@ -133,8 +141,27 @@ export const useSlip = create<SlipState>()(
           set({ status: "failed", failReason: "network" });
           return;
         }
-        useBets.getState().addBets(cur.selections);
-        set({ status: "placed" });
+        const made = useBets.getState().addBets(cur.selections);
+        // selections clear on placement (legs never stick in the slip);
+        // the receipt keeps the accepted price + ref of each leg
+        const receipt: PlacedReceipt = {
+          bets: made.map((b) => {
+            const sel = cur.selections.find((x) => x.outcomeId === b.outcomeId);
+            return {
+              id: b.id,
+              pick: b.pick,
+              odds: b.odds,
+              acceptedFrom:
+                sel && sel.priceAtPick !== b.odds ? sel.priceAtPick : undefined,
+            };
+          }),
+          stake: cur.selections.reduce(
+            (a, x) => a + (parseFloat(x.stake) || 0),
+            0,
+          ),
+          payout: made.reduce((a, b) => a + b.returns, 0),
+        };
+        set({ status: "placed", lastReceipt: receipt, selections: [] });
       }, delay);
     },
     resetStatus: () => set({ status: "idle" }),
