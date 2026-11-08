@@ -1,9 +1,9 @@
 # Contest submission
 
 **Prototype URL (public, no login):**
-https://mohanganesh-intern-pixel.github.io/housebets-sportsbook/
+https://mohanganesh3.github.io/housebets-sportsbook/
 
-**Repo:** https://github.com/mohanganesh-intern-pixel/housebets-sportsbook
+**Repo:** https://github.com/mohanganesh3/housebets-sportsbook
 
 **Pages to select:** Sports home · Live · Football · Match page · Bet slip & My bets
 
