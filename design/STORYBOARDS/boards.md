@@ -7,26 +7,44 @@ countdown, filter chips, live badge, empty state, skeleton).
 
 ## Shared board grammar (all three pages)
 
+All numbers from `design/DATA-CANON.md` (D-17). Glyphs in sketches are shorthand for the
+authored glyph set — never emoji (TOKENS icon law).
+
 - **Coupon = hairline-separated list regions on `--c-bg`, not nested cards** (SA4-01). A
   competition group = `--c-surface-1` region, r-md, rows separated by 1px `--c-surface-2`
   hairlines. Card chrome reserved for hero slide + ticket (U-40 density-via-rhythm).
 - **Match row anatomy (list row, desk):** `clock column | crest+name / crest+name (scores
   right-aligned) | 1X2 cells ×3 | +N ›`. Phone card variant folds to: header line
   (`● LIVE 52' · competition · ☆ · +N ›`) + two team lines + 3-cell odds row (W1-06..08).
-- **Odds cell:** `--c-surface-2` fill + hairline, label hb-label text-2 over price hb-odds
-  Oxanium `--c-brand-neon`; selected = `--c-cta` fill + `--c-cta-fg` + ✓ (71 task 3); implied %
-  rides beside every price at hb-micro (`1.30 · 77%` — P1, U-47).
-- **Suspended row:** full-width amber band replaces ONLY the odds row — `🔒 Suspended —
-  {reason}` (`--c-suspend` text + lock + hairline band), last prices visible dimmed 60% behind
-  it on desk, `+N ›` stays navigable (U-04, U-27, R-YAB-19; W2-09/W2-26 parity).
-- **Clock column honesty:** live = `● LIVE` + `52'`/`HT`/`45+2'`; scheduled = `20:00` +
+- **Odds cell — ONE anatomy per width** (crit a, resolves the label-over-price vs label-left
+  contradiction):
+  · **1440** = wide buttons, outcome label LEFT, price + implied% RIGHT, ≥36px h (W4-24/
+    W1-25 parity): `[Arsenal            1.30 ·77%]`
+  · **390** = compact chips, label OVER price, ≥44px h, ≥8px gaps (P51-03): `[Arsenal 1.30·77%]`
+  Cell fill `--c-surface-2` + hairline; price hb-odds Oxanium `--c-brand-neon`; implied %
+  hb-micro **text-2** (meaning-bearing muted — post-crit token law; t3 is decorative-only);
+  selected = `--c-cta` fill + `--c-cta-fg` + ✓ (71 task 3, C-11).
+- **Suspended row (one encoding — DATA-CANON):** odds cells keep last prices at 60% opacity,
+  pointer-inert; an amber chip `🔒 Suspended — {reason}` (`--c-suspend` bg + dark `--c-cta-fg`-
+  class fg #2A1200) spans the odds zone; `+N ›` stays navigable (U-04, U-27, R-YAB-19;
+  W2-09/W2-26 parity + reason + last-price honesty). Never a dead button, never a padlock for
+  an odds CHANGE (changed = amber edge + `moved {old} → {new}` — different channel).
+- **Clock column honesty:** live = LIVE badge chip + `52'`/`HT`/`45+2'`; scheduled = `20:00` +
   `Tue, Oct 20`; never `0–0` for unstarted matches — countdown instead (U-39, T42-17).
 - **Sticky group headers** at 32–36px (T7-08); counts attached to every header/tab (U-28).
 - **Follow ★:** gold `--c-gold` filled = followed, outline text-3 = not; appears on
   competition headers, team rows, match cards — followable from EVERYWHERE (M4 ask, A37.S2).
+- **Canonical competition names:** `Premier League` · `Champions League` · `LaLiga` ·
+  `Serie A` · `Bundesliga` — country shown by the flag/crest mark, never prefixed into the
+  name (crit b naming drift).
 - **State in URL:** sport, competition filter, tab, market selection all serialise (U-45).
 - **Motion budget:** ≤4 simultaneous motions/viewport (P3); odds ticks = S1 tint+glyph decays
-  ~1s; real deltas only, never on mount (P52-22, P55-04).
+  ~1s; real deltas only, never on mount (P52-22, P55-04); live-badge dots are ONE synchronized
+  ambient class (single pulse timeline shared by all badges = 1 motion, crit b).
+- **Page difference the judge should see:** Live = a time-slice — "what is on NOW", filtered by
+  sport+competition; Football = a competition catalog — "the five leagues", organized by
+  tournament with market rebind + follow-first grouping. Same row atom, different question
+  (crit f).
 
 ---
 
@@ -45,39 +63,50 @@ starting soon → top competitions → upcoming tail.
 
 ```
 SPORT NAV   Home | ● Live 13 | Soccer | Tennis | Basketball | Baseball | Am. Football | Esports
-FAVOURITES  ★ Premier League ×   ⚽ Arsenal ×          [+ Add — via ★ anywhere]
+FAVOURITES  ★ Premier League ×   [crest] Arsenal ×     [+ Add — via ★ anywhere]
 LIVE NOW · 13 ─────────────────────────────────── View all live ›
-  ● LIVE 52'  Arsenal 1–0 Brighton        1.30 · 4.60 · 11.00      +115 ›
-  ● LIVE HT   Aston Villa 0–0 Fulham      2.25 · 2.90 · 3.60        +7 ›
-  ● LIVE 37'  Atlético 1–0 Sevilla   🔒 Suspended — dangerous attack +8 ›
+  ●LIVE 52'  Arsenal 1–0 Brighton    [Arsenal 1.30·77%][Draw 4.80·21%][Brighton 11.00·9%]  +75 ›
+  ●LIVE HT   Aston Villa 0–0 Fulham  [Aston Villa 2.25·44%][Draw 2.90·34%][Fulham 3.60·28%] +7 ›
+  ●LIVE 37'  Atlético 1–0 Sevilla    🔒 Suspended — re-pricing (last prices dimmed)  +8 ›
 FEATURED — featured fixtures, no promos               ‹ 1 / 5 ›
-  ┌ hero slide: Premier League · ● LIVE 52' · crests 48px · ARS 1–0 BHA
-    1.30 · 77% | 4.60 | 11.00        [View match] ·········· (dots) ┐
+  ┌ hero slide: Premier League · ●LIVE 52' · crests 48px · ARS 1–0 BHA
+    [Arsenal 1.30·77%][Draw 4.80·21%][Brighton 11.00·9%]   View match ›  ····· (dots) ┐
 YOUR MATCHES · 3 matches — from your follows                    Match result
-  16:30 Sun, Oct 18  Liverpool v Man Utd ★   1.65 · 4.00 · 4.33   +10 ›
-  20:00 Tue, Oct 20  Arsenal ★ v Inter       1.95 · 3.50 · 4.00    +8 ›
+  ●LIVE 52'  Arsenal ★ 1–0 Brighton   [Arsenal 1.30·77%][Draw 4.80·21%][Brighton 11.00·9%] +75 ›
+  16:30 Sun, Oct 18  Liverpool v Man Utd ★ [Liverpool 1.65·61%][Draw 4.40·23%][Man Utd 4.33·23%] +10 ›
+  20:00 Tue, Oct 20  Arsenal ★ v Inter  [Arsenal 1.95·51%][Draw 3.50·29%][Inter 4.00·25%]  +8 ›
 STARTING SOON — countdown blocks (real kickoffs only)
-  Kicks off in 04:12   Napoli v Milan        2.10 · 3.40 · 3.50    +12 ›
-  Kicks off in 18:47   Real Madrid v Bayern  2.20 · 3.70 · 2.90    +9 ›
+  Kicks off in 04:12   Napoli v Milan      [Napoli 2.10·48%][Draw 3.40·29%][Milan 3.50·29%] +12 ›
+  Tomorrow 20:00       Real Madrid v Bayern [R. Madrid 2.20·45%][Draw 3.70·27%][Bayern 2.90·34%] +9 ›
+  Tomorrow 14:00       Man City v Spurs     [Man City 1.50·67%][Draw 4.80·21%][Spurs 5.25·19%] +8 ›
 TOP COMPETITIONS — 5 league entries w/ live counts
-  England PL ·3 live | Champions League ·1 | LaLiga ·1 | Serie A ·1 | Bundesliga ·1
-UPCOMING EVENTS  17:00 Napoli v Milan …
+  Premier League ·3 live | Champions League ·1 | LaLiga ·1 | Serie A ·1 | Bundesliga ·1
+UPCOMING EVENTS
+  Sat 17:30  Valencia v Getafe  [Valencia 2.30·43%][Draw 3.20·31%][Getafe 3.30·30%]  +7 ›
 ```
 
-Copy notes: `LIVE NOW · 13` count = rail badge parity; `Kicks off in 04:12` is Oxanium hb-clock
-on a `--c-surface-1` chip (R-YAB-12: countdowns only to real events); `View all live ›` deep-links
-`/live`. Section hairlines only; zero promo surfaces in first viewport (T42-14 fold audit).
+Copy notes: `LIVE NOW · 13` count = rail badge parity; `Kicks off in …`/`Tomorrow HH:MM` are
+Oxanium hb-clock chips (R-YAB-12: countdowns only to real events; <24h shows the countdown,
+≥24h shows the day-time — one chip, no layout shift at flip); `View all live ›` deep-links
+`/live`. Cells drawn as desk anatomy (label-left, price+implied-right). Section hairlines only;
+zero promo surfaces in first viewport (T42-14 fold audit). Prices: see overround table, foot.
 
-Attention (A11): 1) live strip first row prices · 2) hero crests+score · 3) pale-cyan View match.
+Attention (A11): 1) live strip first row prices · 2) hero crests+score · 3) `View match ›`.
+The slide's CTA is a SECONDARY text-link (44px hit), not a cta fill — pale-cyan acting fills
+are rationed to selected cells + the slip pill + Deposit per viewport (crit f pale-cyan stack).
 Taps to any market: home → price tap = 1; → match page = 2 (A20.b).
 
 ## HM-02 — 390 arrival
 
-Top bar + sport row (SH-04). Board stacks the same order; differences:
-- Live strip = horizontal scroll of compact live cards (`● LIVE 52'` + score + 1X2 mini cells),
-  edge fades; next card peeks 24px (W1-09 pattern).
+Top bar + sport row (SH-04), then the content search bar `⌕ Search teams, players or leagues`
+(W1-01 — present on every phone board; focuses the SH-06 palette). Board stacks the same order;
+differences:
+- Live strip = **up to 2 compact list rows** + `View all live ›` — vertical rhythm, NOT a
+  horizontal scroller (crit f: two stacked swipe surfaces back-to-back was gesture sameness;
+  the hero keeps the only swipe on the page). Peek affordance is the 3rd row's top edge.
 - Hero slideshow = full-bleed single card, swipe-snap + dots; no ‹ › buttons at 390 (thumb
-  swipe instead — P5); auto-advance OFF (P51-02 removes rotation; manual only, pause exists).
+  swipe instead — P5); auto-advance OFF (P51-02; manual only — and since nothing auto-plays,
+  no pause control is drawn, crit f). `View match ›` is a secondary link per HM-01 note.
 - `Your matches` renders as the phone card variant (W1-06 anatomy); `Top competitions` = 5
   list rows with crest mark + name + `· N live` + `›`, not tiles (progressive density, U-17).
 
@@ -110,19 +139,23 @@ dims (S8 calm-live).
 
 ```
 ‹  Live now · 13 in play                    Scores may be delayed ~seconds (U-15 honesty)
+⌕ Search teams, players or leagues
 Filters:  All 13 | Soccer 6 | Tennis 3 | Basketball 1 | Baseball 1 | Am. Football 1 | Esports 1
-          [All competitions ▾]                                   Session 47 min · Net −24.00
+          [All competitions ▾]                          Session 47 min · net −12.00 USDT
 
-● Premier League · 3 matches ★                                    View all ›
-  ● LIVE 52'  Arsenal 1–0 Brighton          1.30 | 4.60 | 11.00  +115 ›
-  ● LIVE HT   Aston Villa 0–0 Fulham        2.25 | 2.90 | 3.60    +7 ›
-  ● LIVE 58'  Newcastle 2–1 Everton   🔒 Suspended — dangerous attack +6 ›
-● LaLiga · 1 match ☆                                            View all ›
-  ● LIVE 37'  Atlético 1–0 Sevilla    🔒 Suspended — re-pricing   +8 ›
-● Serie A · 1 match ☆                                           View all ›
-  ● LIVE 49'  Juventus 1–1 Roma             2.40 | 3.10 | 3.20    +6 ›
-● Bundesliga · 1 match ☆ …
+Premier League · 3 matches ★                                    View all ›
+  ●LIVE 52'  Arsenal 1–0 Brighton    [Arsenal 1.30·77%][Draw 4.80·21%][Brighton 11.00·9%] +75 ›
+  ●LIVE HT   Aston Villa 0–0 Fulham  [Aston Villa 2.25·44%][Draw 2.90·34%][Fulham 3.60·28%] +7 ›
+  ●LIVE 58'  Newcastle 2–1 Everton   ░1.90 3.40 4.20░ 🔒 Suspended — dangerous attack      +6 ›
+LaLiga · 1 match ☆                                              View all ›
+  ●LIVE 37'  Atlético 1–0 Sevilla    ░1.55 4.00 6.00░ 🔒 Suspended — re-pricing            +8 ›
+Serie A · 1 match ☆                                             View all ›
+  ●LIVE 49'  Juventus 1–1 Roma       [Juventus 2.40·42%][Draw 3.10·32%][Roma 3.20·31%]    +6 ›
+Bundesliga · 1 match ☆ …
 ```
+
+░ = last prices at 60%, pointer-inert, under the amber chip (one suspended encoding —
+DATA-CANON; `+N ›` stays navigable).
 
 - Competition groups = live events grouped by tournament (R-YAB-05 chunking); followed comps
   sort first after PL (follows-first, T42-15).
@@ -137,10 +170,13 @@ Filters:  All 13 | Soccer 6 | Tennis 3 | Basketball 1 | Baseball 1 | Am. Footbal
 
 ## LV-02 — 390 folded
 
-`‹` + `Live now` pill header (W2-01). Sport chips scroll; competition filter becomes a sheet
-dropdown. Group cards keep the phone anatomy; suspended band identical (`🔒 Suspended —
-dangerous attack`). Slip pill floats above bottom nav when legs exist. One-thumb audit: chips
-and first odds row inside lower-2/3 reach band (P5, U-18).
+`‹` + `Live now` pill header (W2-01) + content search bar (W2-02 — `⌕ Search teams, players
+or leagues`). Sport chips scroll; competition filter becomes a sheet dropdown. Group cards
+keep the phone anatomy; suspended chip identical (`🔒 Suspended — dangerous attack` over
+dimmed last prices). Slip pill floats above bottom nav when legs exist. Reach audit (P5,
+U-18): the per-tap money targets — first odds row, `+N ›`, slip pill — sit in the lower-2/3
+thumb band; filter chips ride the top as occasional configuration, not per-tap actions —
+deliberate, not a violation (corrects the earlier "chips in reach" claim, crit e).
 
 ## LV-03 — NOTHING LIVE → Starting soon (the brief's empty ask, X05, P52-23)
 
@@ -151,9 +187,9 @@ Filters: All 0 | Soccer 0 | …           (chips render but disabled, counts hon
   Nothing in play right now — starting soon below        (COPY.md verbatim)
 
 STARTING SOON
-  Kicks off in 04:12   Napoli v Milan        2.10 · 3.40 · 3.50   +12 ›   [Countdown pill]
-  Kicks off in 18:47   Real Madrid v Bayern  2.20 · 3.70 · 2.90   +9 ›
-  Tomorrow 14:00       Man City v Spurs      1.50 · 4.50 · 5.25   +8 ›
+  Kicks off in 04:12   Napoli v Milan        [2.10·48%][3.40·29%][3.50·29%]   +12 ›
+  Tomorrow 14:00       Man City v Spurs      [1.50·67%][4.80·21%][5.25·19%]   +8 ›
+  Tomorrow 20:00       Real Madrid v Bayern  [2.20·45%][3.70·27%][2.90·34%]   +9 ›
 ```
 
 Next kickoff countdown pills are the art — real fixtures only, never fabricated filler
@@ -182,16 +218,17 @@ Counts on remaining chips dim but stay (context), per progressive-disclosure rul
 
 ```
 ‹  Soccer ▾   5 competitions · 6 live              Market: [Match result ▾]
+⌕ Search teams, players or leagues
 Tabs:  [ Live & Upcoming 6 | All Soccer ]                     [All competitions ▾]
 
-England Premier League · 10 matches ★                    Match result · View all 10 ›
-  ● LIVE 52'  Arsenal 1–0 Brighton          1.30 | 4.60 | 11.00  +115 ›
-  ● LIVE HT   Aston Villa 0–0 Fulham        2.25 | 2.90 | 3.60    +7 ›
-  ● LIVE 58'  Newcastle 2–1 Everton   🔒 Suspended — VAR review  +6 ›
+Premier League · 10 matches ★                            Match result · View all 10 ›
+  ●LIVE 52'  Arsenal 1–0 Brighton    [Arsenal 1.30·77%][Draw 4.80·21%][Brighton 11.00·9%] +75 ›
+  ●LIVE HT   Aston Villa 0–0 Fulham  [Aston Villa 2.25·44%][Draw 2.90·34%][Fulham 3.60·28%] +7 ›
+  ●LIVE 58'  Newcastle 2–1 Everton   ░1.90 3.40 4.20░ 🔒 Suspended — dangerous attack      +6 ›
 Champions League · 4 matches ☆                           Match result · Show all 4 ›
-  20:00 Tue, Oct 20   Arsenal v Inter        1.95 | 3.50 | 4.00   +8 ›
-  20:00 Tue, Oct 20   Real Madrid v Bayern   2.20 | 3.70 | 2.90   +9 ›
-  20:00 Wed, Oct 21   Barcelona v PSG        2.05 | 3.80 | 3.30   +8 ›
+  20:00 Tue, Oct 20   Arsenal v Inter      [Arsenal 1.95·51%][Draw 3.50·29%][Inter 4.00·25%] +8 ›
+  20:00 Tue, Oct 20   Real Madrid v Bayern [R. Madrid 2.20·45%][Draw 3.70·27%][Bayern 2.90·34%] +9 ›
+  20:00 Wed, Oct 21   Barcelona v PSG      [Barcelona 2.05·49%][Draw 3.80·26%][PSG 3.30·30%] +8 ›
 LaLiga · 4 matches ☆    Serie A · 3 matches ☆    Bundesliga · 4 matches ☆  (all five — brief)
 ```
 
@@ -215,7 +252,8 @@ LaLiga · 4 matches ☆    Serie A · 3 matches ☆    Bundesliga · 4 matches �
 
 ## FB-02 — 390 folded
 
-`‹` + `Soccer ⌄` sport-switcher + `≡` market/filter button (W3-01). Segmented tabs
+`‹` + `Soccer ⌄` sport-switcher + `≡` market/filter button (W3-01) + content search bar
+(W3-02 — `⌕ Search teams, players or leagues`). Segmented tabs
 `Live & Upcoming 6 | All Soccer` full-width. Groups = phone card anatomy; mixed
 live/upcoming identical order. `All N ›` per header. Market rebind lives under `≡` sheet
 (`Market: Match result ✓ / Both teams to score / Total goals`) — 2 taps to rebind (U-16).
@@ -242,6 +280,32 @@ W3-21 tabs+dropdown, W3-22/23/24 five groups all present at both widths.
 ## Board loading + offline variants (all three pages)
 
 - **Skeleton:** per HM-04 — real markup + `is-loading`, exact geometry, opacity-only (X04).
-- **Offline:** board keeps last data; clocks freeze; cells inert + `Frozen` captions; toast per
-  SH-07. Reconnect revalidates and flashes only real deltas.
+- **Offline:** board keeps last data; clocks freeze; cells inert + `Frozen` captions; banner
+  per SH-07 (cloud-slash glyph + COPY line — never the suspended chip).
 - **Route return:** scroll + active tab/filter restored (U-20); entrances never replay (U-37).
+
+---
+
+## Fixture overround register (P6/X07 law: every book prices 103–107%)
+
+Computed as Σ(1/price). Three fixtures repriced post-crit (were 107.8–108.7%); flagship Draw
+moved 4.60→4.80 per DATA-CANON/D-21 — team prices stay wireframe-true.
+
+| Fixture | 1 / X / 2 | Overround | Note |
+|---|---|---|---|
+| Arsenal v Brighton | 1.30 / 4.80 / 11.00 | 76.9+20.8+9.1 = **106.85%** | repriced (was 4.60 → 107.8%) — D-21 |
+| Liverpool v Man Utd | 1.65 / 4.40 / 4.33 | 60.6+22.7+23.1 = **106.43%** | repriced (was 4.00 → 108.7%) |
+| Man City v Spurs | 1.50 / 4.80 / 5.25 | 66.7+20.8+19.0 = **106.55%** | repriced (was 4.50 → 107.9%) |
+| Real Madrid v Bayern | 2.20 / 3.70 / 2.90 | 45.5+27.0+34.5 = **106.96%** | in band, boundary |
+| Aston Villa v Fulham | 2.25 / 2.90 / 3.60 | 44.4+34.5+27.8 = **106.70%** | ok |
+| Newcastle v Everton (last prices, suspended) | 1.90 / 3.40 / 4.20 | 52.6+29.4+23.8 = **105.85%** | ok |
+| Atlético v Sevilla (last prices, suspended) | 1.55 / 4.00 / 6.00 | 64.5+25.0+16.7 = **106.19%** | ok |
+| Arsenal v Inter | 1.95 / 3.50 / 4.00 | 51.3+28.6+25.0 = **104.85%** | ok |
+| Barcelona v PSG | 2.05 / 3.80 / 3.30 | 48.8+26.3+30.3 = **105.40%** | ok |
+| Juventus v Roma | 2.40 / 3.10 / 3.20 | 41.7+32.3+31.3 = **105.18%** | ok |
+| Napoli v Milan | 2.10 / 3.40 / 3.50 | 47.6+29.4+28.6 = **105.60%** | ok |
+| Valencia v Getafe | 2.30 / 3.20 / 3.30 | 43.5+31.3+30.3 = **105.03%** | ok |
+
+Suspended rows show last prices — those books also priced in-band when open. Any new fixture
+added to sample data must pass this table's arithmetic before a storyboard draws it (X07.S1:
+overround measured ∈ 103–107%).

@@ -15,7 +15,11 @@ Space legend: 4·8·12·16·20·24·32·48·64 scale; radius r-sm 4 / r-md 8 / r
 WHERE: right column, fixed 360 px, full height below top bar, docked to right edge; never overlaps
 the board (MENTAL-MAP rule 1). Order: tabs → scroll body → sticky footer (CTA + RG strip).
 WHY: BETBY/Housebets convention + every rival (bet365/FanDuel/DK right rail, A19.b familiar list);
-P5 — persistent zone, ticket reachable blind. U-11 persistence.
+P5 — persistent zone, ticket reachable blind. U-11 persistence. A2.c parity drops, written:
+wireframe anchors the slip stack to panel BOTTOM — we top-anchor with a sticky CTA footer because
+the zone reads as a docked ledger (Salaja sticky-chrome law: pinned chrome gets hairline +
+scroll-padding), and the wireframe's palm-avatar promo slot inside the panel is a banned promo
+surface (out-of-scope list) — dropped with reason, not merged silently.
 SIZE: 360 px wide; body padding 16; card gaps 12; footer padding 16 16 12; header tabs 48 tall.
 TYPE: zone title n/a — tabs hb-body 14/20 600.
 COLOUR: bg --c-surface-1; hairline border-left 1 px --c-surface-3 on bg --c-bg.
@@ -35,22 +39,26 @@ WHY: brief verbatim "a bar at the bottom" + W5-02 parity; U-29 pill shows the PI
 P5 one-thumb reach; Theo (P-C) reads his pick without opening anything. BETBY/Stake bottom-bar
 convention exceeded: ours carries live state, theirs carries a count.
 SIZE: full-width −24, height 52, radius r-pill, padding 0 16 0 12; chevron hit 44×44.
-TYPE: pick `Arsenal @ 1.30` hb-body 14/20 600 Figtree + odds Oxanium 600 hb-odds 15/20; count badge
-hb-label 12/16.
+TYPE: pick payload `●1 Arsenal @1.30` (DATA-CANON spelling, no space before @) hb-body 14/20 600
+Figtree + odds Oxanium 600 hb-odds 15/20; open-bet payload `●1 Arsenal · 1–0 · 52' · CO 22.40`;
+count badge hb-label 12/16 Oxanium; expand chevron = `⌃` glyph — NEVER `▲` (that glyph means
+odds-up, one-glyph-one-meaning U-41).
 COLOUR: pick state = --c-cta fill, --c-cta-fg text (W5-02's pale bar = judge's own token, D-01);
 open-bet state = --c-surface-1 fill, --c-text text (quieter — the pick asks, the bet reports);
-changed = same fill + 2 px --c-suspend left edge; suspended/break/offline = --c-surface-1 + glyph.
+changed = same fill + 2 px --c-suspend left edge + `moved {old} → {new}` payload (canon grammar);
+suspended = --c-surface-1 + padlock; break = --c-surface-1 `On a break · back 22:40`; offline =
+--c-surface-1 + cloud-slash glyph (canon one-encoding).
 BORDER/RADIUS/ELEV: r-pill; floating → translucent 1 px ring + the one allowed 8/24 shadow (72).
 MOTION: appears 200 ms out-expo scale(0.95)→1 (U-37); pill→sheet is a container transform along
 drag axis (E-03); content swaps (pick→open-bet after placement) cross-fade 150 ms. Interruptible.
 RM: opacity cross-fade.
 THINKS: "my pick/bet is down there" / EXPECTS: tap or drag opens it / WE SHOW: the pick's name +
-price + live minute in one line; state glyphs 🔒/❄ without words hidden / NEXT: open sheet —
-one tap or one flick (P4).
+price + live minute + CO quote in one line; state glyphs 🔒/cloud-slash never words hidden / NEXT:
+open sheet — one tap or one flick (P4).
 FAIL: sheet fails mid-drag → settles back to pill, no penalty (P4); price moves while closed →
 pill edge goes amber, announced not hidden.
-A11Y: `role="button"` `aria-label="Ticket: Arsenal at 1.30, 1 selection"` state words read not
-hue; expanded state via aria-expanded; live-region polite on price change.
+A11Y: `role="button"` `aria-haspopup="dialog"` `aria-expanded` `aria-label="Ticket: Arsenal at
+1.30, 1 selection"` — state words read not hue; live-region polite on price change.
 EVIDENCE: pending build. CHALLENGE: pending critic.
 
 ### E-03 · Slip sheet · PAGE shared-slip · STATES: open / dragging / settling (390 only)
@@ -71,29 +79,36 @@ THINKS: "I want to check my ticket" / EXPECTS: it follows my thumb / WE SHOW: sh
 finger; release decides / NEXT: stake or review — content, zero taps.
 FAIL: interrupted gesture always resolves open or closed, never between; content taller than 80 dvh
 scrolls internally.
-A11Y: `role="dialog"` non-modal label "Bet slip"; Esc closes; focus returns to pill (Salaja);
-drag has click+keyboard twins (open via tap, close via ✕/Esc/scrim).
+A11Y: `role="dialog"` label "Bet slip"; while open the board + bottom nav go `inert` (keyboard
+cannot tab the dimmed board); entry focus → sheet tablist; Esc/scrim-close → focus returns to
+the pill (Salaja focus-return law); drag has click+keyboard twins (open via tap, close via
+✕/Esc/scrim).
 EVIDENCE: pending build. CHALLENGE: pending critic.
 
-### E-04 · Ticket tabs (Bet slip n | My bets n | Chat | ✕) · STATES: active / inactive / badge-pulse
-WHERE: sheet/panel header row, order per W5-04: `Bet slip` `My bets` `Chat` + ✕ right; badges carry
-counts (slip = selections, My bets = open bets).
+### E-04 · Ticket tabs (Bet slip n | My bets n | ✕) · STATES: active / inactive / badge-pulse / ask-dot
+WHERE: sheet/panel header row: `Bet slip` `My bets` + ✕ right; badges carry counts (slip =
+selections, My bets = open bets).
 WHY: wireframe parity W5-04/W5-20/W6 (My bets lives as tab AND page — U-23 reachability); counts
-upfront (U-28). Chat kept — no wireframe element dropped (A2.c).
+upfront (U-28). **Chat tab: CUT — written reason per A2.c:** Chat already owns a dedicated bottom-nav
+tab on 390 (W-shared shell) and the rail/footer on 1440; duplicating it inside the money surface
+creates a non-money path inside the trust surface and a third competing tab for one pick. The
+ticket zone is money-only.
 SIZE: tab hit ≥44×44; badges min 20×20; row height 48; gap 16.
-TYPE: hb-body 14/20; active 600, inactive 400; badge hb-label 12/16 Oxanium-ish numerals.
+TYPE: hb-body 14/20; active 600, inactive 400; badge hb-label 12/16 Oxanium numerals.
 COLOUR: active --c-text on --c-surface-3 pill; inactive --c-text-2; badge slip = --c-cta/--c-cta-fg,
-My bets = --c-surface-3/--c-text (W5-04 blue+mint badges → our pale-cyan + surface).
+My bets = --c-surface-3/--c-text; **ask-dot** = 8 px --c-suspend dot on the Bet slip tab whenever a
+leg awaits odds-change consent (announced on the tab the player is NOT on — crit #25).
 BORDER: r-pill on active indicator; none elsewhere.
 MOTION: active indicator slides 200 ms ease-standard (directional — fly, don't teleport, Family);
 badge +1 pulse once on placed bet traveling home (U-36). Repeat tab visits = zero animation (U-43).
 RM: cross-fade.
 THINKS: "where did my bet go" → the badge answers before they ask (P-B Ana's exit trigger) /
-EXPECTS: tabs switch content / WE SHOW: instant swap, badge counts / NEXT: open bet row — 1 tap.
-FAIL: count desync → authoritative server state on refocus; Chat tab empty-shell banned → ships
-with stub copy or ships cut (challenge flag).
-A11Y: `role="tablist"` + `tab` + `tabpanel`, arrow-key roving, aria-selected; badge in tab label.
-EVIDENCE: pending build. CHALLENGE: pending critic — Chat tab scope unpriced.
+EXPECTS: tabs switch content / WE SHOW: instant swap, badge counts, amber dot if the slip needs an
+answer / NEXT: open bet row — 1 tap.
+FAIL: count desync → authoritative server state on refocus.
+A11Y: `role="tablist"` + `tab` + `tabpanel`, arrow-key roving, aria-selected; badge + ask-dot in
+tab label ("Bet slip, 1 selection, attention needed").
+EVIDENCE: pending build. CHALLENGE: pending critic.
 
 ---
 
@@ -107,9 +122,10 @@ WHY: P1 — price is the product: pick name + price + implied% lead the card; W5
 CO badge (U-05), min/max (U-10).
 SIZE: card padding 12; name+price row 24; sub-line 16; stake row 48; ✕ hit 44×44 pseudo-expanded.
 TYPE: name hb-h1 16/20 600; price Oxanium 700 hb-odds 15/20 fixed-width cell; implied hb-odds-sm
-13/16; sub-line hb-body-sec 13/18 (score+minute --c-live word+dot, never color alone, U-41).
-COLOUR: card bg --c-surface-2; price --c-text; implied --c-text-2; sub-line --c-text-2 with --c-live
-status; ✕ --c-text-3.
+13/16 --c-text-2 (content-bearing, crit #2); sub-line hb-body-sec 13/18 with live score+minute in
+--c-live badge (bg #FF4D6D, fg #14060A — token pair, word+score never color alone, U-41).
+COLOUR: card bg --c-surface-2; price --c-text; implied --c-text-2; sub-line --c-text-2; ✕ --c-text-2
+(control glyph, not decoration — text-3 = 2.09:1 measured fails).
 BORDER: r-md 8 (dominant, TOKENS); 1 px hairline --c-surface-3; no card-in-card (stake field is a
 row, not a nested card).
 MOTION: card enters via S2 flight only on explicit add; price ticks S1 (NumberFlow trend=0, 250 ms,
@@ -120,24 +136,29 @@ FAIL: leg data stale → frozen-marked honestly (offline) or reason chip (suspen
 price shown as live.
 A11Y: `role="group"` `aria-label="Selection: Arsenal to win, 1.30, 77 percent implied"`; ✕
 `aria-label="Remove Arsenal"`; price changes announced `aria-live="polite"` throttled ≥2 s.
+Retap on a selected odds cell removes the pick (E-34 reverse flight).
 EVIDENCE: pending build. CHALLENGE: pending critic.
 
-### E-06 · Selection card · STATE: changed-better (auto-accepted)
-WHERE: same slot; difference = fact line under name row + ▲ glyph + up-tint on price cell.
+### E-06 · Selection card · STATE: changed-auto-accepted (better OR worse under consenting mode)
+WHERE: same slot; difference = fact line under name row + direction glyph + tint on price cell.
 WHY: D-03 default accept-better-only — consent pre-given, announced as fact not asked (P2:
 announced in-frame with reason + consent affordance already set). Ends the rejection loop on
-good news (70§1 #1 verbatim pain).
+good news (70§1 #1 verbatim pain). **The SAME announced grammar covers worse moves under
+`Any change` mode — silent-on-bad-news is a P2 hole even when consent was pre-given (crit #5).**
 SIZE: fact line 20 tall, hb-body-sec.
-TYPE: `Moved 1.30 → 1.45 · better — accepted` ★ hb-body-sec; old price struck through in-line.
-COLOUR: fact text --c-text-2; ▲ + price tint --c-up (triple-coded: glyph+word+color, U-41, Marco).
-BORDER: unchanged — good news gets no alarming edge (P3 calm).
+TYPE: better: `Moved 1.30 → 1.45 · better — accepted` ★ hb-body-sec; worse under Any-change:
+`Moved 1.30 → 1.22 · worse — accepted` ★ — same line, one encoding; old price struck through.
+COLOUR: better = fact --c-text-2 + ▲/--c-up tint; worse-accepted = fact --c-text-2 + ▼/--c-down
+tint + 2 px --c-suspend edge flash that decays (announced, but consent was pre-given — no buttons).
+BORDER: unchanged on better; worse-accepted carries the amber edge for ~1 s then reverts (the
+encoding says "it moved against you and your setting took it").
 MOTION: S1 digit morph + tint decay ~1 s; fact line fades in 200 ms, persists until next event.
 Newest tick supersedes. RM: instant swap + glyph.
-THINKS: "price moved — did I get screwed?" / EXPECTS: to know instantly / WE SHOW: better — already
-accepted, returns recalced / NEXT: place — CTA still armed, zero extra taps (the rival flow costs
-one tap per move).
+THINKS: "price moved — did I get screwed?" / EXPECTS: to know instantly, better OR worse / WE SHOW:
+the delta + which way + that the mode handled it / NEXT: place — CTA still armed, zero extra taps;
+or switch mode via E-09 — one tap.
 FAIL: two moves in flight → newest state wins, fact line shows last delta only.
-A11Y: live-region: "Odds moved 1.30 to 1.45, accepted".
+A11Y: live-region: "Odds moved 1.30 to 1.22, accepted at worse price" — direction always in words.
 EVIDENCE: pending build. CHALLENGE: pending critic.
 
 ### E-07 · Selection card · STATE: changed-worse (consent required)
@@ -152,15 +173,17 @@ TYPE: banner `Odds moved {old} → {new} while you were deciding` hb-body 600; `
 COLOUR: edge --c-suspend (amber reserved for money-integrity, TOKENS allowed use); banner --c-text;
 Accept fill --c-cta/--c-cta-fg (pale-cyan acts, D-01); Remove text-button.
 BORDER: amber edge inside r-md; banner no box (edge carries the signal — no nested cards).
-MOTION: edge appears 0 ms; gentle edge-pulse ≤1 Hz ONLY while awaiting, stops on sheet close or
-answer (74); Accept → re-arm 150 ms; Remove → card exits 160 ms + undo affordance. Interruptible.
-RM: static edge + label, no pulse.
+MOTION: edge + banner appear 0 ms — NO edge-pulse: P3's own example bans "pulsing anywhere near
+money" and a pulsing ask manufactures urgency on a consent step (crit #8; MOTION.md's
+awaiting-pulse line is superseded here — flagged to lead). Accept → re-arm 150 ms; Remove →
+card exits 160 ms + undo affordance. Interruptible. RM: identical (static anyway).
 THINKS: "it got worse — do I still want it" / EXPECTS: a real choice, not a fait accompli / WE
 SHOW: old→new + implied delta + two buttons / NEXT: accept or remove — one tap, in-place.
 FAIL: price moves again while awaiting → newest wins, banner re-bases to latest (no queue, U-56);
 place attempted while unanswered → CTA blocker explains (E-13d).
 A11Y: banner `role="alert"` once (not spammed); buttons labeled "Accept 1.22" / "Remove Arsenal".
-EVIDENCE: pending build. CHALLENGE: pending critic.
+EVIDENCE: pending build. CHALLENGE: open question for lead — MOTION.md S-table still lists
+"edge-pulse while awaiting"; recommend amending it (P3 precedence) or documenting the carve-out.
 
 ### E-08 · Selection card · STATE: suspended
 WHERE: same card, 0 ms same-frame: 60% dim + padlock + reason chip; last price stays visible dimmed
@@ -168,10 +191,10 @@ WHERE: same card, 0 ms same-frame: 60% dim + padlock + reason chip; last price s
 WHY: S3 + U-04 + F29 (unexplained suspensions are the trust-destructive version); 70§2 "no obvious
 reason" complaints; W2-09's `🔒 Suspended` bar convention lifted into the leg.
 SIZE: dim overlay = card bounds; chip h24; lock glyph 20 px grid.
-TYPE: `This pick is suspended — dangerous attack` hb-body-sec 600 on chip; last price dimmed same
-type scale (never hidden — the price was real).
-COLOUR: chip --c-suspend bg 15% + --c-suspend text? No — amber band per U-27: chip fill --c-suspend
-at surface-mix, text --c-text on it (contrast checked ≥4.5); card fg →60% opacity equivalent.
+TYPE: `Suspended — dangerous attack` hb-body-sec 600 on chip + card-local `This pick is suspended`
+label; last price dimmed same type scale (never hidden — the price was real).
+COLOUR: chip = --c-suspend bg (#E17823) + #2A1200 dark fg — the canon token pair, no color-mix
+values (A23.a tokens-only); card fg →60% opacity equivalent; padlock --c-text-2.
 BORDER: unchanged r-md; lock inline-left of chip.
 MOTION: S3 — 0 ms, no lock animation (integrity, MOTION.md). Reopen: 150 ms un-dim + price tick +
 direction glyph (U-04). RM identical.
@@ -183,8 +206,9 @@ A11Y: `aria-disabled` + status text "Suspended — dangerous attack" on card lab
 EVIDENCE: pending build. CHALLENGE: pending critic.
 
 ### E-09 · Odds-change mode control · STATES: Better only (default) / Any change / Ask every time
-WHERE: slip body above CTA, one quiet line `Odds changes: Better only ▾`; opens in-place 3-option
-row (no dialog-on-dialog, U-44).
+WHERE: ONE placement, both sizes: consent stack ABOVE the CTA (totals block → mode line → balance
+line → CTA), `Odds changes: Better only ▾`; opens in-place 3-option row (no dialog-on-dialog,
+U-44). `Any change` mode uses the E-06 worse-accepted announcement — never silent.
 WHY: U-02 3-mode preference; D-03; rival precedent = FanDuel's hidden slip gear + Sportsbet.io's
 broken toggle — ours is visible, word-labeled, and actually controls behavior (P2 consent
 affordance surfaced, not buried).
@@ -209,9 +233,10 @@ WHY: U-09/U-10 fat-finger-proofing (the $1,008 X-submits bug, 70§1); FanDuel du
 → ours pairs field with chips + limits printed upfront. Iris (P-D) needs currency clarity — USDT
 suffix in-field.
 SIZE: field h48 min-width 120; right-aligned numeral; padding 0 12; error line 18 below card.
-TYPE: numeral Oxanium 600 hb-odds 15/20, ≥16 px input (iOS zoom law, Salaja); errors hb-body-sec.
-COLOUR: field --c-surface-3 on card; focus ring --c-focus 2 px offset 2; error text --c-down +
-⚠ icon (never red alone); suffix `USDT` --c-text-3.
+TYPE: numeral Oxanium 600 at 16/20 (hb-h1 size step — ≥16 px input or iOS focus-zooms, crit #4);
+errors hb-body-sec.
+COLOUR: field --c-surface-3 on card; focus ring --c-focus 2 px offset 2; error text --c-down
+(#FF6B86) + ⚠ icon (never red alone); suffix `USDT` --c-text-2 (content-bearing).
 BORDER: r-sm 4 inside r-md card; 1 px --c-surface-3 hairline, error → --c-down.
 MOTION: focus ring 0 ms (Salaja hover/focus instant); error line slides 150 ms; values never
 animate typing (frequent = no animation, U-43); on blur normalize formatting 150 ms fade.
@@ -219,9 +244,11 @@ RM: identical.
 THINKS: "how much do I risk" / EXPECTS: limits visible before I type (kills invisible-limit pain
 70§1) / WE SHOW: `Min 1.00 · max 5,000 USDT` ★ under field; typed value echoed instantly into
 Returns + CTA / NEXT: confirm — CTA shows the same number (read twice = fat-finger tripwire).
-FAIL: >balance → `More than your balance (240.00 USDT)` + `Add funds (demo)` + Max chip sets
-240.00; zero → `Enter a stake — min 1.00 USDT` ★; >2dp → `Two decimals max` ★, value kept not
-wiped; paste → accepted messy, normalized on blur; suspend → field disabled, value preserved.
+FAIL: >available → `More than your balance (180.00 USDT)` + `Add funds (demo)` + Max chip sets
+180.00 (available, not the 240 total); zero → `Enter a stake — min 1.00 USDT` ★; >2dp →
+**displayed = billed (canon law):** extra decimals are rejected at input — field can't hold more
+than 2dp, error `Two decimals max` ★ shows; pasted 6dp normalizes the FIELD to `10.55` on blur so
+the number seen is the number billed; suspend → field disabled, value preserved.
 A11Y: `inputmode="decimal"`, `aria-label="Stake in USDT"`, `aria-describedby` min/max + error;
 error `role="alert"`; Enter submits form once.
 EVIDENCE: pending build. CHALLENGE: pending critic.
@@ -236,32 +263,36 @@ COLOUR: --c-surface-3 fill / --c-text; pressed :active scale .98 + --c-surface-2
 pre-highlighted (their widget highlights 50 — a default stake is a bet the operator makes for you,
 BIT audit: container defaults are operator bets — we refuse it).
 BORDER: r-pill chips? No — r-md keeps one radius thesis (72: no pill rows / encoding discipline).
-MOTION: press 120 ms feedback; repeat taps zero animation (U-43); chip-adds-sum behavior: chip taps
-ADD to current stake? NO — chips SET absolute value (addition = surprise machine, P2); Max sets
-balance. RM: same.
+MOTION: press 120 ms feedback; repeat taps zero animation (U-43); chips SET absolute value —
+addition is a surprise machine (P2); Max sets available balance 180.00. RM: same.
 THINKS: "round number, fast" / EXPECTS: tap = set / WE SHOW: field + returns + CTA update in same
 frame / NEXT: place — CTA one tap below.
-FAIL: chip > balance → chip disabled (chips render per-balance); Max at 0 balance → disabled +
-balance line explains.
-A11Y: `role="button"` `aria-label="Set stake to 50 USDT"`; Max labeled "Set stake to balance
-240 USDT".
+FAIL: chip > available (180.00) → chip disabled (chips render per-available, not total); Max at 0
+available → disabled + balance line explains.
+A11Y: `role="button"` `aria-label="Set stake to 50 USDT"`; Max labeled "Set stake to available
+balance 180 USDT".
 EVIDENCE: pending build. CHALLENGE: pending critic.
 
 ### E-12 · Returns / implied / net block · STATE: computed
-WHERE: slip totals, above CTA, order: Total stake ₮ → Returns·implied → If-it-loses → delay note.
-WHY: W5-09 totals parity (Total stake / Payout with ₮); P1 price-is-product; F11/U-48 loss-framed
+WHERE: consent stack order (one order, both sizes): totals block (Total stake → Returns·implied →
+If-it-loses → delay note) → odds-change mode line (E-09) → balance line (E-19) → CTA.
+WHY: W5-09 totals parity (Total stake / Payout); P1 price-is-product; F11/U-48 loss-framed
 context — the only framing that improved comprehension in BIT RCT; U-47 implied beside returns.
+A2.c parity drop: wireframe's ₮ icon is a decorative glyph duplicating the unit word — ONE currency
+convention everywhere: `X.XX USDT` text (COPY's money strings already say USDT).
 SIZE: rows h20 each, 8 rhythm; numerals right-aligned in fixed cells.
-TYPE: labels hb-body-sec; values Oxanium 600 hb-odds; ₮ icon 16.
+TYPE: labels hb-body-sec; values Oxanium 600 hb-odds; `USDT` unit --c-text-2.
 COLOUR: labels --c-text-2; values --c-text; net-if-lost --c-text-2 (factual, not red — it's
 arithmetic not alarm; red reserved for errors, U-54 factual losses).
 BORDER: hairline top separator.
 MOTION: values NumberFlow on change tint-only (S7 mechanism); zero animation on chip repeats.
 RM: instant values.
-THINKS: "what do I get, what do I risk" / EXPECTS: honest math / WE SHOW: `Returns 26.00 USDT ·
-implied 77%` + `If it loses: −20.00 USDT` ★ + `In-play delay applies` ★ on live legs / NEXT: CTA.
+THINKS: "what do I get, what do I risk" / EXPECTS: honest math / WE SHOW: `Returns 13.00 USDT ·
+implied 77%` + `If it loses: −10.00 USDT` ★ + `In-play delay applies` ★ on live legs / NEXT: CTA.
 FAIL: price moves → all values recompute in one frame, never partial arithmetic.
-A11Y: totals in `role="status"` summary "Total stake 20, returns 26, implied 77 percent".
+A11Y: visual ticks are SILENT — summary announces on commit/blur or coalesced ≥2 s, never per
+NumberFlow tick (crit #12, Marco's spam pain); `role="status"` reads "Total stake 10, returns 13,
+implied 77 percent".
 EVIDENCE: pending build. CHALLENGE: pending critic.
 
 ### E-13a · Place CTA · STATE: idle-armed
@@ -270,7 +301,7 @@ last element before RG strip — the thumb's last stop, not first (P5 arc).
 WHY: W5-10/21 parity + CTA echoes stake (fat-finger double-read, U-09); pale-cyan fill = the acting
 color, neon reserved for text (P3, D-01, U-25).
 SIZE: full-width, h52, margin-top 12.
-TYPE: `Place bet · 20.00 USDT` hb-body 600 + Oxanium for the amount.
+TYPE: `Place bet · 10.00 USDT` hb-body 600 + Oxanium for the amount (canon demo stake = 10.00).
 COLOUR: --c-cta fill, --c-cta-fg text (≥7:1 target, T6 measured).
 BORDER: r-md 8; no shadow (docked, not floating).
 MOTION: press :active scale .98 120 ms; enable = 200 ms fade once (never re-animates per keystroke).
@@ -278,52 +309,64 @@ RM: instant.
 THINKS: "is this the real final step" / EXPECTS: one tap commits, honestly / WE SHOW: stake in the
 label — the number is confirmed in two places (field + button) before money moves / NEXT: receipt.
 FAIL: double-tap → disabled in the same event frame (edge §3); tap with unanswered odds-ask →
-blocker state E-13d not a silent no-op.
-A11Y: `aria-label="Place bet, 20 USDT, returns 26 USDT"`; submits on Enter; busy state E-13b.
+blocker state E-13d not a silent no-op; every submit carries an idempotency key (D-19) so a
+retried request can never double-place.
+A11Y: `aria-label="Place bet, 10 USDT, returns 13 USDT"`; submits on Enter; busy state E-13b.
 EVIDENCE: pending build. CHALLENGE: pending critic.
 
 ### E-13b · Place CTA · STATE: pending (Confirming…)
 WHERE: same CTA slot — busy state keeps the label slot + adds indicator, disabled instantly (U-44).
 WHY: U-03 honest pending; 70§1 "processing wheel stuck" + "pending≠placed" panic → ≤3 s deadline
-written into spec; S8 dims the board while money is in flight.
-SIZE/TYPE/COLOUR: same geometry; label `Confirming…`, spinner glyph inline (16 px), fill darkens
-to --c-surface-3 equivalent — visibly off, not pretend-live.
-MOTION: indicator appears 120 ms; progress hairline on leg card, linear; ≤3 s then terminal —
-result or reason, never a spinning void. Interruptible by nothing (commit in flight) — but the
-UI stays honest: closing sheet doesn't cancel, result lands in My bets + pill (tab-hidden edge).
+written into spec; S8 dims the board while money is in flight; D-19 idempotency + reconcile law.
+SIZE/TYPE/COLOUR: same geometry; label `Confirming…`, indeterminate spinner inline (16 px), fill
+--c-surface-3 — visibly off, not pretend-live.
+MOTION: indicator appears 120 ms — INDETERMINATE only: a determinate hairline over a ≤3 s timeout
+IS the fake progress bar this card bans (crit #3). Bounded wait copy carries the honesty. ≤3 s
+then terminal — result or reason, never a spinning void. Interruptible by nothing (commit in
+flight) — but the UI stays honest: closing sheet doesn't cancel, result lands in My bets + pill.
 RM: identical (no motion in the wait itself).
 THINKS: "did it take?" / EXPECTS: a quick, honest answer / WE SHOW: bounded wait — no fake
-progress bar / NEXT: receipt or reason — zero taps either way.
-FAIL: timeout → `Not placed — timed out. Your balance is untouched.` + retry; rejected on moved
-price → `Place at {new}` one-tap recovery (kills the 5-tries loop).
+progress / NEXT: receipt or reason — zero taps either way.
+FAIL (D-19 reconcile, crit #1): the request may have landed server-side while the response was
+lost (offline blip, suspend mid-flight, tab killed) → NEVER `Your balance is untouched` (may be a
+lie) and NEVER a blind retry (double-place). On reconnect/dismiss the state becomes ★ `Can't
+confirm — check My bets` — the reconcile action routes to My bets where the truth lives; only a
+confirmed-not-placed result offers `Place at {new}` retry (idempotency key makes a true retry
+safe, but only after the check).
 A11Y: `aria-busy`; result announced `role="status"`.
 EVIDENCE: pending build. CHALLENGE: pending critic.
 
 ### E-13c · Place CTA · STATE: failed
 WHERE: reason block replaces CTA temporarily inside the slip (in-place, no toast, no dialog).
 WHY: 74 "respectful" spec; COPY `Not placed — {reason}. Your balance is untouched.` — the
-money-safe sentence is non-negotiable; failure = state with recovery action, not dead end (U-30).
+money-safe sentence is non-negotiable BUT only when we KNOW nothing landed (D-19); failure = state
+with recovery action, not dead end (U-30).
 SIZE: block padding 12; recovery button h44.
 TYPE: reason hb-body 600 + recovery action hb-body.
-COLOUR: --c-down text + ⚠ glyph; recovery --c-cta.
+COLOUR: --c-down (#FF6B86) text + ⚠ glyph; recovery --c-cta/--c-cta-fg.
 MOTION: ONE ≤4 px horizontal settle 150 ms — not a looping shake; RM = reason text only.
 THINKS: "is my money gone" — the first sentence answers / EXPECTS: a fix / WE SHOW: reason +
-recovery + untouched-balance guarantee / NEXT: retry or edit — one tap.
-FAIL: repeat failure → same in-place pattern + persistent reason, never escalation to modal.
+recovery; `untouched` only on confirmed rejections / NEXT: retry or check — one tap.
+FAIL: repeat failure → same in-place pattern + persistent reason, never escalation to modal;
+LOST-RESPONSE variant (D-19): `Can't confirm — check My bets` ★ — no untouched-claim, no blind
+retry; reconcile lands on My bets first.
 A11Y: `role="alert"`; focus moves to recovery action, returns to CTA on resolve.
 EVIDENCE: pending build. CHALLENGE: pending critic.
 
 ### E-13d · Place CTA · STATES: disabled variants (empty / unanswered-ask / suspended / over-balance / break / offline)
-WHERE: same slot; disabled with the reason INLINE — the button explains itself (never dead, U-03).
+WHERE: same slot; CTA stays `Place bet` (≤3-word law intact) disabled, with the reason as a h18
+line DIRECTLY beneath — the button explains itself (never dead, U-03; crit #13: reason text is
+not a control label so no word-count conflict).
 WHY: bet365 frozen-button + Paddy Power mystery-disable complaints (70§1/§2): a disabled control
-with no stated reason is the trust bug. Each variant: `Enter a stake to place` ★ / `Answer the
-odds change to place` ★ / `Waiting on suspended pick` ★ / `More than your balance` / `On a
-break · back 14:30` / `Offline — can't place` ★.
-SIZE/TYPE: same geometry, label hb-body.
-COLOUR: --c-surface-3 fill, --c-text-3 label — dim but legible, never invisible; reason icon inline.
+with no stated reason is the trust bug. Reason lines: `Enter a stake — min 1.00 USDT` ★ /
+`Odds changed — answer above` ★ / `Pick suspended — {reason}` / `More than your balance
+(180.00 USDT)` / `On a break · back 22:40` / `Offline — can't place` ★.
+SIZE/TYPE: same geometry; label hb-body --c-text-2 on disabled fill; reason hb-body-sec.
+COLOUR: fill --c-surface-3; label + reason --c-text-2 (content-bearing — text-3 measured
+2.09–3.10:1, fails its own job, crit #2); reason icon inline.
 MOTION: state swap 150 ms cross-fade; re-arm 150 ms. RM: instant.
-THINKS/EXPECTS/SHOW/NEXT: per variant — always "what now" answered by the label + adjacent action
-(chips / accept buttons / remove / retry).
+THINKS/EXPECTS/SHOW/NEXT: per variant — always "what now" answered by the reason line + adjacent
+action (chips / accept buttons / remove / retry).
 A11Y: `aria-disabled="true"` + `aria-describedby` reason; focusable-disabled (reasons must be
 discoverable by keyboard, Salaja/Walters).
 EVIDENCE: pending build. CHALLENGE: pending critic.
@@ -333,8 +376,12 @@ WHERE: replaces the CTA+legs via S5 container transform — the button becomes t
 ledger metaphor); persists in slip until dismissed or next pick.
 WHY: U-12 receipt = truth: ref + accepted odds + timestamp (the acknowledgement IS the record of
 the wager, 70§1 parlaytools); BIT audit: books ship no receipts — we ship one by default.
-SIZE: card padding 16; ref row h20 mono-ish Oxanium; summary rows h20.
-TYPE: `Bet placed · ref HB-48213 · 1.30 accepted` hb-body 600; recap hb-body-sec.
+SIZE: card padding 16; ref row h20; summary rows h20.
+TYPE: `Bet placed · ref HB-90210 · 1.30 accepted` hb-body 600; ref in Oxanium 600 hb-odds-sm
+13/16 (pinned — no hedge); recap hb-body-sec.
+MULTI-LEG RECEIPT (crit #10): singles N>1 = N placements = N refs; the card aggregates:
+header `N bets placed` ★ + `total stake {sum} USDT` + per-leg lines `pick · odds accepted ·
+ref {id}` — every leg keeps its own ref, never one shared ref (DATA-CANON invariant 3).
 COLOUR: --c-surface-2 + quiet --c-up success tint behind header, fades <3 s (A13.e, U-54: quiet
 wins, no confetti).
 BORDER: r-md; ✓ glyph 20 px.
@@ -343,9 +390,9 @@ tint decay <3 s. ONE hero move per flow (74). RM: instant card.
 THINKS: "did it really take — where's the proof" / EXPECTS: a reference / WE SHOW: ref + accepted
 price + timestamp + recap / NEXT: watch the bet — `View in My bets` one tap (indicator travels to
 My bets tab, U-36).
-FAIL: receipt dismissed → bet still in My bets (receipt is a view, not storage); duplicate submit
-guard → same ref renders, never two bets.
-A11Y: `role="status"` announces "Bet placed, reference HB-48213, 1.30 accepted".
+FAIL: receipt dismissed → bet still in My bets (receipt is a view, not storage); idempotent
+resubmit → same ref renders, never two bets (D-19).
+A11Y: `role="status"` announces "Bet placed, reference HB-90210, 1.30 accepted".
 EVIDENCE: pending build. CHALLENGE: pending critic.
 
 ### E-15 · Clear all + undo · STATES: idle / confirming / undone-toast
@@ -367,32 +414,36 @@ WHERE: pins directly under tab row in sheet AND under panel tabs (same component
 My bets top. Everything below goes read-only with last-known data.
 WHY: U-23 failure-proof + Theo edge (train, bad connection); COPY string; frozen ≠ dead — legs,
 CO values, receipts all viewable, prices marked `frozen` ★ (never stale-as-live — P2).
-SIZE: h40, full zone width, ⚠ icon 20 + text.
-TYPE: `You're offline — prices are frozen, not live` hb-body-sec 600.
-COLOUR: --c-suspend edge + --c-text — amber = system integrity signal, same family as suspension
-(one encoding learned once: interrupted service = amber).
+SIZE: h40, full zone width, cloud-slash glyph 20 + text (canon glyph — NOT ❄).
+TYPE: `You're offline — prices are frozen, not live` hb-body-sec 600 --c-text.
+COLOUR: --c-suspend left edge + --c-text — amber = interrupted service (one encoding learned once).
 MOTION: enters 200 ms slide-down 8 px; exits 160 ms on reconnect + prices re-tick with direction
 flash (state change is informative on return, U-04 pattern). RM: appear/disappear.
 THINKS: "is this real-time" / EXPECTS: honesty / WE SHOW: frozen markers + cached data labeled
 `Showing last known prices` ★ / NEXT: wait or browse — nothing breaks.
-FAIL: flap-loop (on/off/on) → banner state debounced, newest wins, no animation queue.
+FAIL: flap-loop (on/off/on) → banner state debounced, newest wins, no animation queue;
+placement in flight when offline hit → D-19 reconcile: on return show ★ `Can't confirm — check
+My bets`, never `untouched` and never blind retry (crit #1).
 A11Y: `role="status"`; announces once on transition.
 EVIDENCE: pending build. CHALLENGE: pending critic.
 
 ### E-17 · Break lock strip · STATE: break active
 WHERE: replaces CTA zone + banner under tabs; My bets stays readable, CO stays live (money-out
-never blocked — logged decision, needs DECISIONS.md row at build).
+never blocked — logged decision, needs DECISIONS.md row at build). End-break = ONE 2-step
+pattern used identically here and on the pill's break state (lead law): tap `End break` →
+in-place second step `End break now? [End break] [Stay on break]` ★ — never a one-tap exit
+(U-44 destructive = in-place confirm, and an accidental lockout-release must cost two taps).
 WHY: U-21/U-53 RG parity — 4 rungs reachable ≤2 taps (limits/cool-off/break/self-exclusion);
 Revealing Reality: controls in-flow for everyone, not warning-signs messaging; COPY `On a
 break · back {time}`.
 SIZE: strip h56; end-break action h44 in-place confirm (2-step deliberate, U-44).
-TYPE: `On a break · back 14:30` hb-body 600; explainer hb-body-sec `Betting is off until then.
-Prices are read-only. Cash out still works.` ★
+TYPE: `On a break · back 22:40` hb-body 600 (DATA-CANON time); explainer hb-body-sec `Betting is
+off until then. Prices are read-only. Cash out still works.` ★
 COLOUR: --c-surface-2 + --c-text — deliberately NOT amber (not an error, a chosen state) and NOT
 pale-cyan (no affordance-bait on a lock).
 MOTION: none on the lock (integrity); end-break confirm expands 200 ms.
 THINKS: (player set this earlier) "right, I'm on a break" / EXPECTS: the wall to hold / WE SHOW:
-when it ends + what still works / NEXT: wait, or deliberately end — 2 taps, in-place.
+when it ends + what still works / NEXT: wait, or deliberately end — same 2-step everywhere.
 FAIL: break ends mid-session → strip exits 160 ms, controls re-arm without page reload.
 A11Y: `role="status"`; all disabled controls carry `aria-describedby` break reason.
 EVIDENCE: pending build. CHALLENGE: pending critic.
@@ -404,8 +455,9 @@ A7.d/Section-3 — 18+ + limits ≤2 taps; F26/F28 regulator-visibility = trust 
 SIZE: h32 line; links h44 hit via padding.
 TYPE: `18+ · Play responsibly · Take a break` + `Session 47 min · net −12.00 USDT` ★ hb-micro
 11/14 (floor).
-COLOUR: --c-text-3 — present, never the loudest thing (A7.S6 hierarchy check); Take a break
---c-text-2 underline-style link.
+COLOUR: --c-text-2 — content-bearing text, present but never the loudest thing (A7.S6 hierarchy
+check; crit #2: text-3 measured 2.09–3.10:1 = illegible — demoted to decorative only); Take a
+break --c-text-2 underline-style link.
 MOTION: session value updates on minute roll, tint-only, exempt-muted under S8. RM instant.
 THINKS: nothing — ambient by design / EXPECTS: the tools exist if needed / WE SHOW: time + net +
 one-tap break / NEXT: back to ticket.
@@ -419,23 +471,28 @@ available vs in-bets split.
 WHY: U-19 always-live balance; Iris needs fiat-mental-model clarity; `More than your balance`
 error cites the real number inline (E-10).
 SIZE: h20 row.
-TYPE: `Balance 240.00 · in bets 60.00 USDT` ★ hb-body-sec, Oxanium numerals.
+TYPE: `Balance 240.00 · 180.00 available · 60.00 in bets USDT` ★ hb-body-sec, Oxanium numerals
+(DATA-CANON split: total = available + in-bets; stake checks run against 180.00 available).
 COLOUR: --c-text-2.
 MOTION: NumberFlow on change; tint-only; suppressed under S8 while pending.
 THINKS: "what can I actually stake" / EXPECTS: the real number before I type / WE SHOW: split —
 available vs already riding / NEXT: stake chips below.
 FAIL: refetch fails → last-known + marker, never a guessed balance.
 A11Y: static text (not live-region; balance changes announced via CTA context).
-EVIDENCE: pending build. CHALLENGE: pending critic.
+EVIDENCE: pending build. CHALLENGE: canon gap flagged — DATA-CANON lists in-bets 60 but enumerates
+one open bet (HB-48213, 20.00); residual 40.00 = account exposure not itemized in canon. Lead to
+either enumerate the other open bets in DATA-CANON or restate in-bets. Spec renders canon's
+numbers verbatim until then.
 
 ### E-33 · Live-delay disclosure · STATE: present on live legs
-WHERE: totals block, directly above CTA (the consent moment).
+WHERE: last row of the totals block inside the consent stack — 28–40 px above CTA (mode + balance
+rows intervene; "directly above" corrected, crit #6).
 WHY: U-15 live delay honestly disclosed; in-play guidance F29: timely-info fairness — the player
 deserves to know the price can still move between tap and accept.
-SIZE: h18 row, full zone width, 4 above CTA.
+SIZE: h18 row, full zone width.
 TYPE: `In-play delay applies` ★ hb-micro 11/14.
-COLOUR: --c-text-3 on --c-surface-1 — quiet honesty line, not a warning (no amber: it's routine,
-amber is reserved for state interruptions).
+COLOUR: --c-text-2 on --c-surface-1 — content-bearing honesty line (text-3 fails 2.09:1, crit #2);
+no amber — it's routine, amber is reserved for state interruptions.
 BORDER: none.
 MOTION: appears once with leg, no animation. RM: n/a.
 THINKS: nothing — it's ambient disclosure / EXPECTS: live betting is honest about latency / WE
@@ -457,9 +514,10 @@ not-offered rows show no chip — absence is itself labeled in expansion (E-26).
 BORDER: r-sm 4; flat, no ring.
 MOTION: none (a fact, not a prompt — no pulse, U-51 spirit). RM: n/a.
 THINKS: "can I get out of this later" / EXPECTS: eligibility marked before I commit / WE SHOW: CO
-chip on the leg / NEXT: nothing — it's a fact, not a control.
+chip on the leg; tap opens popover `Cash out settles this bet early at the live quote` ★ /
+NEXT: nothing — it's a fact, not a control.
 FAIL: eligibility revoked mid-slip → chip swaps to suspended-style marker, never silently gone.
-A11Y: `aria-label="Cash out offered on this pick"`.
+A11Y: `aria-label="Cash out offered on this pick"`; popover `role="tooltip"` on tap/focus.
 EVIDENCE: pending build. CHALLENGE: pending critic.
 
 ---
@@ -471,8 +529,9 @@ WHERE: sheet/panel: segmented row top of My bets body. 1440 page: `< My bets · 
 header → segmented `Open (1)|Settled (7)` → chips `All time Today Last7 Last30 Custom` + `All
 sports ▾` (W6-02/03/04 exact parity).
 WHY: W6 parity + U-13 open/live/settled split; every rival's My Bets convention (A19.b); counts on
-tabs (U-28).
-SIZE: segmented h44, each ≥120; filter chips h36 hit44; dropdown h44.
+tabs (U-28). `Custom` opens an inline date-range row under the chips (From/To native date fields,
+`Apply` ★) — specified, never a dead control (crit #18).
+SIZE: segmented h44, each ≥120; filter chips h36 hit44; dropdown h44; range row h48.
 TYPE: hb-body; counts hb-label Oxanium.
 COLOUR: active --c-surface-3/--c-text; inactive --c-text-2; filter active --c-surface-3.
 MOTION: segmented indicator slides 200 ms directional; chip select zero animation; RM cross-fade.
@@ -491,26 +550,30 @@ WHY: W6-05 parity incl. live `●52' 1–0` badges ON the row (the open bet is a
 F7 — running value visible); expand ⌄ owns the CO module (wireframe implies it, brief demands it).
 SIZE: row h64 collapsed (card 96); expand ⌄ hit 44; col widths fixed (numbers never shift, P1).
 TYPE: pick hb-h1; fixture hb-body-sec; numbers Oxanium hb-odds; badges hb-label.
-COLOUR: row --c-surface-1 zebra none (one fill, rhythm not stripes, U-40); live minute --c-live
-word+dot; result pill `Open` --c-surface-3/--c-text.
+COLOUR: row --c-surface-1 zebra none (one fill, rhythm not stripes, U-40); live score+minute in
+--c-live badge (bg #FF4D6D, fg #14060A — token pair, word+icon never color alone); result pill
+`Open` --c-surface-3/--c-text.
 BORDER: 1 px hairline bottom; expansion opens as row extension, not a floating card.
 MOTION: expand = height-animates inner 200 ms out-expo (outer keeps open width, Salaja collapse
 law); live badges tick tint-only; zero enter-animation on updates (74 rule 7).
 THINKS: "how's my bet doing" / EXPECTS: score + value at a glance / WE SHOW: live badges + returns
 + result pill / NEXT: the instrument — expand once, CO is there.
 FAIL: match feed drops → badges freeze + frozen marker, never stale-live.
-A11Y: row `role="row"`, expand `aria-expanded`/`aria-controls`; live region throttled on score.
+A11Y: 1440 table = `role="row"` inside `role="table"`; 390/panel stacked card = `role="article"`
+(no table context — crit #25); expand `aria-expanded`/`aria-controls` in both; live region
+throttled on score.
 EVIDENCE: pending build. CHALLENGE: pending critic.
 
 ### E-22 · Cash-out module — idle quote · STATE: offered, ticking
 WHERE: inside row expansion, right block; sheet card = full-width module (bet365 puts it in the
 open-bet card — convention kept, execution cleaner).
 WHY: U-06 live quote; S7 spec; F13/F51 — availability inflates stakes → neutral presentation, NO
-pulse, NO "act now" color: the quote informs, it never pushes (U-4 ethics line).
+pulse, NO "act now" color: the quote informs, it never pushes (U-4 ethics line; D-18 split law).
 SIZE: CO button h48 full-module-width; value right-aligned Oxanium; `updates live` micro under.
 TYPE: `Cash out 22.40 USDT` hb-body 600 label + Oxanium 700 value; micro hb-micro.
-COLOUR: --c-cta fill? NO — CO is secondary money action: --c-surface-3 fill + --c-text, reserving
-pale-cyan for the one primary per view (A9.d); value --c-text.
+COLOUR: idle quote = --c-surface-3 fill + --c-text — D-18: the ticking number never wears the
+acting fill; pale-cyan is reserved for the confirm step (E-23/E-24) which IS the primary of its
+view (A9.d); value --c-text.
 BORDER: r-md; module separated by hairline from bet facts.
 MOTION: S7 — value NumberFlows on quote ticks, neutral tint, no pulse; button press 120 ms → opens
 confirm inline (never dialog-on-dialog, U-44/72 rule 19).
@@ -528,8 +591,9 @@ WHY: U-06 + P2: FanDuel's own rules warn requests die if odds move mid-processin
 new amount and re-ask instead of failing or (worse) executing at an unseen price; S7 spec.
 SIZE: chip h20 on value; confirm h48.
 TYPE: `Offer moved to 21.10 — confirm new amount` hb-body; `Confirm 21.10 USDT` on button — the
-button always carries the exact number being billed (fat-finger tripwire, same law as CTA).
-COLOUR: chip --c-suspend text on surface (money-change = amber family, one encoding).
+button always carries the exact number being billed (displayed = billed, canon law).
+COLOUR: chip --c-suspend bg + #2A1200 fg (canon chip pair); confirm fill --c-cta + --c-cta-fg —
+pinned (D-18/crit #16: the confirm is the primary of this view).
 MOTION: value cross-fade 200 ms + chip 200 ms; re-confirm normal press.
 THINKS: "it moved — what's the new deal" / EXPECTS: re-ask, not a silent swap / WE SHOW: old→new
 + confirm carrying the new figure / NEXT: confirm or dismiss — one tap each.
@@ -539,14 +603,16 @@ A11Y: `role="alert"` once on change; confirm labeled with new value.
 EVIDENCE: pending build. CHALLENGE: pending critic.
 
 ### E-24 · Partial cash-out control · STATES: 25 / 50 / 75 / custom
-WHERE: second module in expansion, `Cash out part ▾`; opens percentage chips + math lines inline.
+WHERE: second module in expansion, `Partial cash out ▾` (industry noun, crit #22); opens
+percentage chips + math lines inline.
 WHY: U-07 partial CO (bet365's slider convention — 70§3 names missing partial CO as an
 industry gap; we ship the chips version, thumb-friendlier than a slider at 390, P5).
-SIZE: chips h40 ×4 + custom numeric field h40 (same rules as E-10); confirm h48.
+SIZE: chips h40 ×4 + custom numeric field h40 (E-10 rules incl. ≥16 px numeral — same iOS-zoom
+law); confirm h48.
 TYPE: `25% 50% 75% Custom`; math `You take 11.20 USDT · 10.00 stays at 1.80 → returns 18.00` ★
 hb-body-sec, numbers Oxanium.
 COLOUR: chips --c-surface-3; selected --c-cta/--c-cta-fg (the acting fill marks the chosen part —
-encoding consistent with selected odds cells).
+encoding consistent with selected odds cells); confirm fill --c-cta/--c-cta-fg (D-18 pinned).
 MOTION: math recomputes with NumberFlow; chips zero-animation (repeat).
 THINKS: "bank some, ride some" / EXPECTS: the split spelled out before I commit / WE SHOW: take +
 stays + new returns in one line / NEXT: confirm — one tap.
@@ -561,7 +627,8 @@ WHY: U-08 never a dead button + S3 shutter; 70§3 is the #1 betrayal surface (be
 Power vanish, SportyBet ₦7 token-offer): we name the reason + show what it was + say it resumes.
 Pausing is honest; vanishing is betrayal.
 SIZE/TYPE: `Cash out paused — dangerous attack` + `last quote 22.40` ★ hb-body-sec.
-COLOUR: --c-suspend chip; dimmed module.
+COLOUR: chip = --c-suspend bg + #2A1200 fg (canon one-encoding, same grammar as E-08 — padlock
++ reason chip + last value at 60%); dimmed module.
 MOTION: 0 ms same-frame dim (integrity); reopen 150 ms un-dim + quote re-ticks; moved quote →
 E-23 reconfirm flow, never silent reprice.
 THINKS: "again? why" / EXPECTS: reason + does it come back / WE SHOW: named suspension + resume
@@ -594,7 +661,8 @@ WHERE: Settled tab rows, same columns; result cell = net figure + word + glyph.
 WHY: U-13 honest P/L; U-54 quiet wins/factual losses (no LDW — BIT audit named "Won £0.10" as
 harm pattern, we refuse); won shows NET not gross (the player already knows their stake).
 SIZE: same row grid; result `▲ won` / `▼ lost` word-pill.
-TYPE: `Settled · won 16.00 USDT` / `Settled · lost 10.00 USDT` hb-body-sec.
+TYPE: `Settled · won 36.00 USDT` (HB-091) / `Settled · lost 10.00 USDT` (HB-068) hb-body-sec —
+DATA-CANON settled refs.
 COLOUR: won --c-up + ▲ + word (triple-coded); lost --c-text-2 — NOT red-flashy: a factual loss,
 red reserved for errors (U-54; red=system-fault encoding, one thesis).
 MOTION: none — terminal rows static. RM: n/a.
@@ -611,7 +679,8 @@ WHERE: Settled tab, same grid; result `↺ void`.
 WHY: U-13 void reasons + refund status; 70§5 "voided only when winning" suspicion → the reason +
 returned amount are ON the row, plus basis + query affordance (U-14).
 SIZE: same row grid as E-27; `↺ void` result pill min-w64 h24; query link h44 target.
-TYPE: `Void — match abandoned · 5.00 USDT returned` hb-body-sec (COPY string slot-filled).
+TYPE: `Void — abandoned 63' · 12.00 USDT returned` hb-body-sec (COPY slot-filled, DATA-CANON
+HB-104).
 COLOUR: --c-text-2 + ↺ glyph — neutral, void is neither win nor loss.
 BORDER: row hairline; pill --c-surface-3 fill r-sm.
 MOTION/FAIL/A11Y: as E-27 — static terminal row, regrade marker rule identical, `aria-expanded`.
@@ -667,6 +736,9 @@ count-pulse once / instant badge.
 THINKS: "it went where my ticket is" — the flight teaches the map without a tutorial (A21) /
 EXPECTS: pick lands in ticket / WE SHOW: it flying there / NEXT: stake — already under the thumb.
 FAIL: interrupted flight resolves to added state (no orphaned chip); rapid adds → each flight
-independent, no queue collapse.
-A11Y: `aria-live` "Arsenal added to ticket" (motion never sole channel, HIG).
+independent, no queue collapse. **Retap-to-deselect:** tapping an already-selected odds cell
+removes the pick — reverse flight 200 ms (object goes home); repeat taps get zero animation
+(U-43). Specified, not assumed (crit #25).
+A11Y: `aria-live` "Arsenal added to ticket" / "Arsenal removed from ticket" (motion never sole
+channel, HIG).
 EVIDENCE: pending build. CHALLENGE: pending critic.

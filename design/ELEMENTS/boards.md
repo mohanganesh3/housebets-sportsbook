@@ -6,10 +6,18 @@ A11Y. Every card cites ≥1 principle + U-row/research file. EVIDENCE + CHALLENG
 until the critic pass and QC runs — a card without them is a guess, not a spec.
 
 Token shorthand: c-bg · s1/s2/s3 (surfaces) · neon (--c-brand-neon, text/icon only) · cta /
-cta-fg (--c-cta #C4F4F1 / #062B31) · t1/t2/t3 (text) · up/down · susp (--c-suspend #E17823) ·
-gold · live (--c-live #FF4D6D) · focus ring. Space = 4-base set; r-sm/r-md/r-lg/r-pill.
-Type = hb-* scale; Oxanium = numerals only, tnum always. Contrast values marked `~` are
-targets pending T6 culori measurement; floor = AA 4.5 text, AAA 7 money (A27.c, C-12).
+cta-fg (--c-cta #C4F4F1 / #062B31) · t1/t2/t3 (text — post-crit law: **t2 carries ALL
+meaning-bearing muted text** incl. implied%/session/disabled-reason; **t3 decorative only**,
+never the carrier) · up · **down #FF6B86** (lightened post-crit) · susp chip =
+**#E17823 bg + #2A1200 fg** · live badge = **#FF4D6D bg + #14060A fg** · gold · focus ring.
+Numbers: `design/DATA-CANON.md` only (D-17). Space = 4-base set; r-sm/r-md/r-lg(sheets only)/
+r-pill. Elevation: hairlines; ONE 8/24 shadow — owned by **sheets** (not palettes, not pills).
+Type = hb-* scale; Oxanium = numerals only, tnum always. Contrast floor = AA 4.5 text, AAA 7
+money (A27.c, C-12); the crit's culori priority list survives as the **D0 measurement
+checklist**: ① text-2-on-s2 implied% (was t3 ≈2.6 — fixed by token, verify ≥4.5) ② LIVE badge
+pair (chip fg-on-bg — verify ≥4.5) ③ suspend chip pair (verify ≥4.5) ④ --c-down #FF6B86 on
+s1/s2 (verify ≥4.5/≥3 glyph) ⑤ cta-fg on cta ≈12.6 — confirm AAA ⑥ --c-up / --c-gold pairs —
+last.
 
 ---
 
@@ -28,15 +36,20 @@ INVENTORY derived-ask #4 (one shared anatomy) + W1-24/25/W2-22 parity; SA4-01 ha
 coupon, no nested cards.
 
 **SIZE/SPACING:** row 52–56px @390 / 44–48px @1440 (T7-08); clock col 56px; name col fluid,
-min 12ch, ellipsis budget; score col 24px right-aligned; 3 odds cells ≥44px h @390 / ≥36px
-@1440, 8px gaps (P51-03, R-YAB-01); `+N ›` 40px hit. Cell grid constant across market rebind.
+min 12ch, middle-truncate budget; score col 24px right-aligned; 3 odds cells — ONE anatomy per
+width (crit a): **390** = compact chips label-over-price ≥44px h, **1440** = wide buttons
+label-left / price+implied% right ≥36px h; 8px gaps (P51-03, R-YAB-01); `+N ›` 40px hit.
+Cell grid constant across market rebind.
 
-**TYPE:** names hb-body t1; scores/minute/prices Oxanium — score hb-score, clock hb-clock
-live=t live-color, prices hb-odds neon, implied% hb-micro t3; `+N ›` hb-label t2.
+**TYPE:** names hb-body t1; scores/minute/prices Oxanium — score hb-score, clock hb-clock t1,
+prices hb-odds neon, implied% hb-micro **t2** (meaning-bearing muted, post-crit law);
+`+N ›` hb-label t2.
 
 **COLOUR+CONTRAST:** row bg transparent on s1 region; hover s3 8px row-edge fill; cells s2 +
-hairline; price neon-on-s2 ~4.6 AA-target; selected = cta fill + cta-fg + ✓ (C-11); suspension
-band = susp hairline + susp text + 🔒 on s1 (~4.5 target on amber text — C-13: never grey).
+hairline; price neon-on-s2 ~4.6 AA-target; selected = cta fill + cta-fg + ✓ + `aria-pressed`
+(C-11); suspended = cells dim 60% + chip `--c-suspend`-bg/`#2A1200`-fg spanning the odds zone —
+dark text on amber passes AA by construction (C-13: never grey-disabled); tick-down = --c-down
+**#FF6B86** glyph+tint (post-crit pair, checklist ④).
 
 **MOTION:** price tick → S1 digit-morph 250ms ease-out-expo + directional edge tint decay ~1s
 + ▲▼ glyph ~9s muted (T42-08); interrupt = newest tick supersedes; suspension → S3 same-frame
@@ -49,11 +62,14 @@ with direction · next tap: `+N ›` match page OR second cell = another selecti
 
 **FAILURE MODES:** flash on mount (banned — P55-04) · layout shift when countdown→LIVE
 flips (fixed-width clock col) · truncated numbers (never — U-45) · name collision: middle-
-truncate + full name on focus/match page · sim/real mix (search only; boards are real-only).
+truncate (`Borussia Mö…bach`) + full name on focus/match page · dimmed cells behind the
+suspend chip left tappable (spec: pointer-inert — crit e) · sim/real mix (search only;
+boards are real-only).
 
-**A11Y:** row = group; cells = real buttons, SR label `Arsenal to win, 1.30, implied 77 percent`
-(X01.S1); suspended band `aria-live` once; scores in `role=status` cadence-batched; 44px
-targets; focus ring 2px neon+offset, dual-tone on cta (C-11).
+**A11Y:** row = group; cells = real buttons w/ `aria-pressed` on selected (`Arsenal to win,
+1.30, implied 77 percent, selected` — X01.S1 + crit e); suspended chip `aria-live` once,
+non-focusable, dimmed cells removed from tab order; scores in `role=status` cadence-batched;
+44px targets; focus ring 2px neon+offset, dual-tone on cta (C-11).
 
 **EVIDENCE:** pending (QC row + Playwright state shots).
 **CHALLENGE:** pending.
@@ -92,7 +108,8 @@ short groups (min 1 row) · star hit overlaps `›` (pseudo-areas never overlap 
 flag emoji → authored crest mark only (SA4-04).
 
 **A11Y:** header = `h2`; star = `aria-pressed` toggle labelled `Follow Premier League`;
-count inside `aria-describedby`; link = real `<a>`.
+count inside `aria-describedby`; link = real `<a>`. Name rendered canonically (`Premier
+League` — country lives in the crest/flag mark, never prefixed, crit b).
 
 **EVIDENCE:** pending. **CHALLENGE:** pending.
 
@@ -115,8 +132,9 @@ chip inside pill, never detached. ~5–7 visible, rest behind edge-fade scroll.
 **TYPE:** name hb-label (active t1 weight 600); count hb-micro Oxanium.
 
 **COLOUR+CONTRAST:** idle = s2 fill + t1 text; active = cta fill + cta-fg (selected-acts,
-P3); Live pill: `●`+count in --c-live on s2 (word+icon, U-41); disabled-0 = t3 + no fill
-change (honest zero, LV-03).
+P3); Live pill: `●`+count as a chip — #FF4D6D bg + #14060A fg numeral (post-crit badge pair,
+checklist ②); disabled-0 = t2 at rest (a zero count is meaning-bearing — post-crit law,
+honest zero, LV-03).
 
 **MOTION:** select → 120ms fill swap; count change → S1 digit tick ≤150ms; scroll = native,
 edge fades (no bounce); repeat-tap already-active = 0 animation (U-43). RM identical instant.
@@ -147,17 +165,20 @@ identical surface/border/radius as match cards, real teams + real market + real 
 CTA so it reads as content, not ad; P51-02 no auto-rotation (peripheral hijack + WCAG 2.2.2).
 
 **SIZE/SPACING:** crests 48px hero tier (TOKENS crests); competition label top-left, status
-top-right (W1-11); 1X2 cells identical geometry to E-BRD-01; `View match` cta 44px; slide
-peek 24px next card @390.
+top-right (W1-11); 1X2 cells identical geometry to E-BRD-01; `View match ›` secondary
+text-link, 44px hit; slide peek 24px next card @390.
 
 **TYPE:** competition hb-label t2; teams hb-title t1; score hb-score Oxanium; prices hb-odds;
-CTA hb-label 600 cta-fg.
+CTA hb-label 600 neon-text.
 
 **COLOUR+CONTRAST:** s1 fill + s2 hairline — same as group regions (the anti-banner rule);
-status = live badge component; CTA = cta fill (the only pale-cyan on the card).
+status = live badge chip (#FF4D6D bg / #14060A fg); `View match ›` = neon TEXT link, not a
+cta fill — the slide carries ZERO pale-cyan so it never competes with selected cells +
+slip pill (crit f pale-cyan stack; pale-cyan is rationed to actions that commit).
 
 **MOTION:** S6 masthead — CSS scroll-snap slides; desk ‹ › buttons + dots; phone swipe;
-kinetic team-name weight shift only; NO autoplay (P51-02); pause control + `1 / 5` counter;
+kinetic team-name weight shift only; NO autoplay (P51-02) — and since nothing auto-plays,
+NO pause control (dead affordance removed, crit f); `1 / 5` counter stays;
 slide change 250–300ms ease-standard; interrupt = swipe overrides mid-transition; RM =
 static slides + controls.
 
@@ -191,12 +212,13 @@ P52-13 countdowns map ONLY to real events; T42-17 flip without layout jump; A13.
 indicators.
 
 **SIZE/SPACING:** chip h 24px; pad 8px; sits in clock column width (fixed — flip can't move
-layout); `Kicks off in` hb-micro + time hb-clock Oxanium.
+layout); `Kicks off in` hb-micro + time hb-clock Oxanium. Display rule: <24h → `Kicks off in
+HH:MM`; ≥24h → `Tomorrow HH:MM` or `Day, Mon DD · HH:MM` — one chip, three honest formats.
 
-**TYPE:** time = Oxanium hb-clock tabular (`04:12`, `18:47`, `45+2'`); label hb-micro t2.
+**TYPE:** time = Oxanium hb-clock tabular (`04:12`, `45+2'`); label hb-micro t2.
 
 **COLOUR+CONTRAST:** chip s2 fill + t2 text; <1min = t1 (proximity, not urgency color — P52
-bans pressure styling); LIVE flip adopts live-badge tokens.
+bans pressure styling); LIVE flip adopts live-badge chip tokens (#FF4D6D/#14060A).
 
 **MOTION:** digits tick 1s (linear-permitted clock rule); at 0 → `● LIVE` word+icon swap
 150ms same-cell (no movement); interrupt = feed correction supersedes; RM = instant text.
@@ -230,7 +252,7 @@ curate→filter→search ladder; U-45 state in URL; A37.S3 market counts.
 **TYPE:** hb-label + Oxanium count hb-micro; dropdown items hb-body.
 
 **COLOUR+CONTRAST:** active = cta/cta-fg; idle s2/t1; count t2→cta-fg when active; zero =
-t3 + disabled styling (never hidden — honest totals).
+t2 + `aria-disabled` (never hidden, never t3 — the zero is the information).
 
 **MOTION:** 120ms fill swap; dropdown = sheet on phone/popover on desk, enter 200ms
 out-expo, close 140ms (faster close — P4); interrupt mid-open = close wins. RM instant.
@@ -263,9 +285,11 @@ match page variant scopes to `Search markets or players` (W4-06).
 quarantine (U1 verbatim Stake e-football mix); Salaja instant-palette rule (no open
 animation — U-43); A11 banner: palette not a promo slot.
 
-**SIZE/SPACING:** desk palette 640px w, anchored under field, r-lg + shadow token + hairline;
-phone = top sheet full-width; rows 44px; group labels 12px caps? No — sentence-case labels
-hb-micro t3 (voice rule).
+**SIZE/SPACING:** desk palette 640px w, anchored under field, surface-2 + hairline + r-md —
+it is a popover: TOKENS grants the ONE 8/24 shadow + r-lg to sheets only (crit b assigns the
+shadow to sheets; desk palette takes neither). Phone = top-anchored SHEET — that variant is a
+sheet and takes r-lg + the one shadow. Rows 44px; group labels sentence-case hb-micro t3
+(decorative label — allowed t3 use).
 
 **TYPE:** input hb-body; row name hb-body t1 + breadcrumb hb-body-sec t2 (`Arsenal · Premier
 League · Match`); type glyph 16px left.
@@ -281,7 +305,8 @@ destination (match page / league / market group deep-link).
 
 **FAILURE MODES:** esim mixing (labelled section only) · keyboard dead-end (Esc always
 closes, Enter always goes) · empty input shows ads (never — recents+follows) · query lost on
-close (state `?q=` persists).
+close (state `?q=` persists) · cameo breach: empty-state renders NO house glyph — the cameo
+arbiter gives the view's one glyph to the ticket panel (crit b, U-32).
 
 **A11Y:** `role=combobox` + listbox, `aria-activedescendant`; results count announced;
 fully keyboard-completable (X01); ⌘K + `/` shortcuts.
@@ -292,7 +317,7 @@ fully keyboard-completable (X01); ⌘K + `/` shortcuts.
 
 ## E-SHL-01 — Balance widget
 
-**ELEMENT/PAGE/STATE:** top-bar balance `₮ 250.00 ▾`; states: idle · tick (settle/place/
+**ELEMENT/PAGE/STATE:** top-bar balance `₮ 240.00 ▾`; states: idle · tick (settle/place/
 deposit) · popover open · break-mode · offline-frozen.
 
 **WHERE:** top bar right cluster desk; phone = compact pill (SH-04).
@@ -302,24 +327,26 @@ P2 never surprise money — delta is shown not swapped; available-vs-in-bets spl
 persona); ₮ glyph always (C-07).
 
 **SIZE/SPACING:** pill h 36px desk / 32px phone; pad 12px; `▾` affordance 16px.
+Values (DATA-CANON, D-17): total `₮ 240.00`; popover `Available 180.00 · In open bets 60.00`.
 
-**TYPE:** amount Oxanium hb-odds desk / hb-odds-sm phone, t1; popover lines hb-body-sec.
+**TYPE:** amount Oxanium hb-odds desk / hb-odds-sm phone, t1; popover lines hb-body-sec t2.
 
-**COLOUR+CONTRAST:** s1 fill + hairline + t1 amount; delta flash = up/down glyph + tint
-(never color alone — C-01); break-mode = t2 chip `On a break · back 22:40` (C-20 neutral).
+**COLOUR+CONTRAST:** s1 fill + hairline + t1 amount; delta flash = up glyph / down #FF6B86
+glyph + tint (never color alone — C-01); break-mode = t2 chip `On a break · back 22:40`
+(C-20 neutral).
 
 **MOTION:** value change → S1 digit morph 250ms + signed delta chip `+36.00` fading <3s;
 interrupt = next delta supersedes; RM = instant value + delta line.
 
 **PLAYER EXPECTATION:** thinks "what can I stake" · expects figure = truth, updated · we
-show live total + split popover `Available 230.00 · In open bets 20.00` · next tap: deposit,
-or a price cell.
+show live total + split popover `Available 180.00 · In open bets 60.00` (canon) · next tap:
+deposit, or a price cell.
 
 **FAILURE MODES:** stale after placement (same-render debit) · silent sync drift (displayed
 ≠ wallet — reconciliation line SH-10) · truncation of big balances (Oxanium fixed, `1,234.56`
 locale format — X02) · offline shows fake-fresh (Frozen caption).
 
-**A11Y:** `aria-live=polite` announces `Balance 250 USDT` on change; popover = disclosure
+**A11Y:** `aria-live=polite` announces `Balance 240 USDT` on change; popover = disclosure
 button; money text AAA target.
 
 **EVIDENCE:** pending. **CHALLENGE:** pending.
@@ -376,7 +403,8 @@ switch (U-16); one custom glyph set, 1.5px stroke, 20px grid (TOKENS icon law �
 **TYPE:** glyph only (title attr for hover); badge numeral Oxanium hb-micro.
 
 **COLOUR+CONTRAST:** idle glyph t2; hover s3 tile + t1 glyph; active neon glyph + s3 tile +
-indicator (neon = accent/icon, allowed — never fill); badge `--c-live` text + `●` (U-41).
+indicator (neon = accent/icon, allowed — never fill); Live count = chip — #FF4D6D bg +
+#14060A fg numeral (post-crit badge pair, U-41).
 
 **MOTION:** hover instant; active change 120ms tile fade; count tick S1 ≤150ms; pulse dot on
 Live = tint-only breathe ~2s, exempt-but-muted in S8 (calm-live). RM: static dot+count.
@@ -397,21 +425,26 @@ focus; 44px hit via pseudo.
 
 ## E-SHL-04 — Bottom nav item (phone)
 
-**ELEMENT/PAGE/STATE:** 67px bottom bar items `Menu · Sports · Casino · Chat · Support`;
-states: active · idle · badge (Chat unread).
+**ELEMENT/PAGE/STATE:** 67px bottom bar items `Menu · Sports · Live ●13 · Casino · Chat ·
+Support` — 6 equal slots; states: active · idle · live-count chip · badge (Chat unread).
 
 **WHERE:** fixed bottom + safe-area, all phone pages (SH-04).
 
-**WHY:** wireframe parity bar (INVENTORY shared); thumb-zone primacy (P5, U-18, 75% thumb);
-Sports stays active across all five pages (ask #20); labels that never truncate (fixes
+**WHY:** wireframe parity bar + Live slot added (INVENTORY shared; crit d — Live = 1 tap at
+every width, ≥1024 rail badge / ≤1024 nav slot); thumb-zone primacy (P5, U-18, 75% thumb);
+Sports stays active across board pages (ask #20); labels that never truncate (fixes
 `Su…` — U-45).
 
-**SIZE/SPACING:** bar 67px + env(safe-area); 5 equal slots; glyph 20px + label; 44px+ hits.
+**SIZE/SPACING:** bar 67px + env(safe-area); 6 equal slots (65px @390, 60px @360); glyph
+20px + label; Live count = chip inside its slot; 44px+ hits. Slip pill floats 8px above
+(T42-19) with canon payload only: `●1 Arsenal @1.30` (picks) or `●1 Arsenal · 1–0 · 52' ·
+CO 22.40` (open bet) — never a `Pays X` string pre-stake (DATA-CANON pill law).
 
 **TYPE:** label hb-micro (≥11px floor, T7-02); active label 600.
 
 **COLOUR+CONTRAST:** bar c-bg + hairline top; idle t2; active neon glyph+label + s3 tile
-(accent grammar, not fill — D-01).
+(accent grammar, not fill — D-01); Live count chip = #FF4D6D bg + #14060A fg; slip pill =
+s2 + hairline ring (the ring separates it from the bar, no shadow — sheets own the shadow).
 
 **MOTION:** tab switch 120ms cross-fade glyph/label (icon-swap rule: scale .25→1 + blur ≤4px
 bridge — Salaja); repeat-tap on active = 0 animation (U-43); RM instant.
@@ -439,16 +472,21 @@ States: live · HT · ET · break (`Break`, `Second break`) · frozen-offline.
 **WHY:** U-41 live/frozen NEVER color alone — word+icon; C-03/C-05 channel rules; T42-17
 honesty pack (`45+2'`, `HT`, `Break`); betby phonetics kept (71: `29′ 1st half`).
 
-**SIZE/SPACING:** badge = `●` 8px + `LIVE` hb-label + space + clock hb-clock; inline, no
-pill-fill needed (C-05 documents fill path only if pill used — we use dot+word on s1).
+**SIZE/SPACING:** two encodings, one truth — **row/card status** = `●` 8px + `LIVE` hb-label
++ clock hb-clock inline on s1 (dot+word, never color alone); **chip contexts** (sport-pill
+count, rail badge, hero status, filter counts) = #FF4D6D bg + #14060A fg numeral chip.
+Same hue family, two mounts — checklist ② verifies both pairs.
 
 **TYPE:** `LIVE` hb-label 600 `--c-live`; clock Oxanium hb-clock same hue; `HT`/`Break`
-switches to t2 (not-live-but-real state).
+switches to t2 (not-live-but-real state); chip numeral Oxanium hb-micro #14060A.
 
-**COLOUR+CONTRAST:** --c-live text on s1/s2 (~4.6–4.87 measured range in C-05 — adopt, then
-verify T6); frozen adds t3 `Frozen` caption, dot stops pulsing.
+**COLOUR+CONTRAST:** --c-live text on s1/s2 (~4.6–4.87 range in C-05 — verify T6); chip
+pair designed-AA (light bg + near-black fg); frozen adds t2 `Frozen` caption, dot stops
+pulsing (t2 = meaning-bearing rule, post-crit).
 
-**MOTION:** dot = tint-only pulse ~2s (ambient life, D-12; counts toward ≤4-motion budget);
+**MOTION:** dot = tint-only pulse ~2s — ONE synchronized `live-pulse` class so every dot
+in the viewport breathes in phase and counts ONCE toward the ≤4-motion budget (crit: N
+desynced dots read as N motions — S8 calm-live keeps the class, RM strips it);
 clock tick linear 1s; HT/break swaps 120ms cross-fade; RM = static dot+word.
 
 **PLAYER EXPECTATION:** thinks "is it actually in play" · expects real minute, real state ·
@@ -477,7 +515,9 @@ explicit "empty → Starting soon" ask; A5.a fingerprint ban (no centred-icon cl
 left-aligned, type-led, one action.
 
 **SIZE/SPACING:** module = s1 region, pad 24px, max-w 480px text col; house-glyph mark 24px
-at 40% — the ≤1 cameo budget (U-32).
+at 40% — subject to the **cameo arbiter** (U-32, crit b): ONE house glyph per view, priority
+ticket panel > empty module > palette (palette = never). Phone (no panel): module renders
+the cameo. Desk (panel present): module renders WITHOUT it — text only.
 
 **TYPE:** headline hb-h1 t1 + line hb-body t2 + one CTA hb-label (cta only when actionable).
 
@@ -535,26 +575,29 @@ loop masking an outage (timeout → error module + retry).
 
 ---
 
-## E-SHL-05 — Offline toast (+ reconnect)
+## E-SHL-05 — Offline banner (+ reconnect toast)
 
-**ELEMENT/PAGE/STATE:** persistent toast while offline → `Back online` transient on
+**ELEMENT/PAGE/STATE:** docked banner while offline → `Back online` transient toast on
 reconnect. States: offline-sticky · reconnect-3s · dismissed-never (offline can't dismiss).
 
-**WHERE:** phone: above bottom nav/slip pill; desk: bottom-right, above panel edge.
+**WHERE:** phone: full-width band above bottom nav/slip pill; desk: bottom edge band —
+docked, never floating over cells.
 
-**WHY:** SH-07 spec; XV4-04 own-the-fault calm copy (`You're offline — prices are frozen, not
-live`); U-41 frozen = word+icon; P6 designed offline (Paddy Power white-screen is the pain);
-betby `Back online` phonetic kept.
+**WHY:** SH-07 spec; canon encoding = **banner, not chip** (DATA-CANON one-encoding law —
+never confused with the suspended chip); XV4-04 own-the-fault calm copy (`You're offline —
+prices are frozen, not live`); U-41 frozen = word+icon; P6 designed offline (Paddy Power
+white-screen is the pain); betby `Back online` phonetic kept.
 
-**SIZE/SPACING:** h 48px, side insets 16px, r-md, pad 16px; icon 20px wifi-off.
+**SIZE/SPACING:** band h 48px, full-width docked, r-0 (a band, not a card), pad 16px;
+icon 20px **cloud-slash** (canon glyph — never the suspended padlock, never wifi-off stock).
 
-**TYPE:** hb-body-sec t1 on s2; `Back online` = up-glyph + t1.
+**TYPE:** hb-body-sec t1 on s2; `Back online` toast = up-glyph + t1, transient 3s.
 
 **COLOUR+CONTRAST:** neutral s2 + hairline — never error red (it isn't the user's fault);
 `Back online` `--c-up` glyph+word.
 
 **MOTION:** enter 200ms out-expo rise-8px; sticky (no auto-dismiss offline); reconnect toast
-3s then close 140ms; interrupt = reconnect supersedes offline toast in place. RM same.
+3s then close 140ms; interrupt = reconnect toast supersedes the banner in place. RM same.
 
 **PLAYER EXPECTATION:** thinks "did I lose my bet / is it me" · expects an answer · we show
 frozen-not-broken + what still works (ticket kept, prices marked frozen) · next tap: nothing
@@ -572,7 +615,7 @@ flapping on bad networks (debounce ≥2s both directions).
 
 ## E-SHL-06 — Session line (ambient reality check)
 
-**ELEMENT/PAGE/STATE:** one-line session readout `Session 47 min · Net −24.00 USDT`;
+**ELEMENT/PAGE/STATE:** one-line session readout `Session 47 min · net −12.00 USDT` (canon);
 states: neutral · positive net · tapped→RG sheet · reality-check due (ack-required variant).
 
 **WHERE:** ticket panel footer (always), Live page sub-head (P52-21), slip sheet footer —
@@ -584,7 +627,9 @@ neutral channel (words carry it, not red).
 
 **SIZE/SPACING:** line h 24px; hb-micro t2 on s1 strip; tap opens RG sheet (4 rungs — U-53).
 
-**TYPE:** hb-micro; numerals Oxanium; sign always explicit `−24.00`/`+36.00`.
+**TYPE:** hb-micro t2-line / Oxanium numerals; sign always explicit `−12.00`/`+36.00` —
+and the FULL string `Session 47 min · net −12.00 USDT` renders everywhere it appears:
+panel, slip sheet, My bets header (canon invariant 2 — identical line, three surfaces).
 
 **COLOUR+CONTRAST:** t2 words; net value t1 (never green/red — P/L hue ban, C-20/C-21);
 reality-check due = t1 text `You've been here 2h — take a break?` + `I'm good`/`Take a break`
@@ -601,7 +646,7 @@ bet (ack sheet waits for safe moment, never interrupts a placement — but can't
 unread) · micro-size burial (hb-micro is 11px floor — P51-16 wants visible, it rides content
 flow).
 
-**A11Y:** `role=timer` + `aria-live=polite` hourly; net labelled `Net this session, minus 24
+**A11Y:** `role=timer` + `aria-live=polite` hourly; net labelled `Net this session, minus 12
 USDT`; RG sheet = focus-trapped dialog returning focus.
 
 **EVIDENCE:** pending. **CHALLENGE:** pending.
@@ -626,5 +671,5 @@ USDT`; RG sheet = focus-trapped dialog returning focus.
 | E-BRD-08 live badge | all live rows/hero |
 | E-BRD-09 empty module | LV-03, HM-03, FB-04, SH-06 |
 | E-BRD-10 skeleton | HM-04, boards loading |
-| E-SHL-05 offline toast | SH-07 |
+| E-SHL-05 offline banner | SH-07 |
 | E-SHL-06 session line | SH-01, LV-01, SH-11 |

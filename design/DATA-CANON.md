@@ -11,6 +11,10 @@ THIS table; any new number is added here first. Rule: the number you see = the n
 ## Bets (refs unique — never reuse)
 - Open: **HB-48213** · Arsenal match result @ **1.80** · stake **20.00** · potential return **36.00** ·
   live cash-out quote **22.40** (ticks ±; a changed quote requires reconfirm)
+- Open: **HB-48214** · Atlético–Sevilla BTTS Yes @ **2.10** · stake **20.00** · potential return **42.00** ·
+  CO quote **17.10** (enumerates the in-bets ledger: 20+20+20 = 60.00)
+- Open: **HB-48215** · Newcastle–Villa draw @ **4.20** · stake **20.00** · potential return **84.00** ·
+  CO suspended (market suspended — dangerous attack; shows the paused-not-dead state)
 - Placed receipt (demo flow): **HB-90210** · Arsenal @ **1.30** accepted · stake 10.00 · return 13.00
 - Settled examples: HB-091 won +36.00 · HB-068 lost −10.00 · HB-104 void — abandoned 63' · 12.00 returned
 

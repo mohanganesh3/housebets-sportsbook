@@ -39,7 +39,7 @@ Fetch date: 2026-11-10 ~02:55 IST. Proposals are labelled [proposal]; sourced fa
 | Bet place → receipt | The prestige — a stamp | Button morphs to receipt card (container transform, 250ms ease-out); ref appears; quiet success tint <3s total | RM: instant receipt swap |
 | Place failed | Respectful | 150ms horizontal settle (one small shake ≤4px) + reason line + recovery action | RM: reason text only |
 | Cash-out value | A live instrument | NumberFlow on value; changed value gets "new amount" chip + requires reconfirm (B09) | RM: instant value + chip |
-| Odds-changed await-accept | Demanding attention without panic | Strikethrough old→new + amber card edge; gentle edge-pulse only while awaiting (stops on slip close) | RM: static card + label |
+| Odds-changed await-accept | Demanding attention without panic | Strikethrough old→new + amber card edge STATIC + `moved` label; NO pulse — P3 bans pulsing near money (post-crit reconcile) | RM: static card + label |
 | Slip sheet open (phone) | Physical — follows the thumb | Motion drag, springs; release velocity respected; dismiss mid-flight cancels (Freiberg) | RM: 150ms fade/translate fixed |
 | Pick→ticket flight | The pick travels to its home | layoutId morph cell→slip-bar chip ~300ms; ONLY on explicit add, not ticks | RM: count+1 badge |
 | List rows entering | Composed, not theatrical | Stagger ≤30ms/row, fade+4px rise, first-paint only — never on live updates | RM: instant |

@@ -29,12 +29,14 @@ Pinned strip preserves match context while hunting 78 markets (P1, P5).
 name blocks and score; pinned strip h44, side padding s12. Score digits in fixed-width boxes
 (wireframe `1 – 0` boxed chips): each score box 44×44 @390 / 40×40 @1440, gap s8.
 
-**TYPE** — competition `PREMIER LEAGUE`: hb-micro 11/14, caps, tracked, text-3. Team names:
+**TYPE** — competition `PREMIER LEAGUE`: hb-micro 11/14, caps, tracked, text-2 (informative muted
+rides text-2 post-B1; text-3 = decorative only). Team names:
 hb-title 20/24 Figtree 600, wrap ≤2 lines then ellipsis. Score: hb-score 22/26 Oxanium 700 tabular.
 Pinned strip: `ARS`/`BHA` hb-label 12/16 600 + score hb-odds 15/20 Oxanium.
 
 **COLOUR+contrast** — surface-1 card on --c-bg, 1px surface-2 hairline all round (border drawn
-once — Geist rule); names --c-text (≥7:1 target, pending T6); competition text-3 (≥4.5 pending);
+once — Geist rule); names --c-text (≥7:1 target); competition text-2 (5.36:1 on surface-2,
+crit-measured — passes ≥4.5 where text-3's 2.56 failed);
 score --c-text on surface-2 score-boxes. Pinned strip = surface-1 + hairline-b.
 
 **BORDER/RADIUS/ELEVATION** — r-md, hairline borders, zero shadow (elevation-by-hairline law;
@@ -131,14 +133,16 @@ C-03, C-05).
 strip h44.
 
 **TYPE** — `52′` hb-clock 12/14 Oxanium 600 tabular — `′` glyph inside the tabular run (T7-17);
-`LIVE` hb-label 12/16 700 caps.
+`LIVE` hb-label 12/16 700 caps inside the badge.
 
-**COLOUR+contrast** — --c-live on surface-1 for LIVE word+dot+minute (C-05: use the passing step —
-#ff4d75-class at ≥4.5 on s1, pending T6 measure; error-500 red banned for text). FT/HT: text-2 —
-no live channel once dead.
+**COLOUR+contrast** — DATA-CANON live badge: `● LIVE` on --c-live (#FF4D6D) badge fill with
+#14060A fg (lead-resolved B1 pair — word+dot+fill, never colour alone, C-03/C-05). The MINUTE is
+data → --c-text Oxanium (P1: clocks are content, not accents; dodges the 4.22:1 live-on-surface
+failure outright). FT/HT/Break: text-2 — no live channel once dead.
 
-**BORDER/RADIUS/ELEVATION** — none; it's a text unit, not a chip (wireframe shows pink text, no
-pill — parity).
+**BORDER/RADIUS/ELEVATION** — badge r-pill, flat. Parity note (corrected): phone wireframe renders
+`● LIVE` inside a dark-red pill with `52′` beside it; desk is pill-free — we ship the badge at
+BOTH widths (declared upgrade: one treatment, one grammar).
 
 **MOTION** — minute increments in place, opacity cross-fade 150ms on the digit(s) that changed —
 clock motion = linear/in-place only (74 vocab: constant motion linear); countdown→LIVE flip =
@@ -182,9 +186,10 @@ followed is the team — proximity = meaning (51 §5 Gestalt).
 
 **TYPE** — pill label hb-label 12/16 Figtree 600.
 
-**COLOUR+contrast** — unfollowed: --c-text-2 label + --c-text-3 star outline, hairline surface-3
+**COLOUR+contrast** — unfollowed: --c-text-2 label + --c-text-2 star outline (glyph affordance
+needs ≥3:1 non-text — text-3's ~2.5 fails; text-3 now decorative-only), hairline surface-3
 border; followed: --c-gold star + label stays text — gold is the glyph, never a fill (scarcity =
-signal, C-08; gold-on-dark contrast for non-text ≥3:1 pending T6).
+signal, C-08; gold-on-dark non-text ≥3:1 — measure owed, logged in EVIDENCE).
 
 **BORDER/RADIUS/ELEVATION** — r-pill (true pill = the label-shape exception, TOKENS radius law);
 hairline border; flat.
@@ -227,11 +232,12 @@ markets — distinct from global ⌘K (scope separation prevents the Stake sim-m
 
 **SIZE/SPACING** — h44, side padding s12, icon 20px + s8 gap; margin s12 below/above.
 
-**TYPE** — input hb-body 14/20 Figtree; placeholder hb-body text-3 `Search markets or players`
+**TYPE** — input hb-body 14/20 Figtree; placeholder hb-body text-2 `Search markets or players`
 (wireframe verbatim).
 
-**COLOUR+contrast** — surface-2 fill, hairline surface-3 border; text --c-text; placeholder text-3
-(≥4.5 pending); focus: --c-focus ring 2px offset 2 + border brightens.
+**COLOUR+contrast** — surface-2 fill, hairline surface-3 border; text --c-text; placeholder text-2
+(informative — the hint teaches scope; text-3's 2.56 fails B1); focus: --c-focus ring 2px offset 2
++ border brightens.
 
 **BORDER/RADIUS/ELEVATION** — r-md; flat.
 
@@ -283,9 +289,10 @@ tabs; edge-fade mask s24 both directions; sticky chrome gets 1px border-b + scro
 **TYPE** — tab label hb-label 12/16 Figtree 600; count same run, Oxanium tabular (T7-03: counts
 are numbers = tnum), one space `Popular 10`.
 
-**COLOUR+contrast** — strip surface-1 on --c-bg; inactive label text-2, count text-3; hover
+**COLOUR+contrast** — strip surface-1 on --c-bg; inactive label text-2, count text-2 (counts are
+informative — B1); hover
 surface-3 (instant 0ms — Salaja hover rule); ACTIVE = --c-cta pill fill + --c-cta-fg label+count
-(≥7:1 pending T6) — the single selected-language reused site-wide (D-01, SA4-18, R-YAB-08:
+(derived pair per TOKENS — ≥7:1 measure owed, logged in EVIDENCE) — the single selected-language reused site-wide (D-01, SA4-18, R-YAB-08:
 one high-salience dual-coded element per view — and on this page that job is shared with the
 selected odds cell; hierarchy kept by size: cell ≥44px content vs 32px tab pills).
 
@@ -333,10 +340,10 @@ via rhythm not smaller type (D-09, FotMob 72-canon rule 11).
 note inline; cell grid: ≤3 outcomes/row (P51-10, R-YAB-03), gap s8, section padding s12 bottom.
 
 **TYPE** — market name hb-h1 16/20 Figtree 600; settle note `Settles on 90′ + stoppage` hb-micro
-11/14 text-3 (T42-22 trust microcopy); outcome labels hb-body-sec 13/18 inside cells.
+11/14 text-2 (T42-22 trust microcopy — informative, so text-2 post-B1); outcome labels hb-body-sec 13/18 inside cells.
 
 **COLOUR+contrast** — header text --c-text on transparent bg (list region); hairline-b surface-2
-separator; chevron text-3; suspended state: header gains amber reason chip (E-M-09) — accordion
+separator; chevron text-2 (affordance glyph ≥3:1, B1); suspended state: header gains the reason chip (E-M-09) — accordion
 itself never dims, only its cells (one boundary = one meaning, R-YAB-19).
 
 **BORDER/RADIUS/ELEVATION** — no card, no radius on the region; the boundary IS the hairline.
@@ -349,7 +356,8 @@ height jump, chevron swaps.
 **PLAYER EXPECTATION**
 - **Before:** sees the market name — "is this what I want?".
 - **Expects:** tap opens it, prices inside are live and tappable.
-- **We show:** first two accordions expanded by default in the group (wireframe behaviour);
+- **We show:** first THREE expanded @1440 (W4-24 parity), first TWO @390 (declared per-width
+  delta — phone wireframe shows two open + third peek; scroll economy on the thumb page);
   others collapsed with settle-note visible; `+N more markets` tail disclosure for long groups.
 - **Next:** odds cells inside — the decision surface.
 
@@ -372,7 +380,8 @@ content region labelled by market name; settled markets still focusable for reco
 **ELEMENT** odds cell (selectable price) · **PAGE** match (canonical definition; reused on every
 page per A3.S3 one-component rule) · **STATES** — full matrix: default / hover / pressed /
 focused / selected / tick-up / tick-down / suspended / reopened-reprice / settled-won /
-settled-lost / void / offline-frozen.
+settled-lost / void / offline-frozen / break-read-only (14th: F8 — break-state taps must not be
+undefined on the flagship page).
 
 **WHERE** — inside accordion grids, ≤3 per row @390 / rows label-left-price-right @1440 (W4-08,
 W4-24). Largest interactive targets on the page = the primary action (51 cross-page rule); thumb
@@ -390,31 +399,50 @@ centered per layout — identical metrics in EVERY state so the target never shi
 (P51-03 geometry-parity rule; A17 CLS≈0; T7-11 digit width never moves). 3-up @390 ⇒ ~110px wide.
 
 **ANATOMY** —
-- 390 chip: two-line stack — label hb-body-sec 13/18 text-2 (single-line ellipsis, never shrink —
-  T7-10) over `price · implied%` : hb-odds 15/20 Oxanium 600 + hb-micro 11/14 text-3.
-- 1440 row: label left hb-body 14/20, price right hb-odds, implied under price hb-micro.
+- 390 chip: two-line stack — label hb-body-sec 13/18 text-2 (single-line END-ellipsis at fixed
+  budget, never shrink — T7-10; middle-truncate is for filenames, not labels) over
+  `price · implied%` : hb-odds 15/20 Oxanium 600 + hb-micro 11/14 **text-2** (B1: implied-% is
+  informative — text-3's 2.56:1 illegible; text-2 = 5.36 ✓).
+- 1440 row: label left hb-body 14/20, price right hb-odds, implied under price hb-micro text-2.
+- `CO` eligibility chip (slip E-32 canon — match page OWNS the pre-bet marker, F7): 24×16, top-LEFT
+  corner (✓ owns top-right), hb-micro 11/14 caps, --c-surface-3 fill + --c-text-2, r-sm, flat.
+  Present only on markets flagged cash-out eligible pre-bet; a fact, not a control — no motion,
+  no pulse (U-05, U-51). Absence = not offered; absence is itself labeled in My bets expansion.
 - Optional second line only for two-part names (`Arsenal or draw`); settle/jargon help lives on
   the accordion, not the cell (extraneous load = 0 in odds areas, R-YAB-15).
 
-**COLOUR+contrast** (per state; all text pairs ≥4.5:1, money facts ≥7:1 per C-12 — measured
-values pending T6):
+**TYPE** — label hb-body-sec 13/18 (@390) / hb-body 14/20 (@1440) Figtree; price hb-odds 15/20
+Oxanium 600 tabular (the money step — fixed digit width so ticks never shift geometry, T7-11);
+implied hb-micro 11/14 text-2; `CO` chip hb-micro caps; state words (`Void`, `Suspended`) hb-micro.
+No step below hb-micro 11/14 anywhere on the cell (T7-10 floor).
+
+**COLOUR+contrast** (per state; all text pairs ≥4.5:1, money facts ≥7:1 per C-12 — B1 pairs now
+LEAD-RESOLVED at token level: informative muted = text-2 everywhere, text-3 demoted decorative):
 - default: surface-2 fill, hairline surface-3 border, label text-2, price --c-text Oxanium,
-  implied text-3.
+  implied text-2 (5.36:1 on surface-2, crit-measured).
 - hover (hover:hover only): surface-3 fill — 0ms instant (Salaja).
 - pressed: same fill + real :active (below).
 - selected: --c-cta fill + --c-cta-fg ALL content (price, label, implied, ✓) — Housebets
   fill-flip convention (C-11, U-25, W5-01); ✓ 16px top-right inside cell; geometry identical.
-- tick-up: price + ▲ glyph --c-up + green ::after tint overlay; tick-down: ▼ --c-down. Red glyph/
-  text uses the AA-passing lighter step on surfaces <4.5 (C-04 — error-500 #f41f50 fails small
-  text at 4.10 on s2: glyph acceptable as ≥3:1 non-text, any red TEXT uses lighter step).
+- tick-up: price + ▲ glyph --c-up + green ::after tint overlay; tick-down: ▼ --c-down (#FF6B86 —
+  updated token resolves the C-04 small-text failure at token level; glyph+tint ride it, and any
+  red TEXT also uses this step, never error-500).
 - suspended: cell stays, dims to 60% opacity, padlock glyph replaces affordance-cue; last price
-  remains legible through the dim (S3, D-04) — amber comes from the accordion's reason chip
-  (C-13: suspended ≠ disabled-grey).
+  remains legible through the dim (S3, D-04) — amber comes from the accordion's reason chip,
+  DATA-CANON suspend grammar: --c-suspend bg + #2A1200 fg + 🔒 (E-M-09, shared verbatim with
+  slip E-08). Suspended ≠ disabled-grey (C-13).
 - settled: won = --c-text price + quiet ✓ + --c-up edge tint ≤3s fade then static mark; lost =
-  text-3 dim; void = `Void` word hb-micro.
+  text-2 at 500 weight (dimmed via weight+colour, T7-12 — never via the now-decorative text-3);
+  void = `Void` word hb-micro text-2.
 - focused: --c-focus 2px ring offset 2; ON selected cell = dual-tone ring (neon + --c-cta-fg
   offset) per C-11 — ring-on-cyan is invisible otherwise.
-- offline: frozen default look + text-3, no amber, no lock (our failure ≠ market's).
+- offline: frozen default look, labels text-2, cells inert — `aria-disabled` (chosen semantic:
+  they remain focusable so SR can read last price + `betting paused — you're offline`; NOT the
+  padlock — padlock = market suspension, cloud = our outage; band carries the amber edge, cells
+  carry none — F5).
+- break (read-only): default look, no hover/press affordance, taps inert; context line lives in
+  the banner slot (M-14): `On a break · back {time}` surface-2 + --c-text — deliberately NOT
+  amber (chosen state, slip E-17 spelling) — `aria-disabled` + `aria-describedby` break reason.
 
 **BORDER/RADIUS/ELEVATION** — r-md (DOMINANT radius, TOKENS); 1px hairline default, selected
 keeps the hairline under the fill; zero shadow (flat, SA4-05 halo audit); ::after overlay for
@@ -427,7 +455,7 @@ tints so borders never animate.
   pulse once.
 - tick-up/down (S1): NumberFlow `trend=0` digit morph 250ms --ease-out-expo, cell width fixed;
   ▲/▼ glyph fades in with tint ::after, decays linearly ~1s to muted caret persisting ~9s
-  (T42-08); hover/focus tooltip `was 4.60 → 4.80`; transform/opacity only (U-56); interrupt:
+  (T42-08); hover/focus tooltip `was 4.80 → 5.00`; transform/opacity only (U-56); interrupt:
   new tick supersedes mid-decay — glyph/tint snap to newest (P4); RM: instant swap + glyph +
   static tint edge.
 - suspend (S3): 0ms same-frame — padlock + dim 60% + market reason chip; NO lock animation
@@ -444,8 +472,9 @@ tints so borders never animate.
 - **We show:** press-in 80ms visual, selected flip same frame, flight to ticket; a move shows
   ▲/▼ + tint + `was →` trail; a lock shows lock+reason+last price — never a dead button, never
   a silent swap (P2, D-04, U1 #1 pain).
-- **Next:** the ticket zone (pill/panel) holding `Arsenal @ 1.30 · Pays 26.00`; cell's price
-  continues to live-tick — slip holds price-at-add and asks on change (D-03, U-01).
+- **Next:** the ticket zone (pill/panel) holding `●1 Arsenal @1.30` (pill payload canon — never
+  `Pays X` before a stake exists, F4); cell's price continues to live-tick — slip holds
+  price-at-add and asks on change (D-03, U-01).
 
 **FAILURE MODES (exhaustive — this cell owns the "every state" scorecard line)**
 - tick while selected → cell keeps selected fill; price updates live (price-at-add lives in the
@@ -463,12 +492,23 @@ tints so borders never animate.
 - CVD → glyph + word direction + fill-style; hue never sole channel (C-01/02/03).
 - long-press → implied-% explainer / `was →` history where cheap (P52-07).
 - odds cell inside suspended accordion stays inert-but-legible — dead-button ban (D-04).
+- tap during break → nothing: cells are read-only with the reason one glance away in the banner
+  slot (F8; ticket zone carries the `On a break` strip, slip E-17).
+- selected+suspended combo → BOTH arias coexist: `aria-pressed="true"` + `aria-disabled="true"`,
+  SR name `Arsenal to win, 1.30 — selected, suspended, dangerous attack` (pick is kept, never
+  silently dropped, R-YAB-13).
+- void at cell density renders the WORD `Void` only; the `↺` pill is the slip-row grammar
+  (E-28) — different surfaces, one meaning (nit-noted divergence).
+- single-market reopen (vs cascade) → same live-region announces `"Total goals reopened — prices
+  updated"` once; a solo reopen still gets its 150ms un-dim + repriced ticks.
 
 **A11Y** — `<button>` `aria-pressed`; SR name `Arsenal to win, 1.30, implied 77 percent` (X01
 format); price changes announced once via one shared live region — never per digit/frame
 (P55-22); suspended → `aria-disabled` + reason text in name (`Suspended, dangerous attack`);
-`aria-hidden` on ✓/▲/▼/🔒 decorative glyphs — the label carries the state (second cue = word,
-not the icon alone).
+offline → `aria-disabled` + `betting paused — you're offline` (inert ≠ disabled-appearance:
+kept focusable so the last price stays readable); break → `aria-disabled` + describedby break
+strip; `aria-hidden` on ✓/▲/▼/🔒/CO decorative glyphs — the label carries the state (second
+cue = word, not the icon alone). `CO` chip adds `cash out offered` to the SR name when present.
 
 **DEFEND IN CRIT (A3.S4)** — "why is the implied % always visible, not a toggle?" Because P1
 declares honesty part of the price itself and F9/F10 show it corrects probability misjudgement;
@@ -487,9 +527,10 @@ contrast table per state.
 cell-dim+header-chip (match page) / full-width band replacing odds row (list rows on other pages
 — defined here for consistency, A3.S3) / reopening / unknown-reason / notify-me (proposal).
 
-**WHERE** — match page: amber reason chip inside the accordion header, right of market name; its
-cells dim+lock (E-M-08). Row variant (W2-09): full-width outlined amber bar `🔒 Suspended` where
-the odds row was — shared grammar, defined once.
+**WHERE** — match page: reason chip inside the accordion header, right of market name; its cells
+dim+lock (E-M-08). Row variant (W2-09): full-width amber-edged band carrying the same chip where
+the odds row was — shared grammar, defined once (F6: ONE chip spec, imported verbatim by slip
+E-08 — this card is the canon).
 
 **WHY THERE** — D-04 + U-04 + S3: same-frame lock + reason + last price — direct answer to U1's
 mystery-suspension cluster ("locks for no obvious reason", "stuck on suspended"); XV4-02:
@@ -503,12 +544,13 @@ right cluster left of chevron. Band variant: h44 replaces cell row, full width.
 **TYPE** — chip `Suspended — dangerous attack` hb-micro 11/14 600 (em-dash per COPY pattern
 `Suspended — {reason}`); band hb-body-sec.
 
-**COLOUR+contrast** — --c-suspend #E17823 text+glyph on surface-2 chip with --c-suspend hairline
-edge (amber ≥4.5 on s2 pending T6 — may need text-side darkening; measure owed); band: amber
-hairline outline + amber text on transparent (wireframe style). Never grey/disabled channel
-(C-13: suspended ≠ disabled).
+**COLOUR+contrast** — DATA-CANON suspend chip (lead-resolved B1): chip = --c-suspend (#E17823)
+fill + #2A1200 fg (words + 🔒 glyph) — amber-on-dark fails (3.68) and white-on-amber fails (2.90);
+dark-on-amber is the passing pair. Band variant: 1px --c-suspend edge inside r-md + the same chip
+inset — amber edge carries the row, identical chip carries the reason (one grammar, both bodies).
+Never grey/disabled channel (C-13: suspended ≠ disabled).
 
-**BORDER/RADIUS/ELEVATION** — chip r-pill (true pill exception); band r-md hairline outline; flat.
+**BORDER/RADIUS/ELEVATION** — chip r-pill (true pill exception); band r-md + 1px amber edge; flat.
 
 **MOTION** — appear: 0ms same-frame (S3 — integrity is instant); the CHIP fades in 120ms
 --dur-feedback only because it enters from nothing — the lock itself does not animate; reopen:
@@ -532,7 +574,8 @@ resume with identical prices: still un-dim+settle, no fake tick (P55-04 honest-f
 **A11Y** — chip is text — announced via the market's live-region event ("Total goals suspended —
 dangerous attack", once, P55-22); not interactive itself; 🔒 aria-hidden.
 
-**EVIDENCE** — pending (amber contrast measure; vocabulary render @390/1440 for all six reasons).
+**EVIDENCE** — pending (#2A1200-on-#E17823 contrast logged in the pair table; vocabulary render
+@390/1440 for all six reasons).
 **CHALLENGE** — pending (notify-toggle scope decision).
 
 ---
@@ -565,10 +608,16 @@ animation (transform/opacity-only money-path rule, U-56).
 
 **MOTION** — binding (S4): beat 1 score NumberFlow +1, 300ms --ease-out-expo + event line types in;
 beat 2 edge flash ::after opacity pulse 400ms (up 120 / decay 280) + same-frame locks; beat 3
-reopens in list order, repriced ticks; total ≤2.5s (P55-06 audit). Interrupt: ANY newer event
-(VAR, second goal, FT) supersedes mid-cascade — partial locks resolve to newest feed state, never
-queue (P4, S4). RM: score + event line only — no roll, no flash, no cascade motion; locks still
-land same-frame (integrity survives RM).
+reopens in list order, repriced ticks; total ≤2.5s (P55-06 audit). **Lock rule (F3):** every
+score-derived market locks — Match result, Double chance, Next goal, Total goals incl. per-half
+lines, Correct score, Goalscorers, and all goal-linked handicap lines (Asian + European, full-
+and half-match); non-score-derived markets (corners, cards, minutes) stay open. The rule is
+"derivable from the score", not a hand list — a stale 1X2-derivative price beside the lock is an
+arb, not a state. **Cascade × S8:** a goal while a stake is pending TRUMPS calm-live muting —
+the cascade is the event, not ambience (pending ticks stay muted; the cascade plays). Interrupt:
+ANY newer event (VAR, second goal, FT) supersedes mid-cascade — partial locks resolve to newest
+feed state, never queue (P4, S4). RM: score + event line only — no roll, no flash, no cascade
+motion; locks still land same-frame (integrity survives RM).
 
 **PLAYER EXPECTATION**
 - **Before:** watching prices when something big happens.
@@ -612,7 +661,7 @@ text button; `+78 ›` right-aligned cell link h≥44 on rows.
 **TYPE** — counts Oxanium tabular (T7-03 — "+N" named explicitly); hb-label in tabs; tail link
 hb-body-sec text-2.
 
-**COLOUR+contrast** — inactive tab count text-3; active tab count --c-cta-fg (≥7:1 with pill);
+**COLOUR+contrast** — inactive tab count text-2 (counts are informative — B1); active tab count --c-cta-fg (≥7:1 with pill);
 tail link text-2 + hover text; `+N ›` brand-neon text? NO — neon reserved for accents (C-10
 budget): use --c-text-2 label + --c-brand-neon only on the `›` affordance cue if needed; prefer
 all text-2 (restraint audit).
@@ -660,14 +709,17 @@ lives; retention-with-respect (follow loops, not bait).
 **SIZE/SPACING** — h48 @390 (one-line strip), padding s8·s12; left block pick, right block quote;
 gap s12. Hit full-strip ≥44 → opens ticket.
 
-**TYPE** — `Your bet` hb-micro 11/14 text-3 caps label; pick `Arsenal @ 1.80` hb-body-sec 13/18
-600; quote `Cash out 14.32 USDT` hb-odds-sm 13/16 Oxanium tabular, --c-text (money fact ≥7:1,
-C-12); settled line uses COPY verbatim.
+**TYPE** — `Your bet` hb-micro 11/14 text-2 caps label (B1); pick `Arsenal @ 1.80` hb-body-sec
+13/18 600; quote `Cash out 14.32 USDT` hb-odds-sm 13/16 Oxanium tabular, --c-text (money fact
+≥7:1, C-12); settled line uses COPY verbatim.
 
 **COLOUR+contrast** — surface-2 fill + hairline surface-3; left edge 2px --c-cta accent mark (the
-"this is yours" channel — pale-cyan acts, D-01); quote text --c-text; paused = text-3 + `Cash out
-paused — market suspended`; NEVER green/red on the quote (P/L colour is outcome-only — neutral
-instrument, U-51, P52-08; CO eligibility badge pre-bet = U-05 flag on market, out of strip scope).
+"this is yours" channel — pale-cyan acts, D-01); quote text --c-text; paused = text-2 + `Cash out
+paused — market suspended`; CO value moved → left edge swaps to 2px --c-suspend amber edge +
+`Offer moved to {value} — confirm new amount` (changed grammar — amber edge, slip E-07/E-02
+canon, F5 unified); NEVER green/red on the quote (P/L colour is outcome-only — neutral
+instrument, U-51, P52-08; CO eligibility badge pre-bet = U-05 flag lives on the market cell —
+E-M-08 owns it, F7 resolved, no longer "out of strip scope" orphaned).
 
 **BORDER/RADIUS/ELEVATION** — r-md, hairline, flat; no glow, no pulse (calm is the brand, P3).
 
@@ -696,7 +748,9 @@ deliberate friction placement).
 demand, P55-22).
 
 **EVIDENCE** — pending (strip shot; quote-tick recording; paused state shot).
-**CHALLENGE** — pending (strip position vs search position tension — second-agent call).
+**CHALLENGE** — RESOLVED (crit-match-v2): strip stays above search — conditional element that
+exists only with an open bet on this fixture; must-be-seen money info (P51-16) at the FD
+"My Action" position; tabs keep 2nd-fixation job.
 
 ---
 
@@ -714,13 +768,15 @@ breadcrumb *is* the where) + XV4-19/T42-15 (switcher = follow-first return loop:
 next fixture without leaving) + familiar convention (A19.b). Text path, no pill-row chrome
 (SA4-02 one-control-grammar: breadcrumbs → text path).
 
-**SIZE/SPACING** — h40 @1440; level items hb-body-sec with s4 gaps + `|` or `›` separators text-3;
-chevron ⌄ 16px per level; phone pill h36 hit 44.
+**SIZE/SPACING** — h40 @1440; level items hb-body-sec with s4 gaps + `|` or `›` separators text-3
+(separators are decorative — the one role text-3 keeps post-B1); chevron ⌄ 16px per level; phone
+pill h36 hit 44.
 
 **TYPE** — levels hb-body-sec 13/18 Figtree 500, current level 600 --c-text; phone `ARS - BHA`
 hb-body 14/20 600.
 
-**COLOUR+contrast** — ancestors text-2, current text; separators text-3; hover text only (0ms);
+**COLOUR+contrast** — ancestors text-2, current text; separators text-3 (decorative-only role —
+B1-compliant); hover text only (0ms);
 dropdown menu surface-2 + hairline + r-md (menus are chrome — square-ish r-md, not pill).
 
 **BORDER/RADIUS/ELEVATION** — path: none; phone pill: surface-2 + hairline + r-md; dropdown: the
@@ -772,8 +828,8 @@ component persisting across a transition stays visually constant).
 marks ✓/✕ hb-body-sec; settled money hb-odds-sm Oxanium.
 
 **COLOUR+contrast** — scoreboard mutes to text-2 hierarchy (the match is over — attention should
-leave); won mark --c-up + word `won` (dual channel); lost text-3 + word; void text-2 + word;
-never colour alone (C-01/C-03). Settled money facts --c-text (C-12).
+leave); won mark --c-up + word `won` (dual channel); lost text-2 at 500 weight + word `lost`;
+void text-2 + word `void`; never colour alone (C-01/C-03). Settled money facts --c-text (C-12).
 
 **BORDER/RADIUS/ELEVATION** — unchanged from live card.
 
@@ -786,13 +842,17 @@ presence (P52-10, A13.e Bashagha rule); RM identical minus fades.
 - **Before:** match ended; "did I win / what's this worth now".
 - **Expects:** result + my outcome, plainly.
 - **We show:** `Settled · won 16.00 USDT` / `Settled · lost 20.00 USDT` + `View in My bets ›`
-  (T42-13 journey: receipt → bet → match links resolve both ways); markets show ✓/✕ marks +
-  `Void` where suspended at end.
+  (T42-13 journey: receipt → bet → match links resolve both ways); markets show ✓/✕ marks —
+  suspended-at-FT markets settle by final score too (F1: a suspension is a pause, not an
+  unsettleable result; a sportsbook voiding live markets is a domain error the judge will catch);
+  `Void` appears only on feed-declared voids.
 - **Next:** My bets for the receipt record; or follow-next-fixture via the match switcher —
   the only "what now" we offer (respectful exit, no re-bet bait).
 
-**FAILURE MODES** — void market: `Void — market closed · stake returned` (N14) with refund
-visible in strip; re-settlement (stat correction): markets get a `Result corrected — {reason}`
+**FAILURE MODES** — feed-declared void: `Void — {reason} · {stake} USDT returned` (COPY pattern
+verbatim, {stake} amount restored) with refund visible in strip; suspended-at-FT: SETTLES by
+final score — `Void` is never the default for a played-out market (F1); re-settlement (stat
+correction): markets get a `Result corrected — {reason}`
 change line (U-14 transparency — never a silent re-grade); revisiting an FT page: renders settled
 instantly (no live ceremony, no skeleton theatre — cached state, Salaja no-replay rule);
 settlement while user mid-slip on this match: leg marked `Market closed — settled` in slip,

@@ -28,23 +28,29 @@ Popular 10 · Goalscorers 9 · Goals 11 ▸…     Popular 10 · Goalscorers 9 �
                                              Halves 8 · Handicaps 5 · Corners & cards 14 ·
                                              Minutes 10 · All markets 78
 Match result ⌃                              Match result ⌃
-[Arsenal 1.30·77%][Draw 4.60·22%][BHA 11.00·9%]   [Arsenal … 1.30][Draw … 4.60][Brighton… 11.00]
+[Arsenal 1.30·77%][Draw 4.80·21%][BHA 11.00·9%]   [Arsenal … 1.30][Draw … 4.80][Brighton… 11.00]
 Double chance ⌃ · Total goals ⌃ · +N          Double chance ⌃ · Total goals ⌃ · +N more markets
 ┌──────────────────────────┐                 (ticket lives in right panel — MM rule 1)
-│ 1 · Arsenal @ 1.30    ⌃  │  slip pill
+│ ●1 Arsenal @1.30      ⌃  │  slip pill
 └──────────────────────────┘
 ```
 
 Attention map (research/51 §3.4): 1st scoreboard · 2nd sticky tab bar · 3rd default-group first
 market grid. Must-not-steal applied: tabs never outrank scoreboard; ≤4 concurrent flashes;
 slip-open scrim freezes background ticks (S8/P51-11). Primary action: first 1X2 cell — slip open:
-Place bet (51 §cross-page rule). Money actions inside left-80% band at 1440 (P51-20) — the right
-panel holds the ticket but never a page-level confirmation (MM rule 1).
+Place bet (51 §cross-page rule). Money actions inside left-80% band at 1440 (P51-20); the
+ticket's own confirmation lives in the right panel where it is the loudest in-panel element
+(P51-20 read exactly — panel confirmations allowed when loudest in-panel; MM rule 1 keeps the
+ticket out of the board's space).
 
 Wireframe deltas (A2.b/c): "Specials 7" tab DROPPED — brief out-of-scope bans specials (A1.k);
-total becomes `All markets 78` not 85 (honest recount, not wireframe-matching fiction). Scoreboard
-`<`/`›` edge steppers kept as prev/next fixture in competition (W4-02 note "prev match?"). Everything
-else from W4-01…24 exists at both widths.
+arithmetic verified vs desk-match.webp: 10+9+11+11+8+5+14+10+**7** = 85 → minus Specials =
+`All markets 78` (honest recount, not wireframe-matching fiction; nothing shipped may say `85`
+or `Specials` — grep at build). Scoreboard `<`/`›` edge steppers are an ADDITION, not a keep
+(wireframe shows `<` only, phone only, none on desk) — declared "beat them" move: prev/next
+fixture in competition. `+N` rows read `78` — internal consistency over the wireframe's own
+`+115`-vs-`85` contradiction. Prices adopt DATA-CANON 1.30/4.80/11.00 (M-05); double-chance book
+re-derived, not copied (M-12). Everything else from W4-01…24 exists at both widths.
 
 ---
 
@@ -53,7 +59,8 @@ else from W4-01…24 exists at both widths.
 **Trigger:** tap a live match row on Home/Live/Football (`+78 ›` or any cell).
 **390:** shared-element transition crest+names+score from card → scoreboard (P55-11; D-07 same-doc
 View Transition, feature-detected; odds grid excluded). 200–260ms --ease-out-expo. First paint:
-scoreboard + search + tabs + Popular group, first two accordions expanded.
+scoreboard + search + tabs + Popular group, first accordions expanded (three @1440 / two @390 —
+M-12 rule).
 **1440:** same morph into the wider scoreboard; right panel already mounted (persistent zone, MM).
 **Copy:** `PREMIER LEAGUE` · `● LIVE 52'` · `Search markets or players` (W4-06 verbatim) ·
 tab labels with counts · `Match result` / `Double chance` / `Total goals`.
@@ -78,8 +85,8 @@ even when visually abbreviated (X02).
 (newest scroll wins); RM: instant cut. Strip content never re-animates on ticks — clock/score
 update in place.
 **Why:** the score must stay glanceable while hunting 78 markets — that's the page's job (P1, P5).
-**Beats wireframe:** wireframe loses all match context on scroll; we keep score+clock+follow in
-84px of chrome vs their 0.
+Wireframe loses all match context on scroll; we keep score+clock+follow in 88px of chrome
+(strip 44 + tabs 44).
 
 ## M-03 — Market search active
 
@@ -92,7 +99,6 @@ auto-expand; tab counts re-sum (`Goals 3 of 11`); `All markets 78` stays as unfi
 **Motion:** zero animation while typing (U-43 frequent-action rule); expansions instant.
 **Why:** 78 markets need a narrowing ladder — curate → filter → search (R-YAB-14); ≤2 taps to any
 market (U-16, P5).
-**Beats wireframe:** wireframe draws the box but no behaviour; ours filters, re-counts, deep-links.
 
 ## M-04 — Sticky group tabs with counts
 
@@ -109,42 +115,41 @@ T7-03).
 RM identical. State in URL `?group=goals` (U-45, 72 rule 22).
 **Why:** counts upfront = M4/A37.S3 ask + scanning aid before opening a group (U-17, R-YAB-05
 chunk-before-count; P51-09 linear menu ordered by frequency).
-**Beats wireframe:** live counts, URL state, scroll-into-view, one honest total.
 
 ## M-05 — 1X2 market row (the task terminus)
 
 **Trigger:** none — default expanded `Match result` accordion under Popular.
 **390:** three cells, label-over-price chips ≥44px h, ≥8px gaps (P51-03, T7-07, R-YAB-01):
-`Arsenal 1.30 · 77%` · `Draw 4.60 · 22%` · `Brighton 11.00 · 9%`.
+`Arsenal 1.30 · 77%` · `Draw 4.80 · 21%` · `Brighton 11.00 · 9%`.
 **1440:** three wide rows label-left / price+implied right (W4-24), ≥36px h.
+**Prices — DATA-CANON:** 1.30/4.80/11.00 → implied 76.92 + 20.83 + 9.09 = **106.85%** ✓ inside the
+P6/X07 103–107 band (lead ruling: wireframe's 4.60 was sample data; in-play prices move anyway —
+one tick of parity deviation is cheap).
 **Why:** P1 — the price is the product: Oxanium tabular, implied probability beside every price
 (U-47, U4-F9/F10 RCT evidence), 1X2 L→R home-draw-away convention kept (R-YAB-04). ≤3
 outcomes/row (P51-10, R-YAB-03 Hick).
-**Open challenge:** wireframe prices 1.30/4.60/11.00 = 107.7% overround, breaching the P6/X07
-103–107% band. Proposal: Draw 4.60→4.80 (106.84%) keeps both team prices wireframe-true — flagged
-to data owner; EVIDENCE pending either way.
 **Beats wireframe:** implied % on every price (nobody ships this), ≥44px targets, fixed geometry.
 
 ## M-06 — Tick up / tick down moment
 
-**Trigger:** feed reprices Draw 4.60 → 4.80 (market still open).
-**Both:** S1 — digits morph in place 250ms --ease-out-expo (NumberFlow trend=0), ▼ glyph appears,
---c-down tint overlay decays ~1s linear; muted ▼ persists ~9s, cell tooltip `was 4.60 → 4.80`
+**Trigger:** feed reprices Draw 4.80 → 5.00 as clock runs past 60' (market still open).
+**Both:** S1 — digits morph in place 250ms --ease-out-expo (NumberFlow trend=0), ▲ glyph appears,
+--c-up tint overlay decays ~1s linear; muted ▲ persists ~9s, cell tooltip `was 4.80 → 5.00`
 where cheap (T42-08). Direction triple-coded: glyph + tint + signed movement — never colour alone
-(A13.c, C-01, C-02).
+(A13.c, C-01, C-02). Book stays honest post-tick: 1.30/5.00/11.00 → 76.92 + 20.00 + 9.09 =
+**106.01%** ✓ in band.
 **Constraints:** ≤4 concurrent flashes in viewport (P51-11, R-YAB-17); while slip holds a pending
 stake, ticks mute to tint-only (S8); a new tick supersedes the running one — never queues
 (P4, U-56). RM: instant swap + glyph + tint.
 **Copy:** none new — movement is the message (U-50 delta-fact, never momentum bait).
-**Beats wireframe:** wireframe is static; the "Odds moving" scorecard line lives here — with the
-`was →` trail no rival shows.
 
 ## M-07 — SUSPENDED market (dangerous attack)
 
 **Trigger:** feed suspends `Total goals` — dangerous attack near Brighton's box.
 **Both:** S3 — same frame, 0ms: accordion stays open; all three cells dim to 60%, padlock glyph
-locks the price column; amber reason chip `Suspended — dangerous attack` appears in the accordion
-header (D-04, U-04, U-27). Last prices stay visible — honest, not dead (P2, P6). `+N`/tab counts
+locks the price column; reason chip `🔒 Suspended — dangerous attack` (--c-suspend bg + #2A1200
+fg — DATA-CANON suspend grammar, shared verbatim with slip E-08) appears in the accordion header
+(D-04, U-04, U-27). Last prices stay visible — honest, not dead (P2, P6). `+N`/tab counts
 unaffected; market still navigable (W2-26 pattern).
 **Copy:** `Suspended — dangerous attack` (COPY suspended pattern; vocabulary: `goal scored` /
 `VAR check` / `penalty` / `dangerous attack` / `break` / `feed issue` — T42-01, XV4-02, A13.S3).
@@ -164,16 +169,24 @@ nobody else shows *why* (42-teardown "ours" column).
 - **Beat 1 (t=0–300ms):** score digit rolls NumberFlow +1, 300ms; event line types in under the
   score: `Goal — Brighton & Hove Albion 54'` (N1). Scoreboard `1 – 1`.
 - **Beat 2 (t≈300–700ms):** scoreboard edge flash — 2px ring ::after opacity pulse 400ms, --c-live;
-  simultaneously (same frame) every goal-linked market locks: Match result, Next goal, Total goals,
-  Correct score, Goalscorers — `Suspended — goal scored` chips, cells dim.
+  simultaneously (same frame) the lock rule fires — **every score-derived market**: Match result,
+  Double chance, Next goal, Total goals (incl. per-half lines), Correct score, Goalscorers, and
+  every goal-linked handicap line (Asian + European, full- and half-match) — `Suspended — goal
+  scored` chips, cells dim. Non-score-derived markets (corners, cards, minutes) stay open — the
+  rule is "derivable from the score", not a hand list (F3 fix; leaving a 1X2 derivative open
+  mid-cascade shows stale arb prices beside the lock).
 - **Beat 3 (t≈700ms–2.5s):** markets reopen one-by-one in list order; prices re-enter as reprice
   ticks. Encoding = odds-number direction, never bettor fortune (C-02 convention, U-50
-  delta-fact): Arsenal 1.30→1.44 ▲, Draw 4.60→3.75 ▼, Brighton 11.00→7.50 ▼ — the number rose or
+  delta-fact): Arsenal 1.30→1.44 ▲, Draw 4.80→4.00 ▼, Brighton 11.00→8.00 ▼ — the number rose or
   fell, the glyph says which; what it means for a backer is the implied %'s job, not the glyph's.
+  Post-goal book stays in band: 1/1.44 + 1/4.00 + 1/8.00 = 69.44 + 25.00 + 12.50 = **106.94%** ✓
+  (F2 — the hero moment must not reprice into a worse book than the one it corrects).
 
 **Interrupt:** a second event (VAR disallowal, second goal) supersedes mid-cascade — newest state
-wins, nothing queues (P4, S4). RM: score updates + event line only — no roll, no flash, no cascade
-motion (states still land).
+wins, nothing queues (P4, S4). **Cascade × S8:** a goal while a stake is pending TRUMPS calm-live
+muting — the cascade is the event, not ambience: pending ticks stay muted, the cascade plays (the
+one hero motion, already budgeted). RM: score updates + event line only — no roll, no flash, no
+cascade motion (states still land).
 **Copy:** `Goal — Brighton & Hove Albion 54'` · `Suspended — goal scored` · reopen ticks silent.
 **Why:** causality made visible is the moat (75: "goal → lock → reprice" in one glance; R-YAB-07
 goal-flash peak; A13.e quiet celebration — edge flash is information, not confetti). This is the
@@ -186,18 +199,21 @@ judge-replayable sequence.
 **Trigger:** tap `Arsenal 1.30`.
 **390:** cell flips to selected (--c-cta fill, --c-cta-fg text, ✓ — identical geometry, C-11) in
 --dur-feedback; S2 flight: cell → slip-pill chip morph 280ms --ease-standard, transform-origin at
-the cell — ONLY on explicit add (S2, U-46: the ONE signature move). Slip pill slides up:
-`1 · Arsenal @ 1.30 · Pays 26.00` + `⌃` (payout preview, T42-12, U-29).
+the cell — ONLY on explicit add (S2, U-46: the ONE signature move). Slip pill enters
+scale(0.95)→1, 200ms --ease-out-expo (slip E-02's verb — one spelling for the same element)
+carrying the pick payload canon `●1 Arsenal @1.30` + `⌃` (lead ruling F4: never `Pays X` before a
+stake exists — a default stake is an operator bet; T42-12's payout preview lives inside the slip
+once a stake is typed).
 **1440:** same cell→panel chip morph into right-panel slip card; no pill (panel is the zone, MM).
-**Copy:** pill `1 · Arsenal @ 1.30 · Pays 26.00` (N — extends U-29 pick-on-pill with return).
+**Copy:** pill pick state `●1 Arsenal @1.30`; open-bet state `●1 Arsenal · 1–0 · 52' · CO 22.40`
+— the pill distinguishes picks from placed bets by grammar (pale-cyan vs surface fill, slip E-02),
+not by invented vocabulary.
 **Motion budget:** while stake is pending, all board motion → tint-only (S8 calm-live; P51-11
 freeze behind scrim when sheet opens).
 **Interrupt/RM:** tap elsewhere mid-flight → morph completes to newest state; RM: ticket count
 pulses once, no flight.
 **Why:** P4/MM rule 3 — the pick's journey is spatial: cell → ticket zone → receipt. The flight
 teaches where the ticket lives (the mental-map lesson in motion).
-**Beats wireframe:** wireframe's ✓-state exists but nothing travels; ours makes the desk's physics
-legible (72-canon rule 23: one authored move).
 
 ## M-10 — Open bet visible on the match page
 
@@ -210,18 +226,23 @@ quote freezes visibly dimmed.
 **Copy:** `Your bet` · `Cash out {value} USDT` · paused variant (COPY) · `Offer moved to {value} —
 confirm new amount` on tap-after-move (COPY, U-06).
 **Motion:** value ticks via S1-style digit morph; no border pulses, no countdown pressure
-(P52-13, U-51). RM: instant values.
+(P52-13, U-51). CO value moved → strip's left edge swaps --c-cta accent → 2px --c-suspend amber
+edge (changed grammar, slip E-07 canon) + `Offer moved to {value} — confirm new amount`. RM:
+instant values.
 **Why:** A22.a/S2 retention-with-respect + T42-11 (FD "My Action" pattern Stake lacks — free win);
 must-be-seen info sits in content flow on a real surface (P51-16), not greyed footer microcopy.
-**Beats wireframe:** nothing in the wireframe connects match → open ticket; this is a named ask.
+Position RESOLVED above search (lead ruling: strip is conditional — exists only with an open bet
+on this fixture — and it's the player's money).
 
 ## M-11 — FT settled state
 
 **Trigger:** feed ends match, 1–1.
 **Both:** clock → `FULL TIME` (word, never colour alone — A13.b); scoreboard settles (follow stars
 persist — follows outlive matches); every market accordion flips to settled: winning outcome cell
-gets quiet ✓ + --c-up edge tint ≤3s fade (P52-10), losing outcomes dim to text-3, suspended
-markets mark `Void — match ended · stake returned` (extends COPY void pattern, N14).
+gets quiet ✓ + --c-up edge tint ≤3s fade (P52-10), losing outcomes dim to text-2 at 500 weight.
+Suspended-at-FT markets SETTLE by final score like everything else — a suspension is a pause, not
+an unsettleable result (F1 ruling); `Void` is reserved for feed-declared voids and carries the
+amount: `Void — {reason} · {stake} USDT returned` (COPY pattern verbatim, stake restored).
 `Your bet` strip → `Settled · won 16.00 USDT` or `Settled · lost 20.00 USDT` (COPY verbatim) +
 `View in My bets ›` deep-link (T42-13 receipt journey).
 **Copy (SR):** "Full time. Arsenal 1, Brighton & Hove Albion 1."
@@ -229,46 +250,57 @@ markets mark `Void — match ended · stake returned` (extends COPY void pattern
 promoted action anywhere on the settled page (U-52, P52-06).
 **Why:** P6 — terminal states are designed, not absent; U-54 quiet wins/factual losses; the market
 grid remains as record (X05 honesty, XV4-17 never-drop).
-**Beats wireframe:** wireframe has no settled world; scorecard's "every state" line is paid here.
 
 ## M-12 — Market accordion depth
 
 **Trigger:** tap collapsed accordion / switch to `All markets 78`.
 **Both:** accordion header = market name hb-h1 + optional settle note `Settles on 90′ + stoppage`
-(T42-22 trust microcopy, hb-micro text-3) + chevron. Height 0↔auto 250–280ms --ease-standard,
+(T42-22 trust microcopy, hb-micro text-2 — informative muted rides text-2 post-B1) + chevron. Height 0↔auto 250–280ms --ease-standard,
 chevron rotates 180°, content keeps open width during collapse (P55-16, Salaja). RM: instant.
-Default: first two accordions open in the active group; `+N more markets` tail disclosure inside
-long groups; `All markets 78` = anchored index jumping to each group (U-16 ≤2 taps).
+Default expanded: first THREE @1440 (W4-24 parity — Match result, Double chance, Total goals all
+open), first TWO @390 (phone wireframe shows result + double chance open, third peeking —
+declared per-width delta: scroll economy on the thumb page); `+N more markets` tail disclosure
+inside long groups; `All markets 78` = anchored index jumping to each group (U-16 ≤2 taps).
+Priced book, consistent with DATA-CANON (F9): Double chance `Arsenal or draw 1.02 ·
+Arsenal or Brighton 1.16 · Draw or Brighton 3.34` → 98.04 + 86.21 + 29.94 = **214.2% ≈ 2×106.85**
+(DC books sum ≈2× the 1X2 margin by construction — the wireframe's own 1.03/1.18/3.30 = 212.1%
+was margin-consistent too; ours are *derived*, not copied). Total goals keeps the wireframe's
+`Over 2.5 2.73 · Under 2.5 1.44` → 36.63 + 69.44 = **106.07%** ✓ in band as drawn.
 **Why:** density via rhythm + grouping — hairline list regions, no nested cards (D-09, U-40,
 SA4-01, R-YAB-19 one boundary = one meaning); chunking beats item caps (R-YAB-05).
 **Copy:** group names verbatim (W4-23); per-market names sentence case.
-**Beats wireframe:** wireframe shows 3 accordions; we show 78 markets across 9 groups with
-URL-addressable state (?group=&open=) and honest empty groups hidden.
 
 ## M-13 — Long-team-name stress frame
 
 **Trigger:** same page, stress fixture data (Brighton & Hove Albion = 22ch real case; test bench
 "Wolverhampton Wanderers" 23ch, Arabic-locale render for X02).
 **Both:** scoreboard names wrap ≤2 lines at hb-title then end-ellipsis (matches W4-03
-`Brighton &\nHove…`); odds-cell/accordion labels single-line ellipsis at fixed budget — type never
-shrinks below hb-body to fit (T7-10); numbers NEVER truncate (U-45, Salaja rule 21); full name in
-SR label + long-press/hover expand (X03.9 edge). Score column width is fixed — names may wrap but
-`1 – 0` never moves. RTL: layout mirrors, digits stay Latin Oxanium (C-18).
+`Brighton &\nHove…`); odds-cell/accordion labels single-line END-ellipsis at fixed budget — type
+never shrinks below hb-body to fit (T7-10); numbers NEVER truncate (U-45 — Salaja's
+middle-truncate rule governs filenames, not team labels: citation corrected, wireframe-true
+end-ellipsis stands); full name in SR label + long-press/hover expand (X03.9 edge). Score column
+width is fixed — names may wrap but `1 – 0` never moves. RTL: layout mirrors, digits stay Latin
+Oxanium (C-18).
 **Nothing clips at 360** (A23.c proof shot owed).
-**Why:** i18n is an X02 row and a named edge case (X03.9); "numbers never truncate, names
-middle-truncate" is Salaja canon.
-**Beats wireframe:** wireframe already clips `Hove…`; we define the wrap rule + SR/full-name path.
+**Why:** i18n is an X02 row and a named edge case (X03.9); truncation grammar is per-content-type
+(labels end-ellipsis, filenames middle-truncate, numbers never).
 
-## M-14 — Offline / frozen prices (edge state)
+## M-14 — Offline / frozen prices + break (edge states)
 
-**Trigger:** connectivity lost mid-page.
-**Both:** scoreboard + all prices freeze as-is; a single quiet band under the scoreboard:
-`You're offline — prices are frozen, not live` (COPY verbatim); all odds cells inert (not
-suspended — no amber, no lock: this is *our* failure, not the market's — different channel:
-text-2 on surface-2, no reason chip). Reconnect → `Back online` + revalidation sweep re-ticks
-changed prices (T42-22, U-15).
-**Why:** every state designed (P6, X06); never fake live-ness — the honesty moat.
-**Beats wireframe:** absent in wireframes; scorecard's "every state" line.
+**Trigger:** connectivity lost mid-page / a player-set break is active.
+**Both (offline):** scoreboard + all prices freeze as-is; one shared-grammar band under the
+scoreboard: cloud-slash glyph + `You're offline — prices are frozen, not live` (COPY verbatim) +
+`Showing last known prices` (slip E-16's honesty marker) — the band carries a 2px --c-suspend
+left edge + --c-text (DATA-CANON offline grammar = amber-edged banner; one encoding with slip
+E-16: amber = interrupted service, F5 unified). Cells stay inert but UN-ambered — the failure is
+ours, not the market's: `aria-disabled` + frozen label, never a padlock (padlock = market
+suspension). Reconnect → `Back online` + revalidation sweep re-ticks changed prices (T42-22, U-15).
+**Both (break):** same slot, different grammar: `On a break · back {time}` (COPY) — surface-2 +
+--c-text, deliberately NOT amber (a chosen state, not an error — slip E-17 spelling); all cells
+read-only; explainer `Betting is off until then. Prices are read-only. Cash out still works.`
+(slip E-17, F8 — the flagship page must not leave break-state taps undefined).
+**Why:** every state designed (P6, X06); never fake live-ness — the honesty moat; one interruption
+grammar across the two highest-scrutiny pages (72-signal-1: one encoding learned once).
 
 ---
 
@@ -286,6 +318,19 @@ changed prices (T42-22, U-15).
 | Long-name/RTL/offline stress | M-13, M-14 |
 | Tiebreak depth (78 markets, counts, S4) | M-04, M-08, M-12 |
 
-Pending QC hooks: blur test @390 first-fixation = scoreboard (P51-17); overround re-measure after
-Draw price decision (X07.S1); CVD shots of tick/suspend/follow states (C-16); Playwright arc
-recording of M-08 cascade (MOTION verification clause).
+Pending QC hooks: blur test @390 first-fixation = scoreboard (P51-17); overround re-measure on
+DATA-CANON 1.30/4.80/11.00 = 106.85% + post-cascade 106.94% (X07.S1); CVD shots of tick/suspend/
+follow states (C-16); Playwright arc recording of M-08 cascade (MOTION verification clause).
+
+## Resolved flags (crit-match-v2 — recorded, not re-litigated)
+
+- Bet strip stays ABOVE search — conditional on open bet, must-be-seen money info (P51-16, FD
+  "My Action" position). E-M-12 challenge closed.
+- Session/RG line stays OFF this page — lives in ticket zone (slip E-18 footer + My bets footer);
+  desk panel is always mounted so the cue is present on-page already; phone reaches it ≤2 taps
+  via sheet/Menu. Shell RG entry = dependency outside match scope.
+- Specials drop verified: wireframe counts 10+9+11+11+8+5+14+10+7 = 85 → 78. Keep, cite arithmetic.
+- COPY's em-dash patterns (`Suspended — {reason}`) are binding over 72-rule-24's no-em-dash
+  guidance — tension logged; COPY wins (it is the newer voice law).
+- Void marker grammar: match cells render the word `Void` only (cell density); slip rows carry the
+  `↺` pill (slip E-28) — different surfaces, one meaning, noted as acceptable divergence.

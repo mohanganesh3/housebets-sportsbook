@@ -25,7 +25,7 @@ RESET_PLAN §9 coverage map; owner files pending).
 | **Break (RG take-a-break)** | SH-11 + SH-01 session-line path | `On a break · back 22:40` chip replaces balance; board visible, cells inert; module offers early end; 4-rung limits sheet ≤2 taps | U-21, U-53, P52-02/03, C-20 |
 | **Break (match HT/Break)** | LV-01 `LIVE HT` row + E-BRD-08 states | honest clock states `HT`, `45+2'`, `Break`, `Second break` — betby phonetics kept | T42-17, U-41 |
 | **Pending (placement)** | SLIP-nn pending (peer) + SH-10 reconcile-on-relaunch | `Confirming…` ≤3s honest state w/ visible countdown, cancel-able; CTA disabled first tap (idempotent); pending bet visible, never balance-debited-invisible | U-03, T42-02, XV4-07/24 |
-| **Selected (cell armed)** | any board row tap + W5-01 parity | cta fill + dark text + ✓; pick→ticket flight S2 280ms; pill updates `❶ Arsenal @ 1.30 → ₮26.00` | U-29, T42-12, C-11 |
+| **Selected (cell armed)** | any board row tap + W5-01 parity | cta fill + dark text + ✓ + `aria-pressed`; pick→ticket flight S2 280ms; pill updates to canon payload `●1 Arsenal @1.30` (never `Pays X` pre-stake — DATA-CANON pill law) | U-29, T42-12, C-11 |
 | **Restored (session continuity)** | SH-10 | selections restored banner + per-leg revalidation; scroll/filters/tab restored; `Checking your last bet…` after kill | U-20, XV4-05/12, T42-04 |
 | **RTL / long-label** | SH-08 | mirrored rail/panel/nav; Oxanium stays LTR; 24-char team name truncates w/ expand; German tab labels fit | X02, C-18, U-45 |
 | **Zero-count (honest totals)** | LV-03 chips `All 0 · Soccer 0…`; FB-04 | counts tell the truth even when empty invites hiding | U-28, P52-23 |
