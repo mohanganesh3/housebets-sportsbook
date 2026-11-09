@@ -1,4 +1,8 @@
 # HOUSEBETS SPORTSBOOK — MASTER PLAN & STORYBOARD
+
+> SUPERSEDED BY `RESET_PLAN.md`. Mohan rejects this visual direction. Retain this
+> document as history only; do not execute its layout, scope, stack or cinematic
+> decisions. Follow the reset plan and original RESET requirements instead.
 $9,000 · ~119 entries · "The sportsbook we'd ship tomorrow wins."
 Deadline: Nov 14, 2026 18:00 UTC · Deliverable: public link, 5 pages, 390px + 1440px
 
