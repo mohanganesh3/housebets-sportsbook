@@ -556,3 +556,70 @@ No visual code was changed to write this plan.
 Next: P0.02 verbatim RESET brief, P0.04 baseline rows B01-B12, P0.05 the atomic ledger `qc/ASKS.md`,
 then dispatch the T1-T12 research tree with real agent IDs logged in `research/TREE.md`.
 Phase 0 is NOT complete: the recovery tag exists; the ledger, regression register and research dispatch do not.
+
+---
+
+# PART B — v2 DOCTRINE (Mohan's bar: tailored, custom, Apple-grade)
+
+Added 10 Nov 01:08 IST after Mohan's direction: design tailored to Housebets' brand flavour,
+all-custom design and animation, Apple-grade quality control, and UX grounded in REAL user
+problems gathered from real human feedback — not restricted thinking. Part B binds every
+later section; where Part A and B conflict, B is stricter.
+
+## 22. The User-Problem Engine (research first, always)
+
+No screen ships until its design cites real human problems, not assumptions.
+
+- Source hierarchy: verbatim bettor feedback (reviews, Reddit/X threads) > observed competitor
+  behaviour > published research > our inference (labelled). Every design decision names its level.
+- `research/70-user-problems.md` (agent b3507d97): a taxonomy of real complaints and delights about
+  bet slips, suspensions, cash-out, live lag, settlement, My bets, density, trust and mobile use —
+  each with a verbatim quote, URL, app, recurrence signal, and which of our five pages it touches.
+- Every derived problem maps to ASKS rows and to at least one element card. A problem with no
+  designed answer = an open defect. An element that answers no problem = candidate for deletion.
+- Pain-led order of work: fix what bettors actually suffer (moved-odds surprises, mystery
+  suspensions, vanishing cash-out, unreadable density, hidden bet state) BEFORE aesthetic upgrades.
+
+## 23. Brand-Tailored Design Doctrine (Housebets-native, not reskinned)
+
+- `research/71-brand-dna-v2.md` (agent 88f6223f) is the forensic source: real fonts, tokens, radii,
+  copy strings, Hubie usage, motion and shell conventions fetched from the live site, plus the
+  judge's stated taste from his own case study. Tokens mirror VERIFIED brand values; inference is
+  labelled. BETBY platform-standard elements are identified so we differentiate where they did.
+- "Feels like Housebets" is scored at 15 and is tiebreak #2 — every screen is checked against the
+  brand grammar checklist before it can pass QC, not just against our own taste.
+- Custom everything that the eye remembers: crests (authored silhouettes per club, never
+  initials-in-discs), sport glyphs (one stroke system), section art, empty-state illustration,
+  Hubie cameos (empty/error moments only). Sourced stock art is banned.
+- The brand pack/starter files remain desired; if still unreachable, every brand claim in the spec
+  cites the live-site evidence it was derived from instead.
+
+## 24. Custom Motion Doctrine (authored, not library-default)
+
+- `research/74-motion-mastery.md` (agent 9b7893ef) defines the vocabulary; `design/MOTION.md`
+  turns it into the spec. Library defaults never ship unmodified.
+- The signature moments in §18 are implemented as authored systems: every effect has a bespoke
+  curve/spring, an interruption rule, and a reduced-motion twin — recorded on video for QC.
+- "Apple-grade" means: physics that respond to the gesture mid-flight, motion that survives
+  interruption, nothing moving that isn't communicating, and 60fps under live-tick load measured
+  on a mid-range phone profile — not "lots of animation".
+- Money paths get the strictest craft: instant same-frame state changes, transform/opacity only,
+  zero layout shift, zero queueing (newest state wins).
+
+## 25. Apple-Grade Quality Control
+
+- Beyond PASS/FAIL rows: every release-candidate screen gets a 60-second silent audit — the
+  reviewer narrates what the eye does at second 0, 5, 15, 60 against the written attention map.
+- Fit-and-finish sweep per build: 1px misalignment, inconsistent radii, orphaned copy, non-tabular
+  numerals, mixed icon weights — each is a filed BUG, not a nit. The register is the bar.
+- Delight is a QC line item too: each screen must name its crafted moment and prove it on video.
+- Two consecutive clean adversarial rounds still gates freeze (§12) — plus a fresh-eyes
+  "is this designed or generated?" verdict per page.
+
+## 26. Revised Pipeline
+
+UNDERSTAND (done: baseline + ledger + this plan) → RESEARCH v2 (U-wave running: b3507d97, 88f6223f,
+2877d70d, 98a699a5, 9b7893ef + existing corpus) → PLAN v2 (tokens/storyboards/cards authored from
+evidence — the scrapped v0.2 spec stays scrapped; mine it only for raw structure) → BUILD in
+gated units (D0→D6, §10) → QC (Apple-grade, §25) → REVIEW LOOP (§12) → FREEZE (same-build, two
+clean rounds). No visual code before that screen's v2 spec passes challenge.
