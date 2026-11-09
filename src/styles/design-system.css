@@ -1,0 +1,97 @@
+/* ==================================================================
+   design-system.css — specimen-only helpers for /design-system.
+   NOT canonical tokens (those live in tokens.css). Raw px/ms values
+   are allowed here — the check-tokens gate scans src/components +
+   src/routes only. Everything below resolves through the --c and hb vars.
+   ================================================================== */
+
+/* Neon glow accent — the ONE place neon is allowed to glow (P3: a
+   voice, not a shout). Text/glow only, never a fill. */
+.ds-glow-neon {
+  color: var(--c-brand-neon);
+  text-shadow:
+    0 0 8px var(--c-neon-a12),
+    0 0 18px color-mix(in oklab, var(--c-brand-neon) 28%, transparent);
+}
+
+/* Odds-cell skeleton — real geometry, opacity-only pulse (≤2 loops
+   visible, no spinner on money surfaces — U-42/U-57). */
+.ds-skel {
+  border-radius: var(--r-sm);
+  background: var(--c-surface-3);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-skel {
+    animation: none;
+  }
+}
+
+/* Live dot ambient pulse — tint-only; one synchronized class (crit b:
+   badges share one ambient motion, never 13 independent pulses). */
+@keyframes ds-live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+.ds-live-dot {
+  animation: ds-live-pulse 1.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-live-dot {
+    animation: none;
+  }
+}
+
+/* Tick tint ::after overlay — tints ride overlays so borders never
+   animate (E-M-08). Decays ~1s linear, then the muted caret persists. */
+@keyframes ds-tick-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+.ds-tick::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: ds-tick-fade 1s linear both;
+}
+.ds-tick--up::after {
+  background: var(--c-up-a16);
+}
+.ds-tick--down::after {
+  background: var(--c-down-a16);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-tick::after {
+    animation: none;
+    opacity: 0.35;
+  }
+}
+
+/* Motion-token demo dot — slides on row hover so a judge can feel each
+   canonical curve/duration without wiring a real tick. */
+.ds-motion-track {
+  transition: none;
+}
+.ds-motion-dot {
+  transform: translateX(0);
+  transition-property: transform;
+  /* duration + curve set per-demo via duration-(--dur-*) / ease-* utilities */
+}
+.group:hover .ds-motion-dot {
+  transform: translateX(160px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-motion-dot {
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,179 @@
+/* ==================================================================
+   TOKENS v2 — canonical token layer · design/TOKENS.md (post-crit, D0)
+   ==================================================================
+   One canonical file. Values verbatim from TOKENS.md — hex where
+   brand-verified or crit-measured, color-mix()/oklch for the alpha
+   tints + derived shades constructed in D0.
+
+   Two layers on purpose:
+   1) :root { --c-*, --hb-*, --s-*, --r-*, --dur-*, --bp-*, --layout-* }
+      Canonical TOKENS.md names — always emitted (plain CSS), readable
+      by judges and usable via var() anywhere.
+   2) @theme { --color-c-*, --text-hb-*, --radius-hb-*, --font-hb-*,
+      --ease-*, --shadow-hb-* }
+      Tailwind-4 utility namespaces that RESOLVE THROUGH the canonical
+      vars → bg-c-surface-1 · text-c-text-2 · border-c-hairline ·
+      text-hb-odds · font-hb-num · rounded-hb-md · ease-out-expo ·
+      shadow-hb-sheet · duration-(--dur-feedback).
+      (Tailwind prunes unused @theme vars, so canonical literals live
+      in :root; nothing here duplicates a literal value.)
+
+   Post-crit law (crit-match B1 / crit-boards h2):
+     · text-2 carries ALL meaning-bearing muted text (implied-%, session,
+       disabled reasons) · text-3 is decorative-only, never the carrier.
+     · measured D0 adjustments, documented direction "lighten fg on dark":
+       --c-text-2  #9FB8BC → #A5C0C5  (s3 pair 4.38 → 4.77)
+       --c-down    #FF6B86 → #FF8AA2  (s2 pair 4.10 → 5.01)
+       --c-up-text #2DBF54 (new derived text step — --c-up on s2 = 4.38;
+         brand green stays for fills/edges/icons at ≥3:1 non-text)
+     · suspend chip = #E17823 bg + #2A1200 fg · live badge = #FF4D6D bg +
+       #14060A fg · neon = text/glow only, NEVER fills.
+   Measured table: scripts/check-contrast.mjs · qc/d0-report.md.
+   ================================================================== */
+
+:root {
+  /* ── Color · canonical --c-* (TOKENS.md names verbatim) ─────────── */
+  --c-bg: #002026;          /* live CSS (BETBY-era teal) — page bg     */
+  --c-surface-1: #08333c;   /* live CSS — rows, panels                 */
+  --c-surface-2: #0b414d;   /* derived +1 level — cards, cells, inputs */
+  --c-surface-3: #104f5c;   /* derived — hover/active fills            */
+  --c-brand-neon: #02f7fd;  /* logo glyph, live CSS — text/glow only   */
+  --c-cta: #c4f4f1;         /* judge's token — primary fills (D-01)    */
+  --c-cta-fg: #062b31;      /* derived on-CTA text                     */
+  --c-text: #f4fbfb;        /* derived near-white — primary text       */
+  --c-text-2: #a5c0c5;      /* meaning-bearing muted (post-D0 bump)    */
+  --c-text-3: #8aa6ab;      /* decorative-only — never meaning-bearing */
+  --c-up: #26ba50;          /* live CSS green — fills/edges/icons      */
+  --c-up-text: #2dbf54;     /* derived text step for tick-up prices    */
+  --c-down: #ff8aa2;        /* post-D0 lighten — odds down/lost/error  */
+  --c-suspend: #e17823;     /* suspension amber — chip bg, band edge   */
+  --c-suspend-fg: #2a1200;  /* derived dark fg on the amber chip       */
+  --c-gold: #ffd205;        /* live CSS gold — prize/trophy/★ only     */
+  --c-live: #ff4d6d;        /* LIVE badge bg (word+icon, never alone)  */
+  --c-live-fg: #14060a;     /* derived dark fg on live badge           */
+  --c-focus: #02f7fd;       /* focus-visible ring 2px, offset 2px      */
+
+  /* hairline = surface-tinted 1px (elevation law: borders > shadows)  */
+  --c-hairline: var(--c-surface-3);
+
+  /* ── Derived shades + alpha tints (D0 clean constructions) ──────── */
+  --c-cta-hi: color-mix(in oklab, var(--c-cta) 92%, #ffffff);    /* hover */
+  --c-cta-lo: color-mix(in oklab, var(--c-cta) 88%, var(--c-cta-fg)); /* press */
+  --c-up-a16: color-mix(in oklab, var(--c-up) 16%, transparent);
+  --c-down-a16: color-mix(in oklab, var(--c-down) 16%, transparent);
+  --c-suspend-a16: color-mix(in oklab, var(--c-suspend) 16%, transparent);
+  --c-neon-a12: color-mix(in oklab, var(--c-brand-neon) 12%, transparent);
+
+  /* ── Type scale · hb-* measured set (px size / px line-height) ──── */
+  --hb-display: 28px; --hb-display-lh: 32px;   /* Red Hat Display — hero */
+  --hb-score: 22px;   --hb-score-lh: 26px;     /* Oxanium — scores       */
+  --hb-title: 20px;   --hb-title-lh: 24px;     /* Figtree 700 — titles   */
+  --hb-h1: 16px;      --hb-h1-lh: 20px;        /* Figtree 600 — headers  */
+  --hb-odds: 15px;    --hb-odds-lh: 20px;      /* Oxanium 600 — prices   */
+  --hb-body: 14px;    --hb-body-lh: 20px;      /* Figtree — names        */
+  --hb-odds-sm: 13px; --hb-odds-sm-lh: 16px;   /* Oxanium — compact odds */
+  --hb-body-sec: 13px;--hb-body-sec-lh: 18px;  /* Figtree — cell labels  */
+  --hb-label: 12px;   --hb-label-lh: 16px;     /* Figtree 600 — controls */
+  --hb-clock: 12px;   --hb-clock-lh: 14px;     /* Oxanium — 52′ clocks   */
+  --hb-micro: 11px;   --hb-micro-lh: 14px;     /* Figtree 500 — floor    */
+
+  /* ── Space · 4px base set ───────────────────────────────────────── */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px; --s-5: 20px;
+  --s-6: 24px; --s-8: 32px; --s-12: 48px; --s-16: 64px;
+
+  /* ── Radius ─────────────────────────────────────────────────────── */
+  --r-sm: 4px;    /* small chips                            */
+  --r-md: 8px;    /* DOMINANT — cells, cards (158× on live) */
+  --r-lg: 12px;   /* sheets only                            */
+  --r-pill: 999px;/* pills, badges                          */
+
+  /* ── Motion · curves live in @theme (utility namespace); the spring
+     and durations are custom props ────────────────────────────────── */
+  --spring-stiffness: 380;  /* --ease-spring-sheet, sheets/drag settle  */
+  --spring-damping: 32;
+  --dur-feedback: 150ms;    /* range 120–150 — press, toggle, tick tint */
+  --dur-enter: 240ms;       /* range 200–260 — appears, overlays        */
+  --dur-move: 280ms;        /* range 250–300 — transforms, routes       */
+  --dur-close: 160ms;       /* range 120–180 — exits < opens            */
+
+  /* ── Layout · breakpoints + shell metrics ───────────────────────── */
+  --bp-360: 360px;  --bp-390: 390px;  --bp-430: 430px;
+  --bp-768: 768px;  --bp-1024: 1024px; --bp-1440: 1440px;
+  --layout-rail: 72px;       /* desktop icon rail            */
+  --layout-max: 1312px;      /* 12-col content max           */
+  --layout-panel: 360px;     /* desktop side panel           */
+  --layout-bottombar: 67px;  /* phone bottom bar             */
+  --layout-gutter: 24px;     /* grid gutter                  */
+  --target-min: 44px;        /* touch-target floor           */
+}
+
+@theme {
+  /* ── Utility namespaces → resolve through the canonical vars ────── */
+  --color-c-bg: var(--c-bg);
+  --color-c-surface-1: var(--c-surface-1);
+  --color-c-surface-2: var(--c-surface-2);
+  --color-c-surface-3: var(--c-surface-3);
+  --color-c-hairline: var(--c-hairline);
+  --color-c-neon: var(--c-brand-neon);
+  --color-c-cta: var(--c-cta);
+  --color-c-cta-hi: var(--c-cta-hi);
+  --color-c-cta-lo: var(--c-cta-lo);
+  --color-c-cta-fg: var(--c-cta-fg);
+  --color-c-text: var(--c-text);
+  --color-c-text-2: var(--c-text-2);
+  --color-c-text-3: var(--c-text-3);
+  --color-c-up: var(--c-up);
+  --color-c-up-text: var(--c-up-text);
+  --color-c-down: var(--c-down);
+  --color-c-suspend: var(--c-suspend);
+  --color-c-suspend-fg: var(--c-suspend-fg);
+  --color-c-gold: var(--c-gold);
+  --color-c-live: var(--c-live);
+  --color-c-live-fg: var(--c-live-fg);
+  --color-c-focus: var(--c-focus);
+  --color-c-up-a16: var(--c-up-a16);
+  --color-c-down-a16: var(--c-down-a16);
+  --color-c-suspend-a16: var(--c-suspend-a16);
+  --color-c-neon-a12: var(--c-neon-a12);
+
+  /* ── Type utilities: text-hb-* (size+line-height), font-hb-* ────── */
+  --font-hb-ui: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-hb-num: "Oxanium", "Figtree", ui-sans-serif, sans-serif;
+  --font-hb-display: "Red Hat Display", "Figtree", ui-sans-serif, sans-serif;
+
+  --text-hb-display: var(--hb-display);
+  --text-hb-display--line-height: var(--hb-display-lh);
+  --text-hb-score: var(--hb-score);
+  --text-hb-score--line-height: var(--hb-score-lh);
+  --text-hb-title: var(--hb-title);
+  --text-hb-title--line-height: var(--hb-title-lh);
+  --text-hb-h1: var(--hb-h1);
+  --text-hb-h1--line-height: var(--hb-h1-lh);
+  --text-hb-odds: var(--hb-odds);
+  --text-hb-odds--line-height: var(--hb-odds-lh);
+  --text-hb-body: var(--hb-body);
+  --text-hb-body--line-height: var(--hb-body-lh);
+  --text-hb-odds-sm: var(--hb-odds-sm);
+  --text-hb-odds-sm--line-height: var(--hb-odds-sm-lh);
+  --text-hb-body-sec: var(--hb-body-sec);
+  --text-hb-body-sec--line-height: var(--hb-body-sec-lh);
+  --text-hb-label: var(--hb-label);
+  --text-hb-label--line-height: var(--hb-label-lh);
+  --text-hb-clock: var(--hb-clock);
+  --text-hb-clock--line-height: var(--hb-clock-lh);
+  --text-hb-micro: var(--hb-micro);
+  --text-hb-micro--line-height: var(--hb-micro-lh);
+
+  /* ── Radius utilities: rounded-hb-* ─────────────────────────────── */
+  --radius-hb-sm: var(--r-sm);
+  --radius-hb-md: var(--r-md);
+  --radius-hb-lg: var(--r-lg);
+  --radius-hb-pill: var(--r-pill);
+
+  /* ── Motion curve utilities: ease-out-expo, ease-standard ───────── */
+  --ease-out-expo: cubic-bezier(0.23, 1, 0.32, 1);   /* enters          */
+  --ease-standard: cubic-bezier(0.77, 0, 0.175, 1);  /* on-screen moves */
+
+  /* ── The ONE allowed shadow — owned by sheets ───────────────────── */
+  --shadow-hb-sheet: 0 8px 24px rgb(0 8 10 / 0.45);
+}

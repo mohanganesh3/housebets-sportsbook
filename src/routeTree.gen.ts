@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BetsRouteImport } from './routes/bets'
+import { Route as DesignSystemRouteImport } from './routes/design-system'
 import { Route as FollowingRouteImport } from './routes/following'
 import { Route as FootballRouteImport } from './routes/football'
 import { Route as LiveRouteImport } from './routes/live'
@@ -24,6 +25,11 @@ const IndexRoute = IndexRouteImport.update({
 const BetsRoute = BetsRouteImport.update({
   id: '/bets',
   path: '/bets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DesignSystemRoute = DesignSystemRouteImport.update({
+  id: '/design-system',
+  path: '/design-system',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FollowingRoute = FollowingRouteImport.update({
@@ -50,6 +56,7 @@ const MatchMatchIdRoute = MatchMatchIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/bets': typeof BetsRoute
+  '/design-system': typeof DesignSystemRoute
   '/following': typeof FollowingRoute
   '/football': typeof FootballRoute
   '/live': typeof LiveRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/bets': typeof BetsRoute
+  '/design-system': typeof DesignSystemRoute
   '/following': typeof FollowingRoute
   '/football': typeof FootballRoute
   '/live': typeof LiveRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/bets': typeof BetsRoute
+  '/design-system': typeof DesignSystemRoute
   '/following': typeof FollowingRoute
   '/football': typeof FootballRoute
   '/live': typeof LiveRoute
@@ -75,13 +84,27 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/bets' | '/following' | '/football' | '/live' | '/match/$matchId'
+    | '/'
+    | '/bets'
+    | '/design-system'
+    | '/following'
+    | '/football'
+    | '/live'
+    | '/match/$matchId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/bets' | '/following' | '/football' | '/live' | '/match/$matchId'
+  to:
+    | '/'
+    | '/bets'
+    | '/design-system'
+    | '/following'
+    | '/football'
+    | '/live'
+    | '/match/$matchId'
   id:
     | '__root__'
     | '/'
     | '/bets'
+    | '/design-system'
     | '/following'
     | '/football'
     | '/live'
@@ -91,6 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BetsRoute: typeof BetsRoute
+  DesignSystemRoute: typeof DesignSystemRoute
   FollowingRoute: typeof FollowingRoute
   FootballRoute: typeof FootballRoute
   LiveRoute: typeof LiveRoute
@@ -111,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/bets'
       fullPath: '/bets'
       preLoaderRoute: typeof BetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/design-system': {
+      id: '/design-system'
+      path: '/design-system'
+      fullPath: '/design-system'
+      preLoaderRoute: typeof DesignSystemRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/following': {
@@ -147,6 +178,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BetsRoute: BetsRoute,
+  DesignSystemRoute: DesignSystemRoute,
   FollowingRoute: FollowingRoute,
   FootballRoute: FootballRoute,
   LiveRoute: LiveRoute,

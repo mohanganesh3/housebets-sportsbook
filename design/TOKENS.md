@@ -16,10 +16,11 @@ index.css vars remain until D0). Components may use tokens only.
 | --c-cta | #C4F4F1 | judge's NEW system token | primary fills (Place bet, Deposit, Accept) |
 | --c-cta-fg | #062B31* | *derived on-CTA text | text on pale-cyan (check ≥7:1) |
 | --c-text | #F4FBFB* | *near-white derived | primary text |
-| --c-text-2 | #9FB8BC* | *derived muted | secondary text — also implied-%/session/disabled-reason (post-crit: text-3 failed 2.09–3.10:1) |
-| --c-text-3 | #8AA6AB* | *bumped post-crit | ONLY decorative/hairline-adjacent text — never meaning-bearing |
-| --c-up | #26BA50 | live CSS green | odds up, won, success |
-| --c-down | #FF6B86* | *lightened post-crit (4.22→target ≥4.5 on s-1/2) | odds down, lost, error |
+| --c-text-2 | #A5C0C5* | *re-lightened at D0 measurement (#9FB8BC failed 4.38 on s-3 → 4.77) | secondary text — also implied-%/session/disabled-reason (post-crit: text-3 failed 2.09–3.10:1) |
+| --c-text-3 | #8AA6AB* | *bumped post-crit | ONLY decorative/hairline-adjacent text — never meaning-bearing (≥3 sanity verified) |
+| --c-up | #26BA50 | live CSS green | fills/edges/icons — NOT text on s-2 (4.38 <4.5; use --c-up-text) |
+| --c-up-text | #2DBF54* | *derived at D0 (up-text step; s-2 4.63, s-1 5.61) | tick-up price + ▲ glyph text — pair-token pattern like suspend/live |
+| --c-down | #FF8AA2* | *re-lightened at D0 (#FF6B86 still failed 4.10 on s-2 → 5.01) | odds down, lost, error |
 | --c-suspend | #E17823 bg + #2A1200 fg* | existing warning var; chip = amber bg/dark text post-crit | suspension band, changed-odds edge |
 | --c-gold | #FFD205 | live CSS gold | prize/trophy accents only |
 | --c-live | #FF4D6D bg + #14060A fg* | *derived badge pair | LIVE badge (word+icon, never color alone) |
@@ -27,6 +28,11 @@ index.css vars remain until D0). Components may use tokens only.
 
 `*` = our derivation pending T6 contrast measurement (culori, dev-only). Banned: neon cyan fills,
 gradient blobs, glassmorphism, amber as decoration.
+
+**D0 measurement pass (culori, `npm run check:contrast` — 32/32 pairs):** --c-text-2 #9FB8BC→#A5C0C5,
+--c-down #FF6B86→#FF8AA2, --c-up-text #2DBF54 added (all "lighten fg on dark" moves; brand-verified
+hexes untouched). Suspended-cell last price @60% = 4.94:1 on s-2 — AA floor, deliberately below AAA
+(dim marks it not-actionable). Report: qc/d0-report.md.
 
 ## Type
 

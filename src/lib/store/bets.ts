@@ -340,9 +340,9 @@ export const useBets = create<BetsState>()((set) => ({
       });
       if (credit > 0) useUI.getState().credit(+credit.toFixed(2));
       // settlement must never be silent — each graded bet announces itself
-      notes.forEach((n, i) =>
-        setTimeout(() => useUI.getState().toast(n.msg, n.kind), 300 + i * 900),
-      );
+      notes.forEach((n, i) => {
+        setTimeout(() => useUI.getState().toast(n.msg, n.kind), 300 + i * 900);
+      });
       saveBets(bets);
       return { bets };
     }),

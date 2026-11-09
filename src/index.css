@@ -1,5 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+/* D0 canonical token layer (design/TOKENS.md) — additive; legacy vars below
+   stay live until later units re-alias them to the --c and hb token names */
+@import "./styles/tokens.css";
 
 /* ── Housebets brand fonts (self-hosted, extracted from live site) ── */
 @font-face {

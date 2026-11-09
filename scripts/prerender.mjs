@@ -18,6 +18,7 @@ const routes = [
   "football",
   "bets",
   "following",
+  "design-system", // hidden specimen route (D0) — deep-linkable, not in nav
   ...matchIds.map((id) => `match/${id}`),
 ];
 
