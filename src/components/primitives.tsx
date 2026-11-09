@@ -1,6 +1,5 @@
 import {
   Bell,
-  House,
   Lock,
   Star,
   TrendingDown,
@@ -12,6 +11,7 @@ import { useSlip } from "../lib/store/slip";
 import { useUI } from "../lib/store/ui";
 import type { Market, Outcome, Team } from "../lib/types";
 import { TeamCrest } from "./Crest";
+import { Hubie } from "./Hubie";
 
 export function TeamLogo({ team, size = 28 }: { team: Team; size?: number }) {
   return <TeamCrest team={team} size={size} />;
@@ -157,9 +157,7 @@ export function OddsCell({
           <motion.span
             key={price}
             initial={
-              flash
-                ? { y: flash.dir === "up" ? 5 : -5, opacity: 0.3 }
-                : false
+              flash ? { y: flash.dir === "up" ? 5 : -5, opacity: 0.3 } : false
             }
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.16, ease: "easeOut" }}
@@ -231,8 +229,8 @@ export function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border-very-strong px-6 py-12 text-center">
-      <div className="grid size-12 place-items-center rounded-full bg-surface-secondary text-text-tertiary">
-        {icon ?? <House size={20} />}
+      <div className="grid size-14 place-items-center">
+        {icon ?? <Hubie size={52} />}
       </div>
       <p className="text-[15px] font-semibold text-text-primary">{title}</p>
       {hint && (

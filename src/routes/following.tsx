@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Star } from "lucide-react";
 import { groupByComp, LeagueSection, MatchRow } from "../components/MatchRow";
-import { FollowStar, TeamLogo } from "../components/primitives";
+import { EmptyState, FollowStar, TeamLogo } from "../components/primitives";
 import { compById, TEAMS } from "../lib/seed";
 import { isMatchFollowed } from "../lib/selectors";
 import { useUI } from "../lib/store/ui";
@@ -40,29 +40,29 @@ function FollowingPage() {
       </div>
 
       {follows.size === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border-very-strong px-6 py-16 text-center">
-          <Star size={30} className="text-warning-400/60" />
-          <p className="text-[15px] font-semibold">Nothing followed yet</p>
-          <p className="max-w-xs text-[13px] leading-relaxed text-text-tertiary">
-            Tap the star on any match, team or league. Your picks collect here ·
-            live first, kickoffs next · so you never hunt for your bet twice.
-          </p>
-          <div className="mt-1 flex items-center gap-2">
-            <Link
-              to="/football"
-              className="btn-primary rounded-lg px-4 py-2 text-[13px] font-bold"
-            >
-              Browse football
-            </Link>
-            <button
-              type="button"
-              onClick={() => useUI.getState().toggleFollow("epl")}
-              className="rounded-lg border border-gold-500/40 bg-warning-a15 px-4 py-2 text-[13px] font-semibold text-gold-500 transition-colors hover:bg-warning-a15/70"
-            >
-              <Star size={13} className="inline fill-gold-500" /> Premier League
-            </button>
-          </div>
-        </div>
+        <EmptyState
+          icon={<Star size={26} className="text-warning-400/60" />}
+          title="Nothing followed yet"
+          hint="Tap the star on any match, team or league. Your picks collect here · live first, kickoffs next · so you never hunt for your bet twice."
+          action={
+            <div className="mt-1 flex items-center gap-2">
+              <Link
+                to="/football"
+                className="btn-primary rounded-lg px-4 py-2 text-[13px] font-bold"
+              >
+                Browse football
+              </Link>
+              <button
+                type="button"
+                onClick={() => useUI.getState().toggleFollow("epl")}
+                className="rounded-lg border border-gold-500/40 bg-warning-a15 px-4 py-2 text-[13px] font-semibold text-gold-500 transition-colors hover:bg-warning-a15/70"
+              >
+                <Star size={13} className="inline fill-gold-500" /> Premier
+                League
+              </button>
+            </div>
+          }
+        />
       ) : (
         <div className="space-y-5">
           {teams.length > 0 && (

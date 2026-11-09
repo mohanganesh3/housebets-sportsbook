@@ -14,7 +14,12 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { groupByComp, LeagueSection, MatchRow } from "../components/MatchRow";
-import { LiveBadge, OddsCell, TeamLogo } from "../components/primitives";
+import {
+  EmptyState,
+  LiveBadge,
+  OddsCell,
+  TeamLogo,
+} from "../components/primitives";
 import { type GlyphComponent, SPORT_GLYPHS } from "../components/SportGlyph";
 import { useEngine } from "../lib/engine";
 import { compById, matchById, teamById } from "../lib/seed";
@@ -451,23 +456,19 @@ function Home() {
     const pill = PILLS.find((p) => p.key === sport);
     return (
       <div className="mx-auto max-w-[860px] space-y-5 px-3 pt-10 lg:px-4">
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border-very-strong px-6 py-16 text-center">
-          {pill && <pill.icon size={30} className="text-text-disabled" />}
-          <p className="text-[15px] font-semibold">
-            {pill?.label} isn't in this demo feed
-          </p>
-          <p className="max-w-xs text-[13px] leading-relaxed text-text-tertiary">
-            The contest scope is football · the demo feed carries soccer
-            fixtures only. This is where {pill?.label} markets would land.
-          </p>
-          <button
-            type="button"
-            onClick={() => setSport(null)}
-            className="btn-primary mt-1 rounded-lg px-4 py-2 text-[13px] font-bold"
-          >
-            Back to football
-          </button>
-        </div>
+        <EmptyState
+          title={`${pill?.label} isn't in this demo feed`}
+          hint={`The contest scope is football · the demo feed carries soccer fixtures only. This is where ${pill?.label} markets would land.`}
+          action={
+            <button
+              type="button"
+              onClick={() => setSport(null)}
+              className="btn-primary mt-1 rounded-lg px-4 py-2 text-[13px] font-bold"
+            >
+              Back to football
+            </button>
+          }
+        />
       </div>
     );
   }
