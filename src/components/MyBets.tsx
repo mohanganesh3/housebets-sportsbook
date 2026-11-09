@@ -337,11 +337,13 @@ function BetRow({ b }: { b: import("../lib/types").Bet }) {
 
 export function MyBetsBody({ full = false }: { full?: boolean }) {
   const bets = useBets((s) => s.bets);
+  const wMatches = useWorld((s) => s.matches);
   const open = bets.filter((b) => b.result === "open");
   const settled = bets.filter((b) => b.result !== "open");
   const coAvail = open.filter((b) => b.cashout?.status === "available");
   const [tab, setTab] = useState<"open" | "settled">("open");
   const [period, setPeriod] = useState<"all" | "today" | "7d" | "30d">("all");
+  const [sport, setSport] = useState<"all" | "soccer">("all");
   const since = (ts: number) => {
     const day = 86_400_000;
     if (period === "today") {
@@ -353,8 +355,11 @@ export function MyBetsBody({ full = false }: { full?: boolean }) {
     if (period === "30d") return ts >= Date.now() - 30 * day;
     return true;
   };
-  const shown = (tab === "open" ? open : settled).filter((b) =>
-    since(b.placedAt),
+  const shown = (tab === "open" ? open : settled).filter(
+    (b) =>
+      since(b.placedAt) &&
+      (sport === "all" ||
+        wMatches.find((m) => m.id === b.matchId)?.sport === sport),
   );
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-3 pb-4">
@@ -398,11 +403,13 @@ export function MyBetsBody({ full = false }: { full?: boolean }) {
               <option value="30d">Last 30 days</option>
             </select>
             <select
+              value={sport}
+              onChange={(e) => setSport(e.target.value as typeof sport)}
               aria-label="Sport"
               className="h-8 rounded-lg border border-border-soft bg-surface-secondary px-2 text-[12px] font-semibold text-text-secondary outline-none"
             >
-              <option>All sports</option>
-              <option>Soccer</option>
+              <option value="all">All sports</option>
+              <option value="soccer">Football</option>
             </select>
           </>
         )}

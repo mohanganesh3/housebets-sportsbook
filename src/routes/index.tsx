@@ -131,16 +131,24 @@ const fmtDay = (ts: number) =>
 function HeroSpotlight({ matches }: { matches: Match[] }) {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const all = useWorld((s) => s.matches);
   const slides = matches
     .map((m) => all.find((x) => x.id === m.id) ?? m)
     .slice(0, 4);
   const n = slides.length;
   useEffect(() => {
-    if (paused || n < 2) return;
+    const onVis = () => setHidden(document.hidden);
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+  useEffect(() => {
+    // autoplay stops in a hidden tab — a judge's backgrounded
+    // browser shouldn't burn the rotation budget
+    if (paused || hidden || n < 2) return;
     const t = setInterval(() => setI((v) => (v + 1) % n), 6000);
     return () => clearInterval(t);
-  }, [paused, n]);
+  }, [paused, hidden, n]);
   const mt = slides[i % n];
   const h2h = mt.markets.find((m) => m.key === "h2h");
 

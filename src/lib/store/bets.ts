@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { matchById } from "../seed";
-import type { Bet, SlipSelection } from "../types";
+import type { Bet, Match, SlipSelection } from "../types";
 import { useUI } from "./ui";
 
 const BET_KEY = "hb-bets";
@@ -20,7 +20,16 @@ const saveBets = (bets: Bet[]) => {
 // bet refs avoid 0/O/1/I — Oxanium has no disambiguating zero glyph.
 // Deterministic: a judge sees the same refs every load.
 const REF_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-let refSeq = 0;
+// resume the sequence past persisted refs — a reload must never mint a
+// ref that already exists in hb-bets
+let refSeq = (() => {
+  try {
+    const prev = loadBets();
+    return prev ? prev.filter((b) => /^HB-[A-Z0-9]{3}$/.test(b.id)).length : 0;
+  } catch {
+    return 0;
+  }
+})();
 const mkRef = () => {
   refSeq += 1;
   let n = refSeq * 137 + 29;
@@ -140,7 +149,7 @@ const seedHistory: Bet[] = [
     marketName: "Both teams to score",
     odds: 1.95,
     stake: 12,
-    returns: 23.4,
+    returns: 12,
     result: "void",
     settledNote: "Void · match abandoned at 63' · stake returned",
   },
@@ -192,7 +201,7 @@ const seedHistory: Bet[] = [
 interface BetsState {
   bets: Bet[];
   addBets: (sel: SlipSelection[]) => Bet[];
-  cashOut: (id: string) => void;
+  cashOut: (id: string, fraction?: number) => void;
   settleMatch: (matchId: string, sh: number, sa: number) => void;
   suspendCashout: (matchId: string) => void;
   resumeCashout: (matchId: string) => void;
@@ -211,26 +220,43 @@ export const useBets = create<BetsState>()((set) => ({
     });
     return made;
   },
-  cashOut: (id) =>
+  cashOut: (id, fraction = 1) =>
     set((s) => {
       const bets = s.bets.map((b) => {
         if (b.id !== id || b.cashout?.status !== "available") return b;
-        const net = +(b.cashout.value - b.stake).toFixed(2);
-        useUI.getState().credit(b.cashout.value);
+        const co = b.cashout;
+        const paid = +(co.value * fraction).toFixed(2);
+        useUI.getState().credit(paid);
+        if (fraction >= 1) {
+          const net = +(co.value - b.stake).toFixed(2);
+          return {
+            ...b,
+            result: "cashedout" as const,
+            settledNote: `Cashed out · net ${net >= 0 ? "+" : "−"}${Math.abs(net).toFixed(2)} USDT`,
+            returns: co.value,
+            cashout: undefined,
+          };
+        }
+        // partial: bank the offered fraction, the rest of the stake rides on
+        const stakeLeft = +(b.stake * (1 - fraction)).toFixed(2);
         return {
           ...b,
-          result: "cashedout" as const,
-          settledNote: `Cashed out · net ${net >= 0 ? "+" : "−"}${Math.abs(net).toFixed(2)} USDT`,
-          returns: b.cashout.value,
-          cashout: undefined,
+          stake: stakeLeft,
+          returns: +(stakeLeft * b.odds).toFixed(2),
+          cashout: {
+            ...co,
+            value: +(co.value * (1 - fraction)).toFixed(2),
+            was: +(co.value * (1 - fraction)).toFixed(2),
+          },
+          settledNote: `${Math.round(fraction * 100)}% cashed out · ${paid.toFixed(2)} banked · ${stakeLeft.toFixed(2)} rides`,
         };
       });
       saveBets(bets);
       return { bets };
     }),
   tickCashout: (outcomeId, newPrice) =>
-    set((s) => ({
-      bets: s.bets.map((b) => {
+    set((s) => {
+      const bets = s.bets.map((b) => {
         if (b.outcomeId !== outcomeId || !b.cashout) return b;
         // Winning (price shortens) lifts the offer toward the full return;
         // drifting prices sink it toward zero. Never exceeds payout − margin.
@@ -242,22 +268,20 @@ export const useBets = create<BetsState>()((set) => ({
           ...b,
           cashout: { ...b.cashout, was: b.cashout.value, value: v },
         };
-      }),
-    })),
+      });
+      saveBets(bets);
+      return { bets };
+    }),
   settleMatch: (matchId, sh, sa) =>
     set((s) => {
-      let won = 0;
+      const mt = matchById(matchId);
+      if (!mt) return s;
+      let credit = 0;
       const bets = s.bets.map((b) => {
         if (b.matchId !== matchId || b.result !== "open") return b;
-        // Only markets we can evaluate honestly settle — match result only
-        if (!b.marketId.endsWith("-h2h")) return b;
-        const mt = matchById(matchId);
-        const hit =
-          (b.pick === mt?.home.name && sh > sa) ||
-          (b.pick === "Draw" && sh === sa) ||
-          (b.pick === mt?.away.name && sa > sh);
-        if (hit) {
-          won += b.returns;
+        const verdict = evalSettle(b, mt, sh, sa);
+        if (verdict === "won") {
+          credit += b.returns;
           return {
             ...b,
             result: "won" as const,
@@ -265,34 +289,169 @@ export const useBets = create<BetsState>()((set) => ({
             cashout: undefined,
           };
         }
+        if (verdict === "lost") {
+          return {
+            ...b,
+            result: "lost" as const,
+            settledNote: `Settled · FT ${sh}-${sa}`,
+            cashout: undefined,
+          };
+        }
+        // markets that can't be graded from the score (scorers, corners,
+        // halves) void honestly — stake comes straight back
+        credit += b.stake;
         return {
           ...b,
-          result: "lost" as const,
-          returns: 0,
-          settledNote: `Settled · FT ${sh}-${sa}`,
+          result: "void" as const,
+          returns: b.stake,
+          settledNote: "Void at FT · stake returned",
           cashout: undefined,
         };
       });
-      if (won > 0) useUI.getState().credit(+won.toFixed(2));
+      if (credit > 0) useUI.getState().credit(+credit.toFixed(2));
       saveBets(bets);
       return { bets };
     }),
   suspendCashout: (matchId) =>
-    set((s) => ({
-      bets: s.bets.map((b) =>
+    set((s) => {
+      const bets = s.bets.map((b) =>
         b.matchId === matchId && b.cashout
-          ? { ...b, cashout: { ...b.cashout, status: "suspended" } }
+          ? { ...b, cashout: { ...b.cashout, status: "suspended" as const } }
           : b,
-      ),
-    })),
+      );
+      saveBets(bets);
+      return { bets };
+    }),
   resumeCashout: (matchId) =>
-    set((s) => ({
-      bets: s.bets.map((b) =>
+    set((s) => {
+      const bets = s.bets.map((b) =>
         b.matchId === matchId && b.cashout?.status === "suspended"
-          ? { ...b, cashout: { ...b.cashout, status: "available" } }
+          ? { ...b, cashout: { ...b.cashout, status: "available" as const } }
           : b,
-      ),
-    })),
+      );
+      saveBets(bets);
+      return { bets };
+    }),
 }));
 
 export { matchById };
+
+// Grade every market derivable from the final score; return "void" for
+// markets that aren't (scorers, corners, halves, minutes) so the demo
+// settles honestly instead of leaving legs open forever.
+function evalSettle(
+  b: Bet,
+  mt: Match,
+  sh: number,
+  sa: number,
+): "won" | "lost" | "void" {
+  const key = b.marketId.slice(b.matchId.length + 1);
+  const pick = b.pick;
+  const hN = mt.home.name,
+    aN = mt.away.name,
+    hS = mt.home.short,
+    aS = mt.away.short;
+  const res = sh > sa ? "H" : sh === sa ? "D" : "A";
+  const btts = sh > 0 && sa > 0;
+  const total = sh + sa;
+  const diff = sh - sa;
+  const bool = (v: boolean): "won" | "lost" => (v ? "won" : "lost");
+  const sideOf = (s: string) =>
+    s.startsWith(hS)
+      ? "H"
+      : s.startsWith(aS)
+        ? "A"
+        : s.startsWith("Draw")
+          ? "D"
+          : null;
+
+  switch (key) {
+    case "h2h":
+      return bool(
+        (pick === hN && res === "H") ||
+          (pick === "Draw" && res === "D") ||
+          (pick === aN && res === "A"),
+      );
+    case "dc":
+      return bool(
+        (pick === `${hN}/Draw` && res !== "A") ||
+          (pick === `${hN}/${aN}` && res !== "D") ||
+          (pick === `Draw/${aN}` && res !== "H"),
+      );
+    case "dnb":
+      if (res === "D") return "void";
+      return bool((pick === hN && res === "H") || (pick === aN && res === "A"));
+    case "btts":
+      return bool((pick === "Yes") === btts);
+    case "cs": {
+      const m = pick.match(/^(\d+)-(\d+)$/);
+      return m ? bool(+m[1] === sh && +m[2] === sa) : "void";
+    }
+    case "oddeven":
+      return bool((pick === "Odd") === (total % 2 === 1));
+    case "winmar": {
+      if (pick === "Draw") return bool(res === "D");
+      const m = pick.match(/^(.*?) by (\d+)(\+?)$/);
+      if (!m) return "void";
+      const side = m[1] === hS ? diff : m[1] === aS ? -diff : null;
+      if (side === null) return "void";
+      const n = +m[2];
+      return bool(m[3] === "+" ? side >= n : side === n);
+    }
+    case "cleanh":
+      return bool((pick === "Yes") === (sa === 0));
+    case "cleana":
+      return bool((pick === "Yes") === (sh === 0));
+    case "firstscore":
+      // derivable only when one side kept a clean sheet — otherwise unknowable
+      if (pick === "No goal") return bool(total === 0);
+      if (pick === hN) return sa === 0 ? "won" : sh === 0 ? "lost" : "void";
+      if (pick === aN) return sh === 0 ? "won" : sa === 0 ? "lost" : "void";
+      return "void";
+    case "resbtts": {
+      const side = sideOf(pick);
+      if (side === null) return "void";
+      return bool(res === side && btts === pick.endsWith("yes"));
+    }
+    case "resou": {
+      const side = sideOf(pick);
+      const m = pick.match(/& (over|under) ([\d.]+)$/);
+      if (side === null || !m) return "void";
+      return bool(
+        res === side && (m[1] === "over" ? total > +m[2] : total < +m[2]),
+      );
+    }
+    case "bttsou": {
+      const m = pick.match(/^(Yes|No) & (over|under)$/);
+      if (!m) return "void";
+      return bool(
+        (m[1] === "Yes") === btts && (m[2] === "over") === total > 2.5,
+      );
+    }
+    case "dcou": {
+      const m = pick.match(/^(.*?) & (over|under)$/);
+      if (!m) return "void";
+      const ok =
+        (m[1] === `${hS}/D` && res !== "A") ||
+        (m[1] === `${aS}/D` && res !== "H") ||
+        (m[1] === `${hS}/${aS}` && res !== "D");
+      return bool(ok && (m[2] === "over") === total > 2.5);
+    }
+  }
+  // asian handicaps (ah1, ahm25, ahm05, ah05, ah15): "SHORT ±N.5"
+  if (/^ah/.test(key)) {
+    const m = pick.match(/^(.*?) ([+-]\d+\.5)$/);
+    if (!m) return "void";
+    const side = m[1] === hS ? diff : m[1] === aS ? -diff : null;
+    if (side === null) return "void";
+    return bool(side + +m[2] > 0);
+  }
+  // totals (tgXX) and team totals (tthXX/ttaXX): "Over"/"Under", line in name
+  if (/^(tg|tt[ha])\d+$/.test(key)) {
+    const m = b.marketName.match(/([\d.]+)\s*$/);
+    if (!m) return "void";
+    const g = key.startsWith("tth") ? sh : key.startsWith("tta") ? sa : total;
+    return bool(pick === "Over" ? g > +m[1] : g < +m[1]);
+  }
+  return "void";
+}

@@ -153,7 +153,7 @@ function Football() {
           {(
             [
               ["liveup", `Live & upcoming ${liveUp.length}`],
-              ["all", "All soccer"],
+              ["all", "All football"],
             ] as const
           ).map(([k, label]) => (
             <button

@@ -57,12 +57,13 @@ export const useSlip = create<SlipState>()(
       if (!found) return;
       // live suspension state lives in the world store, not the seed —
       // a market can suspend between render and click
-      const liveMk = useWorld
+      const liveMt = useWorld
         .getState()
-        .matches.find((m) => m.id === found.match.id)
-        ?.markets.find((mk) => mk.id === found.market.id);
+        .matches.find((m) => m.id === found.match.id);
+      const liveMk = liveMt?.markets.find((mk) => mk.id === found.market.id);
       const liveOc = liveMk?.outcomes.find((o) => o.id === outcomeId);
       if (
+        liveMt?.status === "finished" ||
         liveMk?.status === "suspended" ||
         liveOc?.status === "suspended" ||
         found.outcome.status === "suspended" ||
@@ -178,7 +179,7 @@ export const useSlip = create<SlipState>()(
       const delay = liveSel
         ? 2_400 + Math.random() * 600
         : 650 + Math.random() * 350;
-      const fail = useDemoFailOnce();
+      const fail = consumeFailFlag();
       const sheetWasOpen = get().mobileOpen;
       set({
         status: "placing",
@@ -244,15 +245,20 @@ export const useSlip = create<SlipState>()(
           selections: [],
           placingUntil: null,
         });
-        // teardown honesty: if the sheet closed or the tab hid mid-flight,
-        // the bet still lands — but the user hears about it
-        if (document.hidden || (sheetWasOpen && !cur.mobileOpen)) {
-          useUI
-            .getState()
-            .toast(
-              `Bet placed ${receipt.bets.map((b) => b.id).join(", ")}`,
-              "success",
-            );
+        // teardown honesty: the bet lands server-side regardless — but a
+        // toast fired into a hidden tab is never seen, so queue it for
+        // the user's return instead of letting it die
+        const note = `Bet placed ${receipt.bets.map((b) => b.id).join(", ")}`;
+        if (document.hidden) {
+          const onVis = () => {
+            if (!document.hidden) {
+              useUI.getState().toast(`${note} while you were away`, "success");
+              document.removeEventListener("visibilitychange", onVis);
+            }
+          };
+          document.addEventListener("visibilitychange", onVis);
+        } else if (sheetWasOpen && !cur.mobileOpen) {
+          useUI.getState().toast(note, "success");
         }
       }, delay);
     },
@@ -293,7 +299,7 @@ let failOnce = false;
 export const armFailOnce = () => {
   failOnce = true;
 };
-function useDemoFailOnce() {
+function consumeFailFlag() {
   const v = failOnce;
   failOnce = false;
   return v;

@@ -102,6 +102,12 @@ export function OddsCell({
 }) {
   const override = useOdds((s) => s.overrides[outcome.id]);
   const flash = useOdds((s) => s.flashes[outcome.id]);
+  // medium display name for cramped named cells: "Brighton & Hove Albion" →
+  // "Brighton", applied per "/" segment so DC names stay readable too
+  const pickName = outcome.name
+    .split("/")
+    .map((part) => (part.includes(" & ") ? part.split(" & ")[0] : part))
+    .join("/");
   const selected = useSlip((s) =>
     s.selections.some((x) => x.outcomeId === outcome.id),
   );
@@ -129,7 +135,7 @@ export function OddsCell({
       aria-pressed={selected}
       aria-label={
         named
-          ? `${outcome.name} ${fmt(price)}${suspended ? " · suspended" : ""}`
+          ? `${pickName} ${fmt(price)}${suspended ? " · suspended" : ""}`
           : `${tag ? `${tag} ` : ""}${fmt(price)} · ${outcome.name}${suspended ? " · suspended" : ""}`
       }
       className={[
@@ -156,7 +162,7 @@ export function OddsCell({
             <span
               className={`min-w-0 max-w-full truncate font-sans text-[11px] font-medium leading-tight ${selected ? "text-text-inverse/75" : "text-text-tertiary"}`}
             >
-              {outcome.name}{" "}
+              {pickName}{" "}
             </span>
           )}
           <span className="flex items-center gap-1.5">

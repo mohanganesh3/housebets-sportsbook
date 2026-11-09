@@ -39,6 +39,7 @@ export function TopBar({ onSearch }: { onSearch: () => void }) {
   // Weekly-race pot ticks gently upward — live-venue feel, honest sample data
   const balance = useUI((s) => s.balance);
   const [pot, setPot] = useState(50000);
+  const [modal, setModal] = useState<"deposit" | "race" | null>(null);
   useEffect(() => {
     const t = setInterval(
       () => setPot((p) => p + (17 + (((p / 7) % 41) | 0))),
@@ -51,9 +52,11 @@ export function TopBar({ onSearch }: { onSearch: () => void }) {
     <header className="fixed inset-x-0 top-0 z-40 flex h-[var(--shell-header-h)] items-center gap-3 border-b border-border-soft bg-bg-primary/95 px-3 backdrop-blur-md lg:px-5">
       <Logo />
       {/* centered prize widget — Housebets chrome signature */}
-      <Link
-        to="/"
-        className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-gold-500/25 bg-[#1a1505]/60 px-3.5 py-1.5 lg:flex"
+      <button
+        type="button"
+        onClick={() => setModal("race")}
+        aria-label={`Weekly race · pot $${pot.toLocaleString()} · demo`}
+        className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-gold-500/25 bg-[#1a1505]/60 px-3.5 py-1.5 transition-colors hover:border-gold-500/50 lg:flex"
       >
         <Trophy size={13} className="text-gold-500" />
         <span className="text-[12px] font-semibold text-base-75">
@@ -62,7 +65,7 @@ export function TopBar({ onSearch }: { onSearch: () => void }) {
         <span className="tnum font-odds text-[12px] font-bold text-gold-500">
           ${pot.toLocaleString()}
         </span>
-      </Link>
+      </button>
       {/* Search: icon on phone (space is for money chrome), pill on desktop */}
       <button
         type="button"
@@ -100,14 +103,114 @@ export function TopBar({ onSearch }: { onSearch: () => void }) {
         </div>
         <button
           type="button"
+          onClick={() => setModal("deposit")}
           className="btn-primary flex h-10 shrink-0 items-center gap-2 rounded-xl px-2.5 text-[14px] font-bold sm:px-4"
-          aria-label="Deposit"
+          aria-label="Deposit demo funds"
         >
           <Wallet size={16} className="sm:hidden" />
           <span className="hidden sm:inline">Deposit</span>
         </button>
       </div>
+      {modal && <ChromeModal kind={modal} onClose={() => setModal(null)} />}
     </header>
+  );
+}
+
+function ChromeModal({
+  kind,
+  onClose,
+}: {
+  kind: "deposit" | "race";
+  onClose: () => void;
+}) {
+  const credit = useUI((s) => s.credit);
+  const toast = useUI((s) => s.toast);
+  const pot = 50000 + Math.floor((Date.now() / 60000) % 500);
+  return (
+    <div className="fixed inset-0 z-[60] grid place-items-center p-4">
+      <button
+        type="button"
+        aria-label="Close"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"
+      />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        role="dialog"
+        aria-modal="true"
+        aria-label={kind === "deposit" ? "Deposit demo funds" : "Weekly race"}
+        className="relative w-full max-w-sm rounded-2xl border border-border-soft bg-surface-primary p-5 shadow-2xl"
+      >
+        <div className="mb-1 flex items-center justify-between">
+          <h2 className="text-[16px] font-bold">
+            {kind === "deposit" ? "Deposit" : "Weekly race"}
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="grid size-8 place-items-center rounded-lg text-text-tertiary hover:bg-surface-secondary"
+          >
+            <X size={16} />
+          </button>
+        </div>
+        {kind === "deposit" ? (
+          <>
+            <p className="mb-4 text-[12.5px] leading-relaxed text-text-tertiary">
+              Demo wallet · no real money moves. Top up the sample balance to
+              keep testing stakes and settlement.
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {[50, 100, 250, 500, 1000, 2500].map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => {
+                    credit(v);
+                    toast(
+                      `Deposited ${v.toLocaleString()} USDT demo funds`,
+                      "success",
+                    );
+                    onClose();
+                  }}
+                  className="rounded-xl border border-brand-a30 bg-secondary-a15 py-3 font-odds text-[14px] font-bold text-brand-300 transition-colors hover:bg-secondary-a30"
+                >
+                  +{v >= 1000 ? `${v / 1000}k` : v}
+                </button>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="space-y-3 text-[12.5px] leading-relaxed text-text-secondary">
+            <p>
+              The weekly race pays out a share of{" "}
+              <span className="tnum font-odds font-bold text-gold-500">
+                ${pot.toLocaleString()}
+              </span>{" "}
+              to the top wagering accounts each Friday.
+            </p>
+            <p className="text-text-tertiary">
+              Demo widget · standings and payouts are sample data, not a real
+              promotion.
+            </p>
+            <div className="rounded-xl border border-border-soft bg-surface-secondary p-3">
+              {[
+                ["1.", "K. Mercer", "1,240 pts"],
+                ["2.", "D. Osei", "1,180 pts"],
+                ["3.", "You (demo)", "1,015 pts"],
+              ].map(([r, n, p]) => (
+                <div key={r} className="flex justify-between py-1 text-[12px]">
+                  <span className="text-text-tertiary">{r}</span>
+                  <span className="font-semibold">{n}</span>
+                  <span className="tnum font-odds text-gold-500">{p}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </motion.div>
+    </div>
   );
 }
 
@@ -125,8 +228,9 @@ const RAIL: {
 
 export function LeftRail() {
   const loc = useLocation();
-  const liveCount = useWorld(
-    (s) => s.matches.filter((m) => m.status === "live").length,
+  // badge tracks the real live feed — honors the empty-live scenario
+  const liveCount = useWorld((s) =>
+    s.liveEmpty ? 0 : s.matches.filter((m) => m.status === "live").length,
   );
   const followCount = useUI((s) => s.follows.size);
   return (
@@ -353,8 +457,8 @@ export function BottomBar({ onSearch }: { onSearch: () => void }) {
   >(null);
   const followCount = useUI((s) => s.follows.size);
   const setScenarioOpen = useUI((s) => s.setScenarioOpen);
-  const liveCount = useWorld(
-    (s) => s.matches.filter((m) => m.status === "live").length,
+  const liveCount = useWorld((s) =>
+    s.liveEmpty ? 0 : s.matches.filter((m) => m.status === "live").length,
   );
   const total = sel.reduce(
     (a, s) => a + (parseFloat(s.stake) || 0) * s.livePrice,
@@ -571,7 +675,10 @@ export function SlipSheet() {
   const open = useSlip((s) => s.mobileOpen);
   const setOpen = useSlip((s) => s.setMobileOpen);
   const count = useSlip((s) => s.selections.length);
-  const [tab, setTab] = useState<"slip" | "bets" | "chat">("slip");
+  // one tab state for sheet and desktop panel — receipt "View my bets",
+  // badge taps and panel pills all move together
+  const tab = useUI((s) => s.panelTab);
+  const setTab = useUI((s) => s.setPanelTab);
   const controls = useDragControls();
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
@@ -597,7 +704,11 @@ export function SlipSheet() {
               <div className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-border-very-strong" />
               <div className="flex items-center justify-between px-4 py-3">
                 <Dialog.Title className="text-[15px] font-bold">
-                  Bet slip & My bets
+                  {tab === "slip"
+                    ? "Bet slip"
+                    : tab === "bets"
+                      ? "My bets"
+                      : "Chat"}
                 </Dialog.Title>
                 <Dialog.Close
                   className="grid size-8 place-items-center rounded-lg text-text-tertiary hover:bg-surface-secondary"

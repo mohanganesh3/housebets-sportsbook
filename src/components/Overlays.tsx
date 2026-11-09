@@ -72,7 +72,30 @@ export function SearchPalette({
               .map((mk) => ({ m, mk })),
           ).slice(0, 5)
         : [];
-    return { matches: matches.slice(0, 7), comps: comps.slice(0, 4), markets };
+    // players are indexed via goalscorer market outcomes — every
+    // scorer outcome carries a squad name in this seed
+    const players =
+      needle.length > 1
+        ? MATCHES.flatMap((m) =>
+            m.markets
+              .filter((mk) => mk.group === "goalscorers")
+              .flatMap((mk) =>
+                mk.outcomes
+                  .filter((o) => o.name.toLowerCase().includes(needle))
+                  .map((o) => ({ m, mk, o })),
+              ),
+          )
+            .filter(
+              (v, i, a) => a.findIndex((x) => x.o.name === v.o.name) === i,
+            )
+            .slice(0, 6)
+        : [];
+    return {
+      matches: matches.slice(0, 7),
+      comps: comps.slice(0, 4),
+      markets,
+      players,
+    };
   }, [q, follows]);
 
   const go = (term: string, fn: () => void) => {
@@ -80,6 +103,57 @@ export function SearchPalette({
     setRecents(loadRecents());
     fn();
     onClose();
+  };
+
+  // flat keyboard order: comps → matches → markets → players, same as render
+  const flat = useMemo(
+    () => [
+      ...results.comps.map((c) => ({
+        key: c.id,
+        act: () => go(c.name, () => nav({ to: "/football" })),
+      })),
+      ...results.matches.map((m) => ({
+        key: m.id,
+        act: () =>
+          go(`${m.home.short} v ${m.away.short}`, () =>
+            nav({ to: "/match/$matchId", params: { matchId: m.id } }),
+          ),
+      })),
+      ...results.markets.map(({ m, mk }) => ({
+        key: mk.id,
+        act: () =>
+          go(mk.name, () =>
+            nav({ to: "/match/$matchId", params: { matchId: m.id } }),
+          ),
+      })),
+      ...results.players.map(({ m, o }) => ({
+        key: o.id,
+        act: () =>
+          go(o.name, () =>
+            nav({ to: "/match/$matchId", params: { matchId: m.id } }),
+          ),
+      })),
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [results],
+  );
+  const [hi, setHi] = useState(-1);
+  useEffect(() => setHi(-1), [q]);
+  const hl = (key: string) =>
+    hi >= 0 && flat[hi]?.key === key ? " bg-surface-secondary" : "";
+  const onKey = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      setHi((h) =>
+        flat.length === 0
+          ? -1
+          : e.key === "ArrowDown"
+            ? (h + 1) % flat.length
+            : (h - 1 + flat.length) % flat.length,
+      );
+    } else if (e.key === "Enter" && hi >= 0 && flat[hi]) {
+      flat[hi].act();
+    } else if (e.key === "Escape") onClose();
   };
 
   if (!open) return null;
@@ -104,6 +178,11 @@ export function SearchPalette({
             ref={inputRef}
             value={q}
             onChange={(e) => setQ(e.target.value)}
+            onKeyDown={onKey}
+            role="combobox"
+            aria-expanded="true"
+            aria-controls="search-results"
+            aria-activedescendant={hi >= 0 ? `sr-${flat[hi]?.key}` : undefined}
             placeholder="Teams, players, competitions, markets…"
             className="h-13 w-full bg-transparent text-[15px] outline-none placeholder:text-text-tertiary"
           />
@@ -115,7 +194,11 @@ export function SearchPalette({
             <X size={16} />
           </button>
         </div>
-        <div className="max-h-[55vh] overflow-y-auto p-2">
+        <div
+          id="search-results"
+          role="listbox"
+          className="max-h-[55vh] overflow-y-auto p-2"
+        >
           {!q && recents.length > 0 && (
             <div className="px-1 pb-2">
               <p className="flex items-center gap-1.5 px-2 pb-1.5 text-[10.5px] font-semibold uppercase tracking-wide text-text-tertiary">
@@ -143,9 +226,10 @@ export function SearchPalette({
           {results.comps.map((c) => (
             <button
               key={c.id}
+              id={`sr-${c.id}`}
               type="button"
               onClick={() => go(c.name, () => nav({ to: "/football" }))}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[14px] hover:bg-surface-secondary"
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[14px] hover:bg-surface-secondary${hl(c.id)}`}
             >
               <span className="grid size-7 place-items-center rounded-md bg-secondary-a30 font-odds text-[10px] font-bold text-brand-300">
                 {compShort(c.id)}
@@ -165,7 +249,8 @@ export function SearchPalette({
                   nav({ to: "/match/$matchId", params: { matchId: m.id } }),
                 )
               }
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left hover:bg-surface-secondary"
+              id={`sr-${m.id}`}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left hover:bg-surface-secondary${hl(m.id)}`}
             >
               <TeamLogo team={m.home} size={24} />
               <TeamLogo team={m.away} size={24} />
@@ -192,7 +277,8 @@ export function SearchPalette({
                   nav({ to: "/match/$matchId", params: { matchId: m.id } }),
                 )
               }
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-[13px] hover:bg-surface-secondary"
+              id={`sr-${mk.id}`}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-[13px] hover:bg-surface-secondary${hl(mk.id)}`}
             >
               <span className="text-text-tertiary">Market</span>
               {mk.name}
@@ -201,10 +287,38 @@ export function SearchPalette({
               </span>
             </button>
           ))}
+          {results.players.map(({ m, mk, o }) => (
+            <button
+              key={o.id}
+              type="button"
+              onClick={() =>
+                go(o.name, () =>
+                  nav({ to: "/match/$matchId", params: { matchId: m.id } }),
+                )
+              }
+              id={`sr-${o.id}`}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-[13px] hover:bg-surface-secondary${hl(o.id)}`}
+            >
+              <span className="grid size-6 place-items-center rounded-full bg-secondary-a30 font-odds text-[9px] font-bold text-brand-300">
+                {o.name
+                  .split(" ")
+                  .map((w) => w[0])
+                  .slice(0, 2)
+                  .join("")}
+              </span>
+              <span className="flex flex-col">
+                <span className="text-[13px] font-medium">{o.name}</span>
+                <span className="text-[10.5px] text-text-tertiary">
+                  {mk.name} · {m.home.short} v {m.away.short}
+                </span>
+              </span>
+            </button>
+          ))}
           {q &&
             !results.matches.length &&
             !results.comps.length &&
-            !results.markets.length && (
+            !results.markets.length &&
+            !results.players.length && (
               <p className="px-3 py-8 text-center text-[13px] text-text-tertiary">
                 No matches for “{q}” — sample data covers the listed fixtures.
               </p>
@@ -277,15 +391,36 @@ export function ScenarioDock() {
         slip.setStake(x.outcomeId, ["10", "25", "5"][i] ?? "10");
       });
     };
+    // the offline freeze is honest — scenarios that mutate the board
+    // can't fire while it holds (placement scenarios still run: they
+    // demonstrate the real network failure)
+    if (
+      useUI.getState().offline &&
+      [
+        "odds-change",
+        "suspend-market",
+        "suspended",
+        "mixed",
+        "empty-live",
+      ].includes(s)
+    ) {
+      toast("Board frozen · reconnect first", "info");
+      return;
+    }
     switch (s) {
       case "clean":
         slip.clear();
         world.setLiveEmpty(false);
         useUI.getState().setOffline(false);
+        // restore seed truth: open markets reopen, seed-suspended and
+        // finished-match markets stay exactly as they should
         world.matches.forEach((mt) => {
+          if (mt.status === "finished") return;
+          const seedMt = MATCHES.find((x) => x.id === mt.id);
           mt.markets.forEach((mk) => {
-            if (mk.status === "suspended")
-              world.setMarketStatus(mt.id, mk.id, "open");
+            const seedMk = seedMt?.markets.find((x) => x.id === mk.id);
+            const want = seedMk?.status === "suspended" ? "suspended" : "open";
+            if (mk.status !== want) world.setMarketStatus(mt.id, mk.id, want);
           });
         });
         toast("Reset · clean state", "success");
@@ -324,6 +459,12 @@ export function ScenarioDock() {
         slip.onMarketSuspended("ars-bha-h2h");
         bets.suspendCashout("ars-bha");
         setTimeout(() => {
+          // never resurrect a finished match
+          if (
+            useWorld.getState().matches.find((m) => m.id === "ars-bha")
+              ?.status !== "live"
+          )
+            return;
           world.setMarketStatus("ars-bha", "ars-bha-h2h", "open");
           slip.onMarketResumed("ars-bha-h2h");
           bets.resumeCashout("ars-bha");
@@ -359,24 +500,35 @@ export function ScenarioDock() {
         setTimeout(() => slip.place(), 350);
         toast("Next placement will fail (demo)", "info");
         break;
-      case "goal":
-        world.setScore("ars-bha", [2, 0]);
-        world.goalFlash("ars-bha");
+      case "goal": {
+        if (useUI.getState().offline) {
+          toast("Board frozen · goal can't land while offline", "info");
+          break;
+        }
+        const gm =
+          world.matches.find(
+            (m) => m.id === "ars-bha" && m.status === "live",
+          ) ?? world.matches.find((m) => m.status === "live");
+        if (!gm) {
+          toast("No live match to score in", "info");
+          break;
+        }
+        const sc: [number, number] = [gm.score.home + 1, gm.score.away];
+        world.setScore(gm.id, sc);
+        world.goalFlash(gm.id);
         useEngine.getState().pushEvent({
           kind: "goal",
           at: 0,
-          matchId: "ars-bha",
+          matchId: gm.id,
           scorer: "R. Ashworth",
-          newScore: [2, 0],
+          newScore: sc,
         });
-        toast("GOAL · Arsenal 2-0 (flash + suspension cascade)", "success");
-        world.setMarketStatus("ars-bha", "ars-bha-h2h", "suspended", "Goal");
-        slip.onMarketSuspended("ars-bha-h2h");
-        setTimeout(() => {
-          world.setMarketStatus("ars-bha", "ars-bha-h2h", "open");
-          slip.onMarketResumed("ars-bha-h2h");
-        }, 9000);
+        toast(
+          `GOAL · ${gm.home.short} ${sc[0]}-${sc[1]} (flash + suspension cascade)`,
+          "success",
+        );
         break;
+      }
       case "cashout-susp":
         bets.suspendCashout("juv-rom");
         setTimeout(() => useBets.getState().resumeCashout("juv-rom"), 15_000);
@@ -479,6 +631,7 @@ export function ScenarioDock() {
 
 export function Toaster() {
   const toasts = useUI((s) => s.toasts);
+  const dismiss = useUI((s) => s.dismissToast);
   return (
     <div
       className="pointer-events-none fixed left-1/2 top-[calc(var(--shell-header-h)+10px)] z-[80] flex w-[min(360px,92vw)] -translate-x-1/2 flex-col items-center gap-2"
@@ -486,12 +639,15 @@ export function Toaster() {
     >
       <AnimatePresence>
         {toasts.map((t) => (
-          <motion.div
+          <motion.button
             key={t.id}
+            type="button"
+            onClick={() => dismiss(t.id)}
+            aria-label={`Dismiss · ${t.msg}`}
             initial={{ y: -14, opacity: 0, scale: 0.96 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.96 }}
-            className={`rounded-xl border px-4 py-2.5 text-[13px] font-medium shadow-xl backdrop-blur-md ${
+            className={`pointer-events-auto flex items-center gap-2 rounded-xl border px-4 py-2.5 text-left text-[13px] font-medium shadow-xl backdrop-blur-md ${
               t.kind === "success"
                 ? "border-success-500/40 bg-success-a15 text-success-400"
                 : t.kind === "error"
@@ -499,8 +655,9 @@ export function Toaster() {
                   : "border-border-very-strong bg-surface-secondary/95 text-text-primary"
             }`}
           >
-            {t.msg}
-          </motion.div>
+            <span className="flex-1">{t.msg}</span>
+            <X size={12} className="shrink-0 opacity-60" aria-hidden />
+          </motion.button>
         ))}
       </AnimatePresence>
     </div>

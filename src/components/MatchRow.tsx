@@ -145,8 +145,8 @@ export function MatchRow({
             +{mt.markets.length}
             <ChevronRight size={13} />
           </Link>
-          {!live && (
-            <span className="hidden sm:block">
+          {mt.status === "scheduled" && (
+            <span>
               <BellButton id={mt.id} />
             </span>
           )}

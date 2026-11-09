@@ -313,7 +313,30 @@ function MatchPage() {
             </button>
           </div>
           <div className="flex flex-col items-center gap-1.5">
-            {live ? (
+            {match.status === "finished" ? (
+              <>
+                {/* terminal state — final score persists, FT badge */}
+                <span className="tnum flex items-center gap-1.5 font-odds text-[26px] font-bold leading-none sm:text-[30px]">
+                  <span className="grid min-w-11 place-items-center rounded-lg border border-border-strong bg-bg-primary/80 px-2.5 py-2 shadow-inner">
+                    {match.score.home}
+                  </span>
+                  <span className="text-text-tertiary">-</span>
+                  <span className="grid min-w-11 place-items-center rounded-lg border border-border-strong bg-bg-primary/80 px-2.5 py-2 shadow-inner">
+                    {match.score.away}
+                  </span>
+                </span>
+                <span className="rounded-[4px] bg-surface-tertiary px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-text-secondary">
+                  FULL TIME
+                </span>
+                <span className="text-[11px] text-text-tertiary">
+                  {new Date(match.kickoffAt).toLocaleDateString([], {
+                    weekday: "short",
+                    day: "numeric",
+                    month: "short",
+                  })}
+                </span>
+              </>
+            ) : live ? (
               <>
                 {/* score lives in dark boxes — wireframe signature */}
                 <AnimatePresence mode="popLayout">

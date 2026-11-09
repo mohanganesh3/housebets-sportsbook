@@ -29,6 +29,7 @@ export interface EngineEvent {
   marketId?: string;
   prevPrice?: number;
   newPrice?: number;
+  delta?: number;
   dir?: OddsDir;
   scorer?: string;
   newScore?: [number, number];
@@ -58,20 +59,18 @@ function buildScript(): EngineEvent[] {
     const open = mt.markets.filter((mk) => mk.status === "open");
     const mk = open[Math.floor(rand() * open.length)];
     const oc = mk.outcomes[Math.floor(rand() * mk.outcomes.length)];
-    const dir = rand() > 0.5 ? "up" : "down";
-    const delta = +(0.02 + rand() * 0.12).toFixed(2);
-    const np =
-      dir === "up"
-        ? +(oc.price + delta).toFixed(2)
-        : Math.max(1.01, +(oc.price - delta).toFixed(2));
+    // carry a signed delta — the walk applies to the *current* price at
+    // fire time, so ticks drift instead of ping-ponging the seed
+    const dir = rand() > 0.5 ? 1 : -1;
+    const delta = +(dir * (0.02 + rand() * 0.12)).toFixed(2);
     evs.push({
       kind: "odds-change",
       at: t,
       matchId: mt.id,
       marketId: mk.id,
       outcomeId: oc.id,
-      dir: dir as OddsDir,
-      newPrice: np,
+      dir: (dir > 0 ? "up" : "down") as OddsDir,
+      delta,
     });
     t += 6000 + Math.floor(rand() * 4000);
   }
@@ -138,16 +137,35 @@ import { useSlip } from "./store/slip";
 import { useUI } from "./store/ui";
 import { useWorld } from "./store/world";
 
+// feed events never touch a finished match — FT is terminal, nothing
+// reopens or reprices after the whistle
+const isLive = (matchId: string) =>
+  useWorld.getState().matches.find((m) => m.id === matchId)?.status === "live";
+
 function applyEvent(e: EngineEvent) {
+  // offline freezes the whole board — the banner's promise is kept:
+  // no ticks, no suspensions, no goals land until reconnect
+  if (useUI.getState().offline) return;
+  if (!isLive(e.matchId)) return;
   const world = useWorld.getState();
-  if (e.kind === "odds-change" && e.outcomeId && e.newPrice != null) {
+  if (
+    e.kind === "odds-change" &&
+    e.outcomeId &&
+    (e.newPrice != null || e.delta != null)
+  ) {
     const found = outcomeById(e.outcomeId);
     if (!found) return;
-    e.prevPrice = found.outcome.price;
-    e.dir = e.newPrice > found.outcome.price ? "up" : "down";
-    useOdds.getState().applyChange(e.outcomeId, e.newPrice, e.dir);
-    useSlip.getState().onOddsChange(e.outcomeId, e.newPrice);
-    useBets.getState().tickCashout(e.outcomeId, e.newPrice);
+    const cur = useOdds.getState().price(e.outcomeId) ?? found.outcome.price;
+    const np =
+      e.newPrice ??
+      Math.min(501, Math.max(1.01, +(cur + (e.delta ?? 0)).toFixed(2)));
+    if (np === cur) return;
+    e.prevPrice = cur;
+    e.newPrice = np;
+    e.dir = np > cur ? "up" : "down";
+    useOdds.getState().applyChange(e.outcomeId, np, e.dir);
+    useSlip.getState().onOddsChange(e.outcomeId, np);
+    useBets.getState().tickCashout(e.outcomeId, np);
   }
   if (e.kind === "suspend" && e.marketId) {
     const reason = e.reason ?? "Dangerous attack";
@@ -158,6 +176,8 @@ function applyEvent(e: EngineEvent) {
     useUI.getState().toast(`Market suspended · ${reason}`, "info");
     if (e.resumeDelay) {
       setTimeout(() => {
+        // the match may have gone FT inside the delay — never resurrect
+        if (!isLive(e.matchId)) return;
         useWorld.getState().setMarketStatus(e.matchId, e.marketId!, "open");
         useSlip.getState().onMarketResumed(e.marketId!);
         useBets.getState().resumeCashout(e.matchId);
@@ -183,8 +203,11 @@ function applyEvent(e: EngineEvent) {
       );
     setTimeout(() => {
       const mt = useWorld.getState().matches.find((m) => m.id === e.matchId);
-      if (!mt) return;
+      if (mt?.status !== "live") return;
       const open = mt.markets.filter((mk) => mk.status === "open");
+      // remember which markets THIS cascade closed — trader suspensions
+      // that predate the goal stay closed when we reopen
+      const closedByGoal = new Set(open.map((mk) => mk.id));
       for (const mk of open) {
         useWorld
           .getState()
@@ -193,7 +216,7 @@ function applyEvent(e: EngineEvent) {
       }
       setTimeout(() => {
         const mt2 = useWorld.getState().matches.find((m) => m.id === e.matchId);
-        if (!mt2) return;
+        if (mt2?.status !== "live") return;
         // reprice h2h toward the scoring side before reopening
         const h2h = mt2.markets.find((mk) => mk.key === "h2h");
         if (h2h) {
@@ -201,19 +224,22 @@ function applyEvent(e: EngineEvent) {
             const isScorer =
               (oc.name === mt2.home.name && homeScored) ||
               (oc.name === mt2.away.name && !homeScored);
+            // reprice from the CURRENT price, not the seed — prior ticks
+            // may have already moved it
+            const cur = useOdds.getState().price(oc.id) ?? oc.price;
             const np = isScorer
-              ? Math.max(1.01, +(oc.price * 0.72).toFixed(2))
+              ? Math.max(1.01, +(cur * 0.72).toFixed(2))
               : oc.name === "Draw"
-                ? +(oc.price * 1.15).toFixed(2)
-                : +(oc.price * 1.4).toFixed(2);
-            useOdds
-              .getState()
-              .applyChange(oc.id, np, np > oc.price ? "up" : "down");
+                ? +(cur * 1.15).toFixed(2)
+                : +(cur * 1.4).toFixed(2);
+            useOdds.getState().applyChange(oc.id, np, np > cur ? "up" : "down");
             useSlip.getState().onOddsChange(oc.id, np);
             useBets.getState().tickCashout(oc.id, np);
           }
         }
-        for (const mk of mt2.markets.filter((m) => m.status === "suspended")) {
+        for (const mk of mt2.markets.filter(
+          (m) => m.status === "suspended" && closedByGoal.has(m.id),
+        )) {
           useWorld.getState().setMarketStatus(e.matchId, mk.id, "open");
           useSlip.getState().onMarketResumed(mk.id);
         }

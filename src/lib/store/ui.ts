@@ -29,8 +29,10 @@ interface UIState {
   toggleFavMarket: (key: string) => void;
   oddsPref: "ask" | "higher" | "any";
   setOddsPref: (p: "ask" | "higher" | "any") => void;
+  setBalance: (v: number) => void;
   toasts: { id: number; msg: string; kind: "info" | "success" | "error" }[];
   toast: (msg: string, kind?: "info" | "success" | "error") => void;
+  dismissToast: (id: number) => void;
   balance: number;
   debit: (v: number) => void;
   credit: (v: number) => void;
@@ -123,12 +125,31 @@ export const useUI = create<UIState>()((set, get) => ({
     } catch {}
     set({ favMarkets: f });
   },
-  oddsPref: "ask",
-  setOddsPref: (p) => set({ oddsPref: p }),
+  oddsPref:
+    typeof window !== "undefined" &&
+    ["ask", "higher", "any"].includes(
+      localStorage.getItem("hb-odds-pref") ?? "",
+    )
+      ? (localStorage.getItem("hb-odds-pref") as "ask" | "higher" | "any")
+      : "ask",
+  setOddsPref: (p) => {
+    try {
+      localStorage.setItem("hb-odds-pref", p);
+    } catch {}
+    set({ oddsPref: p });
+  },
+  // a stored 0.00 must read back as 0.00 — `|| 1250` revived it
   balance:
-    typeof window !== "undefined"
-      ? Number(localStorage.getItem("hb-balance")) || 1250
+    typeof window !== "undefined" && localStorage.getItem("hb-balance") !== null
+      ? Number(localStorage.getItem("hb-balance"))
       : 1250,
+  setBalance: (v) => {
+    const balance = +v.toFixed(2);
+    try {
+      localStorage.setItem("hb-balance", String(balance));
+    } catch {}
+    set({ balance });
+  },
   debit: (v) =>
     set((s) => {
       const balance = +(s.balance - v).toFixed(2);
@@ -156,4 +177,6 @@ export const useUI = create<UIState>()((set, get) => ({
       2800,
     );
   },
+  dismissToast: (id) =>
+    set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
 }));

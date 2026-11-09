@@ -3,6 +3,7 @@ import { subscribeWithSelector } from "zustand/middleware";
 import { MATCHES } from "../seed";
 import type { MarketStatus, Match } from "../types";
 import { useBets } from "./bets";
+import { useSlip } from "./slip";
 import { useUI } from "./ui";
 
 interface WorldState {
@@ -24,11 +25,21 @@ interface WorldState {
   kickoff: (matchId: string) => void;
 }
 
+const htDwell = new Map<string, number>();
+
 export const useWorld = create<WorldState>()(
   subscribeWithSelector((set, get) => ({
     matches: MATCHES,
     goalFlashes: {},
-    suspReasons: {},
+    // seed-suspended markets carry a generic reason — engine suspensions
+    // write specific ones via setMarketStatus
+    suspReasons: Object.fromEntries(
+      MATCHES.flatMap((mt) =>
+        mt.markets
+          .filter((mk) => mk.status === "suspended")
+          .map((mk) => [mk.id, "Suspended by trader"]),
+      ),
+    ),
     liveEmpty: false,
     setLiveEmpty: (v) => set({ liveEmpty: v }),
     setMarketStatus: (matchId, marketId, status, reason) =>
@@ -63,10 +74,20 @@ export const useWorld = create<WorldState>()(
           mt.id === matchId ? { ...mt, score: { home: h, away: a } } : mt,
         ),
       })),
-    goalFlash: (matchId) =>
+    goalFlash: (matchId) => {
       set((s) => ({
         goalFlashes: { ...s.goalFlashes, [matchId]: Date.now() },
-      })),
+      }));
+      // clear after the flash animation so repeat goals re-fire it
+      setTimeout(
+        () =>
+          set((s) => {
+            const { [matchId]: _drop, ...rest } = s.goalFlashes;
+            return { goalFlashes: rest };
+          }),
+        4_500,
+      );
+    },
     bumpMinute: (matchId) =>
       set((s) => ({
         matches: s.matches.map((mt) =>
@@ -79,19 +100,33 @@ export const useWorld = create<WorldState>()(
       set((s) => ({
         matches: s.matches.map((mt) => {
           if (mt.id !== matchId || mt.status !== "live") return mt;
-          // HT break ends → second half resumes
-          if (mt.period === "HT" && mt.minute == null)
+          // HT break: hold two ticks so the whistle actually reads as a break
+          if (mt.period === "HT" && mt.minute == null) {
+            const dwell = (htDwell.get(mt.id) ?? 0) + 1;
+            htDwell.set(mt.id, dwell);
+            if (dwell < 2) return mt;
+            htDwell.delete(mt.id);
             return { ...mt, period: "2nd half", minute: 46 };
+          }
           if (mt.minute == null) return mt;
-          // full time: markets close, open h2h bets settle
-          if (mt.minute >= 90) {
+          // stoppage time, then full time: markets close, every open bet
+          // settles or voids, cash-out locks for good
+          if (mt.minute >= 93) {
             useBets.getState().settleMatch(mt.id, mt.score.home, mt.score.away);
-            return {
+            const closed = {
               ...mt,
-              status: "finished",
+              status: "finished" as const,
               period: "FT",
-              markets: mt.markets.map((mk) => ({ ...mk, status: "suspended" })),
+              markets: mt.markets.map((mk) => ({
+                ...mk,
+                status: "suspended" as const,
+              })),
             };
+            for (const mk of closed.markets) {
+              useSlip.getState().onMarketSuspended(mk.id);
+            }
+            useBets.getState().suspendCashout(mt.id);
+            return closed;
           }
           // half time whistle (compressed — demo clock)
           if (mt.minute >= 45 && mt.period === "1st half")

@@ -7,10 +7,9 @@ import {
   X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
 import { matchById } from "../lib/seed";
 import { useBets } from "../lib/store/bets";
-import { armFailOnce, useSlip } from "../lib/store/slip";
+import { useSlip } from "../lib/store/slip";
 import { useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
 import { LiveBadge, TeamLogo } from "./primitives";
@@ -70,10 +69,10 @@ const USDT = (
 
 function SlipItem({
   sel,
-  onFailArm,
+  conflict,
 }: {
   sel: import("../lib/types").SlipSelection;
-  onFailArm: () => void;
+  conflict?: boolean;
 }) {
   const { remove, setStake, accept } = useSlip();
   const mt = matchById(sel.matchId);
@@ -110,6 +109,11 @@ function SlipItem({
             {mt && <TeamLogo team={mt.home} size={14} />}
             {mt ? `${mt.home.short} v ${mt.away.short}` : ""}
           </p>
+          {conflict && (
+            <p className="mt-0.5 text-[10.5px] font-medium text-warning-400">
+              Two picks in this market · they compete as singles
+            </p>
+          )}
         </div>
         <div className="flex shrink-0 items-center gap-1.5">
           <span
@@ -201,7 +205,12 @@ function SlipItem({
             <button
               key={q}
               type="button"
-              onClick={() => setStake(sel.outcomeId, String(q))}
+              onClick={() =>
+                setStake(
+                  sel.outcomeId,
+                  String(+((parseFloat(sel.stake) || 0) + q).toFixed(2)),
+                )
+              }
               className={`h-7 flex-1 rounded-md font-odds text-[11px] font-semibold transition-colors ${
                 parseFloat(sel.stake) === q
                   ? "bg-brand-500/25 text-brand-300 ring-1 ring-brand-500/50"
@@ -218,12 +227,6 @@ function SlipItem({
       {changed && (
         <span className="sr-only">Odds changed, requires acceptance</span>
       )}
-      {/* hidden easter egg: triple-tap the card to arm fail-demo */}
-      <span
-        className="absolute inset-x-0 top-0 h-1 cursor-default"
-        onClick={onFailArm}
-        aria-hidden
-      />
     </motion.div>
   );
 }
@@ -243,7 +246,6 @@ export function BetSlipBody() {
   const toast = useUI((s) => s.toast);
   const oddsPref = useUI((s) => s.oddsPref);
   const balance = useUI((s) => s.balance);
-  const [taps, setTaps] = useState(0);
   const netPL = useBets((s) =>
     s.bets.reduce((a, b) => {
       if (b.result === "won" || b.result === "cashedout")
@@ -267,17 +269,6 @@ export function BetSlipBody() {
     0,
   );
   const ready = selections.length > 0 && changed.length === 0 && totalStake > 0;
-
-  const armTap = () => {
-    const n = taps + 1;
-    setTaps(n);
-    if (n >= 3) {
-      armFailOnce();
-      toast("Demo armed: next placement fails", "info");
-      setTaps(0);
-    }
-    setTimeout(() => setTaps(0), 1200);
-  };
 
   if (status === "placed")
     return (
@@ -442,7 +433,14 @@ export function BetSlipBody() {
           <div className="min-h-0 flex-1 space-y-2 overflow-y-auto px-3 pb-3">
             <AnimatePresence mode="popLayout">
               {selections.map((s) => (
-                <SlipItem key={s.outcomeId} sel={s} onFailArm={armTap} />
+                <SlipItem
+                  key={s.outcomeId}
+                  sel={s}
+                  conflict={
+                    selections.filter((x) => x.marketId === s.marketId).length >
+                    1
+                  }
+                />
               ))}
             </AnimatePresence>
           </div>
@@ -471,11 +469,19 @@ export function BetSlipBody() {
                 </span>
                 <span className="text-text-tertiary">
                   Balance after bet{" "}
-                  <span className="tnum text-text-secondary">
+                  <span
+                    className={`tnum ${totalStake > balance ? "font-bold text-error-300" : "text-text-secondary"}`}
+                  >
                     {(balance - totalStake).toFixed(2)}
                   </span>
                 </span>
               </div>
+            )}
+            {totalStake > balance && (
+              <p className="mb-2 flex items-center justify-center gap-1.5 text-[11.5px] font-semibold text-error-300">
+                <TriangleAlert size={12} /> Stake exceeds balance · reduce it or
+                deposit
+              </p>
             )}
             {suspended.length > 0 && (
               <button
@@ -495,7 +501,7 @@ export function BetSlipBody() {
               whileTap={ready ? { scale: 0.97 } : undefined}
               onClick={place}
               disabled={!ready || suspended.length > 0 || status === "placing"}
-              className={`relative flex h-11 w-full items-center justify-center gap-2 overflow-hidden rounded-xl text-[14px] font-bold transition-all ${
+              className={`relative flex h-11 w-full items-center justify-center gap-2 overflow-hidden rounded-xl text-[14px] font-bold transition-colors ${
                 status === "failed"
                   ? "fail-shake bg-error-500 text-white"
                   : suspended.length > 0
@@ -560,7 +566,7 @@ export function BetSlipBody() {
               </p>
             )}
             <p className="mt-2 text-center text-[10.5px] text-text-tertiary">
-              Session {sessionMins} min · Net {netPL >= 0 ? "+" : "−"}
+              Session {sessionMins} min · All-time net {netPL >= 0 ? "+" : "−"}
               {Math.abs(netPL).toFixed(2)} USDT ·{" "}
               <button
                 type="button"
