@@ -15,9 +15,9 @@ Legend: ✅ landed (pre-scrap corpus, kept) · 🟡 running · ⬜ queued · ❌
 
 ## Wave U (v2 — launched 10 Nov 01:08 IST, background)
 - U1 b3507d97 🟡 real human betting-app problems → research/70-user-problems.md
-- U2 88f6223f 🟡 Housebets brand DNA + judge taste → research/71-brand-dna-v2.md
-- U3 2877d70d 🟡 craft canon (Family/Linear/Stripe/Geist/Apple/live-score) → research/72-craft-canon.md
-- U4 98a699a5 🟡 bettor-behavior academic+regulator → research/73-bettor-behavior.md
+- U2 88f6223f ✅ → research/71-brand-dna-v2.md (221 lines; Cloudflare-gated, verified via captures+Wayback)
+- U3 2877d70d ✅ → research/72-craft-canon.md (175 lines; Salaja+Family+Linear+Geist+HIG)
+- U4 98a699a5 ✅ → research/73-bettor-behavior.md (236 lines; 30 cited findings)
 - U5 9b7893ef died (rate limit); lead-covered ✅ → research/74-motion-mastery.md
 
 ## Queued after U-wave
