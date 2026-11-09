@@ -142,6 +142,45 @@ import { useWorld } from "./store/world";
 const isLive = (matchId: string) =>
   useWorld.getState().matches.find((m) => m.id === matchId)?.status === "live";
 
+// keep the book honest: implied probs should sum near a real overround
+// (~6.5%). A 1.01 favourite whose siblings still imply 25% is a
+// bookmaker red flag — stretch the long shots instead.
+function normalizeBook(matchId: string, marketId: string) {
+  const mt = useWorld.getState().matches.find((m) => m.id === matchId);
+  const mk = mt?.markets.find((x) => x.id === marketId);
+  if (mt?.status !== "live" || !mk) return;
+  const TARGET = 1.065;
+  const floor = (p: number) => Math.min(501, Math.max(1.01, +p.toFixed(2)));
+  const seed = mk.outcomes.map(
+    (o) => useOdds.getState().price(o.id) ?? o.price,
+  );
+  const implied = seed.reduce((a, p) => a + 1 / p, 0);
+  if (implied <= TARGET + 0.02) return;
+  const cur = [...seed];
+  for (let pass = 0; pass < 3; pass++) {
+    const imp = cur.reduce((a, p) => a + 1 / p, 0);
+    if (imp <= TARGET + 0.005) break;
+    const fixedImp = cur
+      .filter((p) => p <= 1.02)
+      .reduce((a, p) => a + 1 / p, 0);
+    const freeImp = TARGET - fixedImp;
+    const curFreeImp = imp - fixedImp;
+    if (freeImp <= 0.02 || curFreeImp <= 0) break;
+    const k = curFreeImp / freeImp;
+    for (let i = 0; i < cur.length; i++)
+      if (cur[i] > 1.02) cur[i] = floor(cur[i] * k);
+  }
+  mk.outcomes.forEach((o, i) => {
+    if (cur[i] !== seed[i]) {
+      useOdds
+        .getState()
+        .applyChange(o.id, cur[i], cur[i] > seed[i] ? "up" : "down");
+      useSlip.getState().onOddsChange(o.id, cur[i]);
+      useBets.getState().tickCashout(o.id, cur[i]);
+    }
+  });
+}
+
 function applyEvent(e: EngineEvent) {
   // offline freezes the whole board — the banner's promise is kept:
   // no ticks, no suspensions, no goals land until reconnect
@@ -236,6 +275,9 @@ function applyEvent(e: EngineEvent) {
             useSlip.getState().onOddsChange(oc.id, np);
             useBets.getState().tickCashout(oc.id, np);
           }
+          // raw multipliers skew the overround after big swings —
+          // stretch the long shots back to a realistic book
+          normalizeBook(e.matchId, h2h.id);
         }
         for (const mk of mt2.markets.filter(
           (m) => m.status === "suspended" && closedByGoal.has(m.id),

@@ -24,12 +24,14 @@ if (import.meta.env.DEV) {
   const { useSlip } = await import("./lib/store/slip");
   const { useUI } = await import("./lib/store/ui");
   const { useOdds } = await import("./lib/store/odds");
+  const { useEngine } = await import("./lib/engine");
   (window as unknown as Record<string, unknown>).__hb = {
     useWorld,
     useBets,
     useSlip,
     useUI,
     useOdds,
+    useEngine,
   };
 }
 
