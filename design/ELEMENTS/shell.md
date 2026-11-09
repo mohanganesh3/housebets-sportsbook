@@ -73,7 +73,7 @@ WHERE: fixed inset-x-3, bottom = bottombar-h + space-2, above tab bar
 WHY: wireframe convention `❶ pick @odds ⌃` [P5]
 SIZE: h-48 r-3; count badge; pick + odds font-num 13
 COLOUR: surface-3 + border-strong; pick text-1; odds accent-neon
-MOTION: press scale .97 80ms; count bump pulse 250ms; sheet opens 240ms spring (interruptible)
+MOTION: press scale .97 80ms; count bump pulse 250ms ONCE on first selection (earned grab); sheet opens 240ms spring (interruptible). **Never re-animates on odds ticks — the Pays number updating is enough; a bouncing pill per tick is Times-Square motion (T4 §3.5)**
 PLAYER: "my pick is alive, see it, open it"
 FAILURE: pick lost on refresh → persist slip (X-pain #1)
 A11Y: button role "Bet slip, 1 selection, Arsenal at 1.30, opens ticket"

@@ -47,8 +47,8 @@ EMPTY: not rendered (never an empty band)
 crest-40 + name + "N matches" + ★corner; authored tile art variant (PENDING-ILLUST)
 TAP → competition section/page anchor
 
-## E-BD-10 Edit-mode board dimming
-Ticket open on phone / editing stake → board signals dim to ~40% opacity (CSS class, cheap)
+## E-BD-10 Edit-mode board dimming + flash-freeze
+Ticket open on phone / editing stake → board signals dim to ~40% opacity AND **scrim freezes background odds flashes entirely** (T4 §3.4: peripheral motion behind a sheet during stake entry = attention hijack; stake decisions need attention-quiet modal)
 WHY: attention budget (RHYTHM); the money being edited wins — T10 anxiety pattern killed
 RM: dim is opacity not motion — same for all users
 
