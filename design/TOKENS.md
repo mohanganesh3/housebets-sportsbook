@@ -39,21 +39,23 @@ Roles, not just values. The mistake to kill: neon cyan used as fill (generic cry
 Contrast gate (T6 measured): AA all text, AAA odds/money — full matrix `research/53-colour.md`. **CVD law: error/warn/gold collapse to one olive family under deuteranopia+protanopia → second channel (glyph/label/edge-position) is MANDATORY on every meaning-bearing colour.**
 Second-cue rule: every meaningful state pairs colour with glyph/label/pattern — colour alone never carries state.
 
-## 2. Type — BRAND FONTS VERIFIED · scale [PENDING-T7]
+## 2. Type — BRAND FONTS VERIFIED · hb-* scale locked (T7 measured)
 
 | Token | Family | Role |
 |---|---|---|
-| `font-ui` | Figtree variable 300–900 | All UI text |
-| `font-display` | Red Hat Display 700 | Hero/section display |
-| `font-num` | Oxanium 600/700 | Odds, scores, clocks, money — tabular lining required; fallback `tabular-nums` on Figtree if tnum absent (verify glyph table at D0) |
+| `font-ui` | Figtree variable 300–900 | All UI text — **`font-variant-numeric: tabular-nums` REQUIRED on any ticking number** (Figtree "1" is 33% narrower than "8" — jitter without tnum, T7 measured) |
+| `font-display` | Red Hat Display 700 | Hero/section display — has real tnum too; lh ≈1.32em box |
+| `font-num` | Oxanium 600/700 | Odds, scores, clocks, money — **digits natively tabular (578‰ all), plus `pnum` + `zero` slashed-zero** (T7 fontTools). lh ≈1.0em box — needs explicit line-height |
 
-Scale (draft, T7 refines): display 28/32 · h1 20/26 · h2 15/20 semibold · body 13/18 · label 11/14 semibold caps-on-context · odds 15/20 Oxanium · score 40/48 Oxanium hero · micro 10/13.
-Rule: hierarchy from weight/size/alignment, not boxes. Money numbers right-aligned, fixed-width cells.
+**LAW: `line-height: normal` banned** — fonts' boxes differ sharply (Oxanium 1.0 / Figtree 1.2 / RHD 1.32em). Explicit lh everywhere. Weight never below 400 (Apple + Refactoring UI).
 
-## 3. Space — 4px base
+hb-* scale (T7): `hb-11` micro labels · `hb-13` body/labels · `hb-15` h2 semibold · `hb-17` h1 · `hb-20` section · `hb-24` match score · `hb-28` display · `hb-40` hero score — full table `research/54-type-and-space.md`. **Floor: 11px absolute min** (Apple); 8/9/10px sizes in old build are violations to purge.
+Rule: hierarchy from weight/size/alignment, not boxes. Money numbers right-aligned, fixed-width cells. Long team names may use condensed variant (Sofascore precedent).
+
+## 3. Space — 4px base (T7 density rules)
 
 `space-1:4 space-2:8 space-3:12 space-4:16 space-5:20 space-6:24 space-8:32 space-10:40 space-12:48`
-Row heights: list row 48 phone / 40 desktop (T4 Fitts check pending). Touch target ≥44×44.
+Density: odds cells 44px @390 / 36–40px @1440 · match rows 52–56px · sticky league headers. Touch target ≥44×44 (WCAG floor 24 — we use Apple 44).
 
 ## 4. Radius — deliberate set
 
@@ -63,9 +65,9 @@ Row heights: list row 48 phone / 40 desktop (T4 Fitts check pending). Touch targ
 
 Shadow-below grammar: `elev-1` subtle down shadow for sheets/popovers; ONE halo budget per screen (slop H5 — glow halos capped). Suspended = amber band (full-width on list rows, per-cell on match markets).
 
-## 6. Motion [PENDING-T8 refinement — law already set]
+## 6. Motion — LOCKED (T8 registry + MOTION-PALETTE.md)
 
-Feedback 100–150ms · transitions 200–300ms · nothing decorative >400ms on money paths · suspension 0ms same-frame · ease-out enter / ease-in-out morph / linear tickers · interruptible always · reduced-motion twin for every effect · win glow <3s (judge's own rule).
+Buckets: instant 0 (suspension same-frame) · feedback 100–150 · transitions 200–300 · signal 350–1200 · moment ≤3s. Enter curve `cubic-bezier(0.22,1,0.36,1)` · spring 0.5/0.825 · interruptible always · RM twin per effect (deletion ≠ twin) · win glow <3s · whole-value roll over per-digit odometer (2.10→3.40 reads wrong per-digit, T8). Only 12 motions exist — MOTION-PALETTE.md.
 
 ## 7. Layout / shell — VERIFIED
 
