@@ -26,16 +26,18 @@ Roles, not just values. The mistake to kill: neon cyan used as fill (generic cry
 | `cta-text` | `#041015` | Text on pale-cyan | — |
 | `interactive-secondary` | `#113a4c` | Secondary buttons | — |
 | `input-bg` | `#0d2531` | Inputs | — |
-| `live` | red-pink (verify exact from `#f41f50` family) | LIVE badge only | Any non-live use |
-| `success` | `#47d496` | Wins, up direction (with glyph) | Colour alone |
-| `error` | `#f41f50` | Failures, down direction (with glyph) | Colour alone |
-| `warn` | `#e17823` | Suspended band, cautions | — |
-| `gold` | `#daa520` | Follow/star, premium markers | Error/caution |
-| `usdt` | `#26a17b` | Tether denomination | — |
+| `live` | `#cc1b44` fill (white text = 5.24 ✓) — `#f41f50` fill FAILS 3.87 | LIVE badge only | Any non-live use; dot+`error-300` clock style also compliant |
+| `success` | `#47d496` | Wins, up direction (with glyph) | Colour alone; 7.9–10.2:1 on surfaces |
+| `error` | `#f41f50` | Fills/borders/large only — **4.10:1 small text FAILS on s2** | Small text → `tick-down #ff4d75` (5.22) or error-300 |
+| `tick-down` | `#ff4d75` | Small down/error text | Fills |
+| `warn` | `#e17823` | Suspended band, cautions | Small text on s3 — pair w/ dark text or glyph |
+| `gold` | `#daa520` | Follow/star, premium markers | White text on fill FAILS — dark text/glyph only |
+| `usdt` | `#26a17b` | Tether denomination — 4.60 on s3 borderline, use ≥13px or bold | — |
 | `tab-bg` | `#09667d26` | Segmented containers (from live) | — |
+| `positive-500` | `#26ba50` | **DEAD token — removed (T6 C-21)** | — |
 
-Contrast gate: AA on all text, AAA on odds/money — measured with culori at token lock **[PENDING-T6]**.
-Second-cue rule: every meaningful state pairs colour with glyph/label/pattern — colour alone never carries state (deuteranopia).
+Contrast gate (T6 measured): AA all text, AAA odds/money — full matrix `research/53-colour.md`. **CVD law: error/warn/gold collapse to one olive family under deuteranopia+protanopia → second channel (glyph/label/edge-position) is MANDATORY on every meaning-bearing colour.**
+Second-cue rule: every meaningful state pairs colour with glyph/label/pattern — colour alone never carries state.
 
 ## 2. Type — BRAND FONTS VERIFIED · scale [PENDING-T7]
 
