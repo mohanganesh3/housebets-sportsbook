@@ -421,7 +421,7 @@ export function ScenarioDock() {
         type="button"
         onClick={() => setScenarioOpen(!scenarioOpen)}
         aria-label="Demo states"
-        className="fixed bottom-[calc(var(--shell-bottombar-h)+env(safe-area-inset-bottom)+74px)] left-3 z-[70] grid size-10 place-items-center rounded-full border border-border-very-strong bg-surface-secondary text-text-tertiary shadow-lg transition-colors hover:border-border-interactive hover:text-brand-300 lg:bottom-4 lg:left-auto lg:right-[calc(var(--panel-w)+14px)]"
+        className="fixed left-1.5 top-1/2 z-[70] grid size-10 -translate-y-1/2 place-items-center rounded-full border border-border-very-strong bg-surface-secondary/80 text-text-tertiary shadow-lg backdrop-blur-sm transition-colors hover:border-border-interactive hover:text-brand-300 lg:bottom-4 lg:left-auto lg:right-[calc(var(--panel-w)+14px)] lg:top-auto lg:translate-y-0"
       >
         <FlaskConical size={17} />
       </button>
