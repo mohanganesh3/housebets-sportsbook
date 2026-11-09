@@ -1,4 +1,11 @@
-import { House, Lock, Star, TrendingDown, TrendingUp } from "lucide-react";
+import {
+  Bell,
+  House,
+  Lock,
+  Star,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useOdds } from "../lib/store/odds";
 import { useSlip } from "../lib/store/slip";
@@ -52,6 +59,30 @@ export function FollowStar({ id, size = 16 }: { id: string; size?: number }) {
       <Star
         size={size}
         className={on ? "fill-gold-500 text-gold-500" : ""}
+        strokeWidth={on ? 0 : 1.8}
+      />
+    </button>
+  );
+}
+
+export function BellButton({ id, size = 15 }: { id: string; size?: number }) {
+  const on = useUI((s) => s.reminds.has(id));
+  const toggle = useUI((s) => s.toggleRemind);
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        toggle(id);
+      }}
+      aria-pressed={on}
+      aria-label={on ? "Remove kickoff reminder" : "Remind me at kickoff"}
+      title={on ? "Reminder set" : "Remind me at kickoff"}
+      className="-m-1.5 grid size-10 place-items-center rounded-md text-text-tertiary transition-colors hover:text-brand-300"
+    >
+      <Bell
+        size={size}
+        className={on ? "fill-brand-400 text-brand-400" : ""}
         strokeWidth={on ? 0 : 1.8}
       />
     </button>

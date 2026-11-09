@@ -9,6 +9,8 @@ import {
 import { motion } from "motion/react";
 import { useState } from "react";
 import { matchById, useBets } from "../lib/store/bets";
+import { useSlip } from "../lib/store/slip";
+import { useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
 import { TeamLogo } from "./primitives";
 
@@ -190,6 +192,25 @@ function BetCard({ b }: { b: import("../lib/types").Bet }) {
             <XCircle size={13} />
           )}
           {b.settledNote}
+          <button
+            type="button"
+            onClick={() => {
+              const slip = useSlip.getState();
+              if (!slip.selections.some((x) => x.outcomeId === b.outcomeId)) {
+                slip.toggle(b.outcomeId);
+              }
+              useUI.getState().setPanelTab("slip");
+              useUI
+                .getState()
+                .toast(
+                  "Same pick added — review the price before placing",
+                  "info",
+                );
+            }}
+            className="ml-auto shrink-0 rounded-md px-2 py-0.5 text-[11px] font-semibold text-text-tertiary underline decoration-dotted underline-offset-2 transition-colors hover:text-brand-300"
+          >
+            Same again
+          </button>
         </div>
       )}
     </motion.div>

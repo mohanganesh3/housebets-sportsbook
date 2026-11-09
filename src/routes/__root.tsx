@@ -1,5 +1,5 @@
 import { createRootRoute, Outlet, useLocation } from "@tanstack/react-router";
-import { AnimatePresence } from "motion/react";
+import { AnimatePresence, MotionConfig } from "motion/react";
 import { useEffect, useState } from "react";
 import { ScenarioDock, SearchPalette, Toaster } from "../components/Overlays";
 import {
@@ -86,26 +86,28 @@ function Root() {
   }, [loc.pathname]);
 
   return (
-    <div className="min-h-dvh">
-      <TopBar onSearch={() => setSearchOpen(true)} />
-      <LeftRail />
-      <SidePanel />
-      <main className="pb-[calc(var(--shell-bottombar-h)+env(safe-area-inset-bottom)+16px)] pt-[var(--shell-header-h)] lg:ml-[var(--shell-rail-w)] lg:mr-[var(--panel-w)] lg:pb-0">
-        <Outlet />
-        <Footer />
-      </main>
-      <BottomBar onSearch={() => setSearchOpen(true)} />
-      <SlipSheet />
-      <AnimatePresence>
-        {searchOpen && (
-          <SearchPalette
-            open={searchOpen}
-            onClose={() => setSearchOpen(false)}
-          />
-        )}
-      </AnimatePresence>
-      <ScenarioDock />
-      <Toaster />
-    </div>
+    <MotionConfig reducedMotion="user">
+      <div className="min-h-dvh">
+        <TopBar onSearch={() => setSearchOpen(true)} />
+        <LeftRail />
+        <SidePanel />
+        <main className="pb-[calc(var(--shell-bottombar-h)+env(safe-area-inset-bottom)+16px)] pt-[var(--shell-header-h)] lg:ml-[var(--shell-rail-w)] lg:mr-[var(--panel-w)] lg:pb-0">
+          <Outlet />
+          <Footer />
+        </main>
+        <BottomBar onSearch={() => setSearchOpen(true)} />
+        <SlipSheet />
+        <AnimatePresence>
+          {searchOpen && (
+            <SearchPalette
+              open={searchOpen}
+              onClose={() => setSearchOpen(false)}
+            />
+          )}
+        </AnimatePresence>
+        <ScenarioDock />
+        <Toaster />
+      </div>
+    </MotionConfig>
   );
 }

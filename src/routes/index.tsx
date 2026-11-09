@@ -6,7 +6,10 @@ import {
   Dumbbell,
   Flame,
   Gamepad2,
+  Lock,
   Medal,
+  Pause,
+  Play,
   RadioTower,
   Star,
   Trophy,
@@ -16,6 +19,9 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { groupByComp, LeagueSection, MatchRow } from "../components/MatchRow";
 import { LiveBadge, OddsCell, TeamLogo } from "../components/primitives";
+import { useEngine } from "../lib/engine";
+import { matchById } from "../lib/seed";
+import { isMatchFollowed } from "../lib/selectors";
 import { useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
 import type { Match } from "../lib/types";
@@ -196,7 +202,7 @@ function HeroSpotlight({ matches }: { matches: Match[] }) {
             <Link
               to="/match/$matchId"
               params={{ matchId: mt.id }}
-              className="flex items-center justify-center gap-1.5 rounded-xl bg-brand-500 py-2.5 text-[13px] font-bold text-text-inverse transition-colors hover:bg-brand-400"
+              className="btn-primary flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-[13px] font-bold"
             >
               View match · {mt.markets.length} markets
               <ChevronRight size={15} />
@@ -222,6 +228,15 @@ function HeroSpotlight({ matches }: { matches: Match[] }) {
           ))}
         </div>
         <div className="flex gap-1">
+          <button
+            type="button"
+            aria-label={paused ? "Play slideshow" : "Pause slideshow"}
+            aria-pressed={paused}
+            onClick={() => setPaused((v) => !v)}
+            className="grid size-7 place-items-center rounded-lg border border-border-soft text-text-tertiary transition-colors hover:border-border-very-strong hover:text-text-primary"
+          >
+            {paused ? <Play size={13} /> : <Pause size={13} />}
+          </button>
           {[
             {
               icon: ChevronLeft,
@@ -303,13 +318,7 @@ function FollowingStrip() {
   const follows = useUI((s) => s.follows);
   const matches = useWorld((s) => s.matches);
   const mine = matches
-    .filter(
-      (m) =>
-        follows.has(m.id) ||
-        follows.has(m.competitionId) ||
-        follows.has(m.home.id) ||
-        follows.has(m.away.id),
-    )
+    .filter((m) => isMatchFollowed(m, follows))
     .sort(
       (a, b) => (a.status === "live" ? -1 : 1) - (b.status === "live" ? -1 : 1),
     )
@@ -333,6 +342,53 @@ function FollowingStrip() {
         {mine.map((m) => (
           <MatchRow key={m.id} match={m} />
         ))}
+      </div>
+    </section>
+  );
+}
+
+// "Live at the House" — the real event feed, not fabricated social proof
+function HouseFeed() {
+  const feed = useEngine((s) => s.feed);
+  const items = feed
+    .filter(
+      (e) => e.kind === "goal" || e.kind === "suspend" || e.kind === "resume",
+    )
+    .slice(-6)
+    .reverse();
+  if (items.length === 0) return null;
+  return (
+    <section aria-label="Live at the House" className="overflow-hidden">
+      <p className="mb-1.5 flex items-center gap-1.5 px-1 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-text-tertiary">
+        <RadioTower size={11} className="text-brand-300" /> Live at the House ·
+        real feed
+      </p>
+      <div className="no-scrollbar -mx-3 flex gap-2 overflow-x-auto px-3 lg:mx-0 lg:px-0">
+        {items.map((e, i) => {
+          const mt = matchById(e.matchId);
+          const label =
+            e.kind === "goal"
+              ? `GOAL ${e.newScore?.[0]}-${e.newScore?.[1]}${e.scorer ? ` · ${e.scorer}` : ""}`
+              : e.kind === "suspend"
+                ? `Suspended · ${e.reason ?? "Dangerous attack"}`
+                : "Markets reopened";
+          return (
+            <span
+              key={`${e.at}-${i}`}
+              className="flex shrink-0 items-center gap-1.5 rounded-full border border-border-soft bg-surface-secondary px-2.5 py-1 text-[11px] text-text-secondary"
+            >
+              {e.kind === "goal" ? (
+                <Volleyball size={11} className="text-warning-400" />
+              ) : (
+                <Lock size={10} className="text-warning-400" />
+              )}
+              <span className="font-semibold text-text-primary">
+                {mt ? `${mt.home.short} v ${mt.away.short}` : ""}
+              </span>
+              {label}
+            </span>
+          );
+        })}
       </div>
     </section>
   );
@@ -374,6 +430,8 @@ function Home() {
       </div>
 
       <HeroSpotlight matches={featured.length ? featured : live} />
+
+      <HouseFeed />
 
       <FollowingStrip />
 

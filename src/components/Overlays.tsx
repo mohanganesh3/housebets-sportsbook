@@ -1,14 +1,30 @@
 import { useNavigate } from "@tanstack/react-router";
-import { FlaskConical, Search, X } from "lucide-react";
+import { Clock, FlaskConical, Search, Star, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useEngine } from "../lib/engine";
 import { COMPS, MATCHES } from "../lib/seed";
+import { isMatchFollowed } from "../lib/selectors";
 import { useBets } from "../lib/store/bets";
 import { armFailOnce, useSlip } from "../lib/store/slip";
 import { type Scenario, useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
 import { TeamLogo } from "./primitives";
+
+const RECENTS_KEY = "hb-search-recents";
+const loadRecents = (): string[] => {
+  try {
+    return JSON.parse(localStorage.getItem(RECENTS_KEY) ?? "[]");
+  } catch {
+    return [];
+  }
+};
+const saveRecent = (term: string) => {
+  try {
+    const list = [term, ...loadRecents().filter((t) => t !== term)].slice(0, 6);
+    localStorage.setItem(RECENTS_KEY, JSON.stringify(list));
+  } catch {}
+};
 
 export function SearchPalette({
   open,
@@ -27,8 +43,13 @@ export function SearchPalette({
     }
   }, [open]);
 
+  const follows = useUI((s) => s.follows);
+  const [recents, setRecents] = useState<string[]>(loadRecents);
+
   const results = useMemo(() => {
     const needle = q.trim().toLowerCase();
+    const rank = (m: (typeof MATCHES)[number]) =>
+      (isMatchFollowed(m, follows) ? 0 : 1) + (m.status === "live" ? 0 : 0.5);
     const matches = MATCHES.filter(
       (m) =>
         !needle ||
@@ -36,7 +57,7 @@ export function SearchPalette({
         m.away.name.toLowerCase().includes(needle) ||
         m.home.short.toLowerCase().includes(needle) ||
         m.away.short.toLowerCase().includes(needle),
-    );
+    ).sort((a, b) => rank(a) - rank(b));
     const comps = Object.values(COMPS).filter(
       (c) =>
         !needle ||
@@ -52,7 +73,14 @@ export function SearchPalette({
           ).slice(0, 5)
         : [];
     return { matches: matches.slice(0, 7), comps: comps.slice(0, 4), markets };
-  }, [q]);
+  }, [q, follows]);
+
+  const go = (term: string, fn: () => void) => {
+    saveRecent(term);
+    setRecents(loadRecents());
+    fn();
+    onClose();
+  };
 
   if (!open) return null;
   return (
@@ -88,14 +116,35 @@ export function SearchPalette({
           </button>
         </div>
         <div className="max-h-[55vh] overflow-y-auto p-2">
+          {!q && recents.length > 0 && (
+            <div className="px-1 pb-2">
+              <p className="flex items-center gap-1.5 px-2 pb-1.5 text-[10.5px] font-semibold uppercase tracking-wide text-text-tertiary">
+                <Clock size={11} /> Recent
+              </p>
+              <div className="flex flex-wrap gap-1.5 px-1">
+                {recents.map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setQ(r)}
+                    className="rounded-full border border-border-soft px-2.5 py-1 text-[12px] text-text-secondary hover:border-border-interactive hover:text-text-primary"
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {!q && results.matches.some((m) => isMatchFollowed(m, follows)) && (
+            <p className="flex items-center gap-1.5 px-3 pb-1.5 text-[10.5px] font-semibold uppercase tracking-wide text-gold-500">
+              <Star size={11} className="fill-gold-500" /> Following
+            </p>
+          )}
           {results.comps.map((c) => (
             <button
               key={c.id}
               type="button"
-              onClick={() => {
-                nav({ to: "/football" });
-                onClose();
-              }}
+              onClick={() => go(c.name, () => nav({ to: "/football" }))}
               className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[14px] hover:bg-surface-secondary"
             >
               <span className="grid size-7 place-items-center rounded-md bg-secondary-a30 font-odds text-[10px] font-bold text-brand-300">
@@ -111,10 +160,11 @@ export function SearchPalette({
             <button
               key={m.id}
               type="button"
-              onClick={() => {
-                nav({ to: "/match/$matchId", params: { matchId: m.id } });
-                onClose();
-              }}
+              onClick={() =>
+                go(`${m.home.short} v ${m.away.short}`, () =>
+                  nav({ to: "/match/$matchId", params: { matchId: m.id } }),
+                )
+              }
               className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left hover:bg-surface-secondary"
             >
               <TeamLogo team={m.home} size={24} />
@@ -123,6 +173,9 @@ export function SearchPalette({
                 {m.home.name} <span className="text-text-tertiary">v</span>{" "}
                 {m.away.name}
               </span>
+              {isMatchFollowed(m, follows) && (
+                <Star size={12} className="fill-gold-500 text-gold-500" />
+              )}
               {m.status === "live" && (
                 <span className="ml-auto rounded bg-error-500/15 px-1.5 py-0.5 font-odds text-[10px] font-bold text-error-300">
                   LIVE
@@ -134,10 +187,11 @@ export function SearchPalette({
             <button
               key={mk.id}
               type="button"
-              onClick={() => {
-                nav({ to: "/match/$matchId", params: { matchId: m.id } });
-                onClose();
-              }}
+              onClick={() =>
+                go(mk.name, () =>
+                  nav({ to: "/match/$matchId", params: { matchId: m.id } }),
+                )
+              }
               className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-[13px] hover:bg-surface-secondary"
             >
               <span className="text-text-tertiary">Market</span>
@@ -249,7 +303,12 @@ export function ScenarioDock() {
         break;
       }
       case "suspend-market":
-        world.setMarketStatus("ars-bha", "ars-bha-h2h", "suspended");
+        world.setMarketStatus(
+          "ars-bha",
+          "ars-bha-h2h",
+          "suspended",
+          "VAR check",
+        );
         slip.onMarketSuspended("ars-bha-h2h");
         bets.suspendCashout("ars-bha");
         setTimeout(() => {
@@ -264,7 +323,12 @@ export function ScenarioDock() {
         pickSome();
         const first = useSlip.getState().selections[0];
         if (first) {
-          world.setMarketStatus(first.matchId, first.marketId, "suspended");
+          world.setMarketStatus(
+            first.matchId,
+            first.marketId,
+            "suspended",
+            "Dangerous attack",
+          );
           slip.onMarketSuspended(first.marketId);
         }
         toast("A selection in the slip was suspended", "info");
@@ -294,7 +358,7 @@ export function ScenarioDock() {
           newScore: [2, 0],
         });
         toast("GOAL — Arsenal 2-0 (flash + suspension cascade)", "success");
-        world.setMarketStatus("ars-bha", "ars-bha-h2h", "suspended");
+        world.setMarketStatus("ars-bha", "ars-bha-h2h", "suspended", "Goal");
         slip.onMarketSuspended("ars-bha-h2h");
         setTimeout(() => {
           world.setMarketStatus("ars-bha", "ars-bha-h2h", "open");

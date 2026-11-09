@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { MATCHES } from "../seed";
 import type { MarketStatus, Match } from "../types";
+import { useUI } from "./ui";
 
 interface WorldState {
   matches: Match[];
@@ -20,7 +21,7 @@ interface WorldState {
 }
 
 export const useWorld = create<WorldState>()(
-  subscribeWithSelector((set) => ({
+  subscribeWithSelector((set, get) => ({
     matches: MATCHES,
     goalFlashes: {},
     suspReasons: {},
@@ -68,14 +69,28 @@ export const useWorld = create<WorldState>()(
             : mt,
         ),
       })),
-    kickoff: (matchId) =>
+    kickoff: (matchId) => {
+      const mt = get().matches.find((m) => m.id === matchId);
       set((s) => ({
-        matches: s.matches.map((mt) =>
-          mt.id === matchId && mt.status === "scheduled"
-            ? { ...mt, status: "live", minute: 1, period: "1st half" }
-            : mt,
+        matches: s.matches.map((m) =>
+          m.id === matchId && m.status === "scheduled"
+            ? { ...m, status: "live", minute: 1, period: "1st half" }
+            : m,
         ),
-      })),
+      }));
+      if (mt) {
+        const ui = useUI.getState();
+        if (ui.reminds.has(matchId)) {
+          ui.toggleRemind(matchId);
+          ui.toast(
+            `Kickoff · ${mt.home.name} v ${mt.away.name} is live`,
+            "success",
+          );
+        } else {
+          ui.toast(`${mt.home.short} v ${mt.away.short} kicked off`, "info");
+        }
+      }
+    },
   })),
 );
 

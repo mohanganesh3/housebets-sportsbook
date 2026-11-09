@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Star } from "lucide-react";
 import { groupByComp, LeagueSection, MatchRow } from "../components/MatchRow";
 import { FollowStar, TeamLogo } from "../components/primitives";
-import { compById, type MATCHES, TEAMS } from "../lib/seed";
+import { compById, TEAMS } from "../lib/seed";
+import { isMatchFollowed } from "../lib/selectors";
 import { useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
 
@@ -10,19 +11,10 @@ export const Route = createFileRoute("/following")({
   component: FollowingPage,
 });
 
-function isFollowed(m: (typeof MATCHES)[number], f: Set<string>) {
-  return (
-    f.has(m.id) ||
-    f.has(m.competitionId) ||
-    f.has(m.home.id) ||
-    f.has(m.away.id)
-  );
-}
-
 function FollowingPage() {
   const matches = useWorld((s) => s.matches);
   const follows = useUI((s) => s.follows);
-  const mine = matches.filter((m) => isFollowed(m, follows));
+  const mine = matches.filter((m) => isMatchFollowed(m, follows));
   const live = mine.filter((m) => m.status === "live");
   const upcoming = mine
     .filter((m) => m.status === "scheduled")
@@ -55,12 +47,21 @@ function FollowingPage() {
             Tap the star on any match, team or league. Your picks collect here —
             live first, kickoffs next — so you never hunt for your bet twice.
           </p>
-          <Link
-            to="/football"
-            className="mt-1 rounded-lg bg-brand-500 px-4 py-2 text-[13px] font-bold text-text-inverse"
-          >
-            Browse football
-          </Link>
+          <div className="mt-1 flex items-center gap-2">
+            <Link
+              to="/football"
+              className="btn-primary rounded-lg px-4 py-2 text-[13px] font-bold"
+            >
+              Browse football
+            </Link>
+            <button
+              type="button"
+              onClick={() => useUI.getState().toggleFollow("epl")}
+              className="rounded-lg border border-gold-500/40 bg-warning-a15 px-4 py-2 text-[13px] font-semibold text-gold-500 transition-colors hover:bg-warning-a15/70"
+            >
+              ★ Premier League
+            </button>
+          </div>
         </div>
       ) : (
         <div className="space-y-5">

@@ -22,6 +22,8 @@ interface UIState {
   setScenarioOpen: (v: boolean) => void;
   follows: Set<string>;
   toggleFollow: (id: string) => void;
+  reminds: Set<string>;
+  toggleRemind: (id: string) => void;
   oddsPref: "ask" | "higher" | "any";
   setOddsPref: (p: "ask" | "higher" | "any") => void;
   toasts: { id: number; msg: string; kind: "info" | "success" | "error" }[];
@@ -38,6 +40,18 @@ const loadFollows = (): Set<string> => {
 const saveFollows = (f: Set<string>) => {
   try {
     localStorage.setItem("hb-follows", JSON.stringify([...f]));
+  } catch {}
+};
+const loadReminds = (): Set<string> => {
+  try {
+    const raw = localStorage.getItem("hb-reminds");
+    if (raw) return new Set(JSON.parse(raw) as string[]);
+  } catch {}
+  return new Set();
+};
+const saveReminds = (f: Set<string>) => {
+  try {
+    localStorage.setItem("hb-reminds", JSON.stringify([...f]));
   } catch {}
 };
 
@@ -61,6 +75,19 @@ export const useUI = create<UIState>()((set, get) => ({
     }
     saveFollows(f);
     set({ follows: f });
+  },
+  reminds: typeof window !== "undefined" ? loadReminds() : new Set(),
+  toggleRemind: (id) => {
+    const f = new Set(get().reminds);
+    if (f.has(id)) {
+      f.delete(id);
+      get().toast("Kickoff reminder removed", "info");
+    } else {
+      f.add(id);
+      get().toast("Reminder set — we'll flag kickoff", "success");
+    }
+    saveReminds(f);
+    set({ reminds: f });
   },
   oddsPref: "ask",
   setOddsPref: (p) => set({ oddsPref: p }),

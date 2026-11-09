@@ -3,7 +3,13 @@ import { ChevronRight } from "lucide-react";
 import { compById } from "../lib/seed";
 import { useWorld } from "../lib/store/world";
 import type { Match } from "../lib/types";
-import { FollowStar, LiveBadge, OddsCell, TeamLogo } from "./primitives";
+import {
+  BellButton,
+  FollowStar,
+  LiveBadge,
+  OddsCell,
+  TeamLogo,
+} from "./primitives";
 
 const fmtKick = (ts: number) =>
   new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -45,12 +51,20 @@ export function MatchRow({ match }: { match: Match }) {
         </div>
       </Link>
       <div className="flex items-center gap-2">
-        <div className="hidden w-14 justify-end sm:flex">
+        <div className="hidden w-16 justify-end sm:flex">
           {live ? (
             <LiveBadge minute={mt.minute} period={mt.period} />
           ) : (
-            <span className="tnum text-[13px] text-text-tertiary">
-              {fmtKick(mt.kickoffAt)}
+            <span className="flex flex-col items-end leading-tight">
+              <span className="tnum text-[13px] text-text-tertiary">
+                {fmtKick(mt.kickoffAt)}
+              </span>
+              {mt.kickoffAt - Date.now() < 3_600_000 &&
+                mt.kickoffAt > Date.now() && (
+                  <span className="tnum font-odds text-[10px] font-semibold text-brand-300">
+                    in {Math.ceil((mt.kickoffAt - Date.now()) / 60_000)}m
+                  </span>
+                )}
             </span>
           )}
         </div>
@@ -69,6 +83,11 @@ export function MatchRow({ match }: { match: Match }) {
           +{mt.markets.length}
           <ChevronRight size={13} />
         </Link>
+        {!live && (
+          <span className="hidden sm:block">
+            <BellButton id={mt.id} />
+          </span>
+        )}
         <span>
           <FollowStar id={mt.id} />
         </span>

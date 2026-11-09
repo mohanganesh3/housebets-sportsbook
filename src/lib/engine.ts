@@ -135,6 +135,7 @@ export const useEngine = create<EngineState>()(
 import { useBets } from "./store/bets";
 import { useOdds } from "./store/odds";
 import { useSlip } from "./store/slip";
+import { useUI } from "./store/ui";
 import { useWorld } from "./store/world";
 
 function applyEvent(e: EngineEvent) {
@@ -149,20 +150,18 @@ function applyEvent(e: EngineEvent) {
     useBets.getState().tickCashout(e.outcomeId, e.newPrice);
   }
   if (e.kind === "suspend" && e.marketId) {
-    world.setMarketStatus(
-      e.matchId,
-      e.marketId,
-      "suspended",
-      e.reason ?? "Dangerous attack",
-    );
+    const reason = e.reason ?? "Dangerous attack";
+    world.setMarketStatus(e.matchId, e.marketId, "suspended", reason);
     useSlip.getState().onMarketSuspended(e.marketId);
     // cash-out locks in lockstep with the market — always
     useBets.getState().suspendCashout(e.matchId);
+    useUI.getState().toast(`Market suspended · ${reason}`, "info");
     if (e.resumeDelay) {
       setTimeout(() => {
         useWorld.getState().setMarketStatus(e.matchId, e.marketId!, "open");
         useSlip.getState().onMarketResumed(e.marketId!);
         useBets.getState().resumeCashout(e.matchId);
+        useUI.getState().toast("Market reopened — prices live again", "info");
       }, e.resumeDelay);
     }
   }
@@ -176,6 +175,12 @@ function applyEvent(e: EngineEvent) {
     world.setScore(e.matchId, e.newScore);
     world.goalFlash(e.matchId);
     useBets.getState().suspendCashout(e.matchId);
+    useUI
+      .getState()
+      .toast(
+        `GOAL ${e.newScore[0]}-${e.newScore[1]}${e.scorer ? ` · ${e.scorer}` : ""} — markets suspended, repricing`,
+        "success",
+      );
     setTimeout(() => {
       const mt = useWorld.getState().matches.find((m) => m.id === e.matchId);
       if (!mt) return;
