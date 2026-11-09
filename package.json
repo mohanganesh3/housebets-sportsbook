@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && node scripts/prerender.mjs",
+    "build": "tsc -b && GH_PAGES=1 vite build && node scripts/prerender.mjs",
     "preview": "vite preview",
     "check": "biome check .",
-    "check:fix": "biome check --write ."
+    "check:fix": "biome check --write .",
+    "build:dev": "tsc -b && vite build"
   },
   "dependencies": {
     "@base-ui/react": "1.9.0",

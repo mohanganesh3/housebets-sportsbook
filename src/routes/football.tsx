@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronDown, ChevronRight, Star, Volleyball } from "lucide-react";
+import { ChevronDown, ChevronRight, Star } from "lucide-react";
 import { useState } from "react";
 import { groupByComp, LeagueSection } from "../components/MatchRow";
 import { FollowStar } from "../components/primitives";
+import { SportGlyph } from "../components/SportGlyph";
 import { COMPS, compShort } from "../lib/seed";
 import { isMatchFollowed } from "../lib/selectors";
 import { useUI } from "../lib/store/ui";
@@ -53,7 +54,7 @@ function Football() {
         </Link>
         <ChevronRight size={13} className="text-text-disabled" />
         <span className="flex items-center gap-1.5 rounded-full border border-brand-a30 bg-secondary-a20 px-3 py-1.5 text-brand-300">
-          <Volleyball size={13} /> Football
+          <SportGlyph sport="soccer" size={13} /> Football
         </span>
       </nav>
 

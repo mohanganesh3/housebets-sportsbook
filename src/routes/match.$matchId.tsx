@@ -5,7 +5,6 @@ import {
   ChevronRight,
   Lock,
   Star,
-  Volleyball,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
@@ -15,6 +14,7 @@ import {
   OddsCell,
   TeamLogo,
 } from "../components/primitives";
+import { SportGlyph } from "../components/SportGlyph";
 import { type EngineEvent, useEngine } from "../lib/engine";
 import { compById, matchById } from "../lib/seed";
 import { useUI } from "../lib/store/ui";
@@ -314,7 +314,7 @@ function MatchPage() {
               className="overflow-hidden border-t border-warning-a30 bg-warning-a15/40"
             >
               <p className="flex items-center justify-center gap-2 py-2 font-odds text-[12px] font-bold text-warning-400">
-                <Volleyball size={13} />
+                <SportGlyph sport="soccer" size={13} />
                 GOAL · {goalBanner.scorer} {match.minute}′
               </p>
             </motion.div>
@@ -400,7 +400,7 @@ function MatchPage() {
       {related.length > 0 && (
         <section className="border-t border-border-soft py-4">
           <h2 className="mb-2 flex items-center gap-2 px-1 text-[14px] font-bold text-text-secondary">
-            <Volleyball size={15} /> Also in {comp.name}
+            <SportGlyph sport="soccer" size={15} /> Also in {comp.name}
           </h2>
           <div className="no-scrollbar -mx-3 flex snap-x gap-2.5 overflow-x-auto px-3 pb-1 lg:mx-0 lg:px-0">
             {related.map((r) => {

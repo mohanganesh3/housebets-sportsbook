@@ -2,25 +2,20 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ChevronLeft,
   ChevronRight,
-  CircleDot,
-  Dumbbell,
   Flame,
-  Gamepad2,
   House,
   Lock,
-  Medal,
   Pause,
   Play,
   RadioTower,
   Star,
-  Trophy,
-  Volleyball,
   X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { groupByComp, LeagueSection, MatchRow } from "../components/MatchRow";
 import { LiveBadge, OddsCell, TeamLogo } from "../components/primitives";
+import { type GlyphComponent, SPORT_GLYPHS } from "../components/SportGlyph";
 import { useEngine } from "../lib/engine";
 import { compById, matchById, teamById } from "../lib/seed";
 import { isMatchFollowed } from "../lib/selectors";
@@ -33,17 +28,22 @@ export const Route = createFileRoute("/")({ component: Home });
 const PILLS: {
   key: string;
   label: string;
-  icon: typeof House;
+  icon: GlyphComponent;
   to?: "/" | "/live" | "/football";
 }[] = [
   { key: "home", label: "Home", icon: House, to: "/" },
   { key: "live", label: "Live", icon: RadioTower, to: "/live" },
-  { key: "soccer", label: "Soccer", icon: Volleyball, to: "/football" },
-  { key: "tennis", label: "Tennis", icon: CircleDot },
-  { key: "basketball", label: "Basketball", icon: Dumbbell },
-  { key: "esports", label: "Esports", icon: Gamepad2 },
-  { key: "cricket", label: "Cricket", icon: Trophy },
-  { key: "hockey", label: "Ice hockey", icon: Medal },
+  {
+    key: "soccer",
+    label: "Soccer",
+    icon: SPORT_GLYPHS.soccer,
+    to: "/football",
+  },
+  { key: "tennis", label: "Tennis", icon: SPORT_GLYPHS.tennis },
+  { key: "basketball", label: "Basketball", icon: SPORT_GLYPHS.basketball },
+  { key: "esports", label: "Esports", icon: SPORT_GLYPHS.esports },
+  { key: "cricket", label: "Cricket", icon: SPORT_GLYPHS.cricket },
+  { key: "hockey", label: "Ice hockey", icon: SPORT_GLYPHS.hockey },
 ];
 
 // Wave motif — Housebets' aquatic promo language, quiet version
@@ -423,7 +423,7 @@ function HouseFeed() {
               className="flex shrink-0 items-center gap-1.5 rounded-full border border-border-soft bg-surface-secondary px-2.5 py-1 text-[11px] text-text-secondary"
             >
               {e.kind === "goal" ? (
-                <Volleyball size={11} className="text-warning-400" />
+                <SPORT_GLYPHS.soccer size={11} className="text-warning-400" />
               ) : (
                 <Lock size={10} className="text-warning-400" />
               )}

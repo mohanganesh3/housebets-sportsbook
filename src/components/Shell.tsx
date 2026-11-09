@@ -13,7 +13,6 @@ import {
   Star,
   Ticket,
   Trophy,
-  Volleyball,
   Wallet,
   X,
 } from "lucide-react";
@@ -25,6 +24,7 @@ import { useWorld } from "../lib/store/world";
 import { BetSlipBody } from "./BetSlip";
 import { HousebetsLogo } from "./HousebetsLogo";
 import { MyBetsBody } from "./MyBets";
+import { type GlyphComponent, SPORT_GLYPHS } from "./SportGlyph";
 
 export function Logo() {
   return (
@@ -109,13 +109,13 @@ export function TopBar({ onSearch }: { onSearch: () => void }) {
 
 const RAIL: {
   to: "/" | "/live" | "/football" | "/following";
-  icon: typeof House;
+  icon: GlyphComponent;
   label: string;
   badge?: boolean;
 }[] = [
   { to: "/", icon: House, label: "Home" },
   { to: "/live", icon: RadioTower, label: "Live", badge: true },
-  { to: "/football", icon: Volleyball, label: "Football" },
+  { to: "/football", icon: SPORT_GLYPHS.soccer, label: "Football" },
   { to: "/following", icon: Star, label: "Following" },
 ];
 
@@ -398,7 +398,10 @@ export function BottomBar({ onSearch }: { onSearch: () => void }) {
           aria-current={sportsActive ? "page" : undefined}
           className={`relative flex flex-1 flex-col items-center justify-center gap-1 text-[10px] font-medium ${sportsActive ? "text-brand-400" : "text-text-tertiary"}`}
         >
-          <Volleyball size={21} strokeWidth={sportsActive ? 2.2 : 1.8} />
+          <SPORT_GLYPHS.soccer
+            size={21}
+            strokeWidth={sportsActive ? 2.2 : 1.8}
+          />
           Sports
           {sportsActive && (
             <motion.span
