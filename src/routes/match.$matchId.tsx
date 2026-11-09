@@ -171,6 +171,10 @@ function MatchPage() {
   const allMatches = useWorld((s) => s.matches);
   const match = mt ?? matchById(matchId);
   const comp = match ? compById(match.competitionId) : null;
+  const mineCount =
+    match?.markets.filter((m) => favMarkets.has(m.key)).length ?? 0;
+  // falling back to Popular when "mine" empties keeps the tab honest
+  const effGroup = group === "mine" && mineCount === 0 ? "popular" : group;
   const related = useMemo(
     () =>
       allMatches
@@ -185,11 +189,11 @@ function MatchPage() {
     if (!match) return [];
     const q = mq.trim().toLowerCase();
     const list = (
-      q || group === "all"
+      q || effGroup === "all"
         ? match.markets
-        : group === "mine"
+        : effGroup === "mine"
           ? match.markets.filter((m) => favMarkets.has(m.key))
-          : match.markets.filter((m) => m.group === group)
+          : match.markets.filter((m) => m.group === effGroup)
     ).filter(
       (m) =>
         !q ||
@@ -199,7 +203,7 @@ function MatchPage() {
     return [...list].sort((a, b) =>
       a.popular === b.popular ? 0 : a.popular ? -1 : 1,
     );
-  }, [match, group, favMarkets, mq]);
+  }, [match, effGroup, favMarkets, mq]);
 
   if (!match || !comp) {
     return (
@@ -474,14 +478,14 @@ function MatchPage() {
           role="tablist"
           aria-label="Market groups"
         >
-          {favMarkets.size > 0 && (
+          {mineCount > 0 && (
             <button
               type="button"
               role="tab"
-              aria-selected={group === "mine"}
+              aria-selected={effGroup === "mine"}
               onClick={() => setGroup("mine")}
               className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors ${
-                group === "mine"
+                effGroup === "mine"
                   ? "border-gold-500/40 bg-gold-500/10 text-gold-500"
                   : "border-border-soft text-text-secondary hover:text-text-primary"
               }`}
@@ -491,9 +495,7 @@ function MatchPage() {
                 className="mr-0.5 inline fill-gold-500 text-gold-500"
               />
               My markets{" "}
-              <span className="tnum text-[10.5px] opacity-60">
-                {match.markets.filter((m) => favMarkets.has(m.key)).length}
-              </span>
+              <span className="tnum text-[10.5px] opacity-60">{mineCount}</span>
             </button>
           )}
           {GROUPS.map((g) => {
@@ -507,10 +509,10 @@ function MatchPage() {
                 key={g.key}
                 type="button"
                 role="tab"
-                aria-selected={group === g.key}
+                aria-selected={effGroup === g.key}
                 onClick={() => setGroup(g.key)}
                 className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors ${
-                  group === g.key
+                  effGroup === g.key
                     ? "border-brand-a30 bg-secondary-a20 text-brand-300"
                     : "border-border-soft text-text-secondary hover:text-text-primary"
                 }`}

@@ -575,29 +575,31 @@ function Home() {
       <FollowingStrip />
 
       {/* Featured rail */}
-      <section aria-label="Featured matches">
-        <div className="mb-2.5 flex items-center justify-between px-1">
-          <h2 className="flex items-center gap-2 text-[16px] font-bold">
-            <RadioTower size={17} className="text-error-400" /> In play now
-          </h2>
-          <Link
-            to="/live"
-            className="flex items-center gap-0.5 text-[12px] font-semibold text-brand-300 hover:text-brand-200"
-          >
-            All live <ChevronRight size={14} />
-          </Link>
-        </div>
-        <div className="no-scrollbar -mx-3 flex snap-x gap-3 overflow-x-auto px-3 pb-1 lg:mx-0 lg:px-0">
-          {featured.map((mt) => (
-            <FeaturedCard key={mt.id} match={mt} />
-          ))}
-          {live
-            .filter((m) => !m.featured)
-            .map((mt) => (
-              <FeaturedCard key={mt.id} match={mt} />
-            ))}
-        </div>
-      </section>
+      {live.some((m) => m.featured) && (
+        <section aria-label="Featured matches">
+          <div className="mb-2.5 flex items-center justify-between px-1">
+            <h2 className="flex items-center gap-2 text-[16px] font-bold">
+              <RadioTower size={17} className="text-error-400" /> In play now
+            </h2>
+            <Link
+              to="/live"
+              className="flex items-center gap-0.5 text-[12px] font-semibold text-brand-300 hover:text-brand-200"
+            >
+              All live <ChevronRight size={14} />
+            </Link>
+          </div>
+          <div className="no-scrollbar -mx-3 flex snap-x gap-3 overflow-x-auto px-3 pb-1 lg:mx-0 lg:px-0">
+            {/* featured live only — everything else lives in the league
+              sections below, never twice; scheduled features are not
+              "in play" */}
+            {live
+              .filter((m) => m.featured)
+              .map((mt) => (
+                <FeaturedCard key={mt.id} match={mt} />
+              ))}
+          </div>
+        </section>
+      )}
 
       {/* Live sections */}
       <section className="space-y-3" aria-label="Live matches">
