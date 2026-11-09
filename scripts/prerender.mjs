@@ -28,6 +28,7 @@ for (const r of routes) {
 }
 
 writeFileSync(join(dist, "404.html"), index);
+writeFileSync(join(dist, ".nojekyll"), "");
 console.log(
   `prerendered ${routes.length} routes + 404.html (${matchIds.length} match ids)`,
 );
