@@ -19,7 +19,7 @@ import { type EngineEvent, useEngine } from "../lib/engine";
 import { compById, matchById } from "../lib/seed";
 import { useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
-import type { Market, MarketGroupKey } from "../lib/types";
+import type { Market, MarketGroupKey, Match } from "../lib/types";
 
 export const Route = createFileRoute("/match/$matchId")({
   component: MatchPage,
@@ -42,16 +42,28 @@ const GROUPS: { key: MarketGroupKey | "all" | "mine"; label: string }[] = [
   { key: "handicaps", label: "Handicaps" },
   { key: "corners", label: "Corners & cards" },
   { key: "minutes", label: "Minutes" },
-  { key: "specials", label: "Specials" },
   { key: "all", label: "All markets" },
 ];
 
-function MarketCard({ market }: { market: Market }) {
+function MarketCard({
+  market,
+  match,
+}: {
+  market: Market;
+  match: Match;
+}) {
   const susp = market.status === "suspended";
   const reason = useWorld((s) => s.suspReasons[market.id]);
   const pinned = useUI((s) => s.favMarkets.has(market.key));
   const togglePin = useUI((s) => s.toggleFavMarket);
   const cols = market.outcomes.length > 4 ? 2 : market.outcomes.length;
+  // compact pick labels inside ≤3-outcome cells: team names → shorts
+  const tagFor = (nm: string) => {
+    const s = nm
+      .replaceAll(match.home.name, match.home.short)
+      .replaceAll(match.away.name, match.away.short);
+    return s.length <= 12 ? s : undefined;
+  };
   return (
     <section
       className={`overflow-hidden rounded-xl border transition-colors ${susp ? "border-warning-a40" : "border-border-soft"} bg-surface-primary`}
@@ -103,7 +115,13 @@ function MarketCard({ market }: { market: Market }) {
                 {o.name}
               </span>
             )}
-            <OddsCell outcome={o} market={market} />
+            <OddsCell
+              outcome={o}
+              market={market}
+              tag={
+                market.outcomes.length <= 3 ? tagFor(o.name) : undefined
+              }
+            />
           </div>
         ))}
       </div>
@@ -380,7 +398,7 @@ function MatchPage() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.18 }}
             >
-              <MarketCard market={mk} />
+              <MarketCard market={mk} match={match} />
             </motion.div>
           ))}
         </AnimatePresence>

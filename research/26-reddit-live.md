@@ -100,3 +100,61 @@
 ## 8. Caveats
 - Direct reddit.com URLs under-surfaced (index suppression); threads confirmed via multiple quoting sources.
 - Limiting/withdrawal disputes dominate raw volume but are policy problems, not demoable UX — deprioritized.
+
+---
+
+# Part B — Trust signals, app feel, personalization wishes
+
+## 1. Executive clusters
+1. **Trust is built at the withdrawal and the ticket, not the promo** — payout speed is the #1 "why I stay"; honest ticket states + visible net P/L close behind.
+2. **Perceived speed beats measured speed** — 2s load + skeleton + instant tap feedback is forgiven; 300ms freeze unacknowledged is rage.
+3. **Personalization is the #1 unmet wish** — favorites rails, bettable search, "my games first" home.
+4. **Bettors keep spreadsheets because books hide the number** — "the books don't show you the number" is tracker-app marketing; in-app honest ledger = trust + RG foundation.
+5. **RG that works is structural** — Danish regulator field study (14k): dismissible popups do ~nothing; limit-as-default, one-tap access, net-result displays land.
+
+## 2. Speed & feel
+- "Designed in 2010" thread: FD = least annoying/smoothest; Caesars dedicated hate thread.
+- Slip state loss on app-switch = silent killer (Novig: "when it clears the parlay I just give up"); inverse: stale selections resurrecting confusingly (Betway). → **persist draft + revalidate legs + mark moved prices, never silent-clear or stale-resurrect.**
+- Stake backlash: legs stay selected after parlay → auto-clear on placement (done) + accept-odds prefs first-class (done).
+- Peak-event degradation: Caesars 18min AFC Championship outage; DK rejects delayed more when odds move → skeletons + instant press feedback + graceful copy.
+- Density > flash for regulars: 10+ games at a glance, compact rows, dark mode by name.
+- Session timeout rage → configurable timeout / biometric re-auth returning to slip+scroll state.
+
+## 3. Trust signals / killer details
+- Withdrawal tracker with visible stages (Request→Review→Sent→Received) + per-method ETA — the review stage is where delay hides.
+- Merged cash+bonus balances feel like scam → split-balance display + every rejection carries a reason.
+- Stale odds without staleness signal destroys trust → "updated Xs ago" freshness pulse + auto-dim stale + suspension reasons (done).
+- Live-bet delay shown not hidden: Betfair 5–12s countdowns are LIKED by power users → "Placing bet in Xs" (our progress bar) + confirmed-ticket state.
+- Crash-recovery: "checking if your bet was placed…" reconciliation before resubmit.
+- Voided-leg opacity → per-leg Won/Lost/Void/Repriced + inline rule ("DNP = void") pre-placement.
+- Geolocation/KYC timing → status chip + pre-placement check; verification progress meter early.
+- Promo profiling resentment → promo cap, never in slip, never post-loss.
+
+## 4. Personalization gaps
+- Favorites/My Teams = most-requested least-delivered (Hard Rock "For You" shipped Dec 2025 proving demand).
+- Search broken industry-wide (Caesars hid its own) → typeahead + typos + bettable results + saved filters.
+- Promo clutter = home-screen tax → ≤3 slots, dismissible, promo-free toggle.
+- SGP builders optimize "add one more leg" → show joint implied-% beside payout (honesty differentiator); filter-by-player table stakes.
+- Dead tickets haunt My Bets → auto-archive lost, "hide settled" filter.
+- Bolla Snapbet: betting-profile onboarding → 94% adoption, time-to-bet 184s→32s.
+
+## 5. Notifications
+- Wrong: 93% of pushes are ads (NCL 2025); marketing+security bundled; stale pushes; over-broad live toggles.
+- Right: granular channels (transactional always-wanted), quiet hours w/ perishable-alert discarding + settlement roundup batching, event-personalized alerts tied to follows, Live Activity trackers (whole app category exists for "is my parlay alive").
+
+## 6. Net P/L opportunity
+- "It stops you from lying to yourself" — tracking threads canonical; CLV = the column pros add.
+- Books deliberately obscure lifetime P/L (Action Network exposé; FD praised-but-cumbersome); Juice/Pikkit monetize the gap; ~60% keep no records → in-app ledger serves silent majority.
+- Bet-history export adversarial → one-tap CSV.
+
+## 7. RG that doesn't feel preachy
+- Buried tools = pretend compliance (BetMGM 4-5 clicks).
+- Pop-ups measurably don't work (DCCA 14k field study).
+- What works: limits default at registration (must decline), one-tap-from-wallet, lower-instant/raise-24h cooldown, reality check requiring micro-decision w/ net number, duty-of-care framing.
+- North-star line: *"the home screen should answer 'what's happening with my money right now' before it sells anything."*
+
+## 8. Anti-pattern catalog (never ship)
+Default above-min stakes · one-click no-confirm bets · re-bet prompt post-placement · invisible session loss · withdrawal sludge · "most popular bet" bandwagon · post-loss promo push · marketing bundled w/ security alerts · merged balances · slip cleared-or-resurrected-stale · legs staying post-parlay · dead tickets pinned · search returning U21/women's variants.
+
+## 9. Top derived tasks (beyond Part A's top-5)
+Net P/L ledger · withdrawal-stage tracker · split balances · leg-level live status w/ rules · freshness pulse · pending-countdown copy · geolocation/KYC status · promo governance · notification channels · hide-settled filter · joint implied-% · density toggle · CSV export · player-event alerts.

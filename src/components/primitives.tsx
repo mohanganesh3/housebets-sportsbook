@@ -95,10 +95,12 @@ export function OddsCell({
   outcome,
   market,
   compact,
+  tag: tagProp,
 }: {
   outcome: Outcome;
   market: Market;
   compact?: boolean;
+  tag?: string;
 }) {
   const override = useOdds((s) => s.overrides[outcome.id]);
   const flash = useOdds((s) => s.flashes[outcome.id]);
@@ -109,11 +111,15 @@ export function OddsCell({
   const suspended =
     market.status === "suspended" || outcome.status === "suspended";
   const price = override ?? outcome.price;
-  // 1X2 cells carry the industry label so every price has a name
+  // every price carries a name — 1X2/DC use industry labels, others get a
+  // shortened pick name computed by the caller
   const tag =
-    market.key === "h2h"
+    tagProp ??
+    (market.key === "h2h"
       ? (["1", "X", "2"] as const)[market.outcomes.indexOf(outcome)]
-      : undefined;
+      : market.key === "dc"
+        ? (["1X", "12", "X2"] as const)[market.outcomes.indexOf(outcome)]
+        : undefined);
 
   return (
     <motion.button

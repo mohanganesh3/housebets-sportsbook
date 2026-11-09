@@ -55,8 +55,7 @@ export type MarketGroupKey =
   | "halves"
   | "handicaps"
   | "corners"
-  | "minutes"
-  | "specials";
+  | "minutes";
 
 export interface Match {
   id: string;
