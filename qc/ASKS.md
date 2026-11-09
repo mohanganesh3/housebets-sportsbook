@@ -827,3 +827,70 @@ Merged verbatim from wave-1/wave-2 research "derived ask proposals" sections. No
 | SA4-22 | research/30-slop-audit-v4.md | **Radius/elevation token spec**: codify the new scale (6 cell / 8 control / 12 hero+slip / full only true pills) into index.css tokens before rebuild — the reset process requires tokens before pixels. `[process, P0-blocker]` | unassigned | wave-2 | PROPOSED — pending adjudication |
 
 **Rows appended: 228** (P51-01…21 = 21 · P52-01…24 = 24 · C-01…24 = 24 · T7-01…22 = 22 · P55-01…24 = 24 · R-YAB-01…22 = 22 · T42-01…22 = 22 · RV4-01…22 = 22 · XV4-01…25 = 25 · SA4-01…22 = 22). Exact duplicates removed: 0.
+
+## Wave-U derived requirements (post-research, merged 10 Nov ~03:00 IST)
+
+Sources: research/70-user-problems.md (U1), 71-brand-dna-v2.md (U2), 72-craft-canon.md (U3), 73-bettor-behavior.md (U4), 74-motion-mastery.md (U5). Status: all NOT MET until evidenced.
+
+| ID | Requirement | Src | Status |
+|----|-------------|-----|--------|
+| U-01 | Odds-changed re-confirm per leg with old→new; never silently worse | U1 | NOT MET |
+| U-02 | 3-mode odds-change preference on slip; default = accept better only | U1 | NOT MET |
+| U-03 | Honest pending placement: countdown/state + explicit rejection reason; CTA disabled instantly | U1 | NOT MET |
+| U-04 | Suspension = locked+dimmed+reason chip; flash new prices on reopen | U1 | NOT MET |
+| U-05 | Cash-out eligibility badge pre-bet (market + slip leg) | U1 | NOT MET |
+| U-06 | Cash-out as live quote: ticking value, re-confirm on move/expiry | U1 | NOT MET |
+| U-07 | Partial cash-out control (25/50/75/custom) with remaining-stake math | U1 | NOT MET |
+| U-08 | "CO paused — market suspended" state; never a dead button | U1 | NOT MET |
+| U-09 | Fat-finger-proof stake: chips, max shown, clear≠submit, big confirm totals | U1 | NOT MET |
+| U-10 | Min/max stake shown before input | U1 | NOT MET |
+| U-11 | Slip persists across nav/reload; collapsed bar shows count | U1 | NOT MET |
+| U-12 | Receipt = truth: ref + accepted odds + timestamp; pending labelled | U1 | NOT MET |
+| U-13 | My Bets open/live/settled; void reasons + refund status; P/L honest | U1 | NOT MET |
+| U-14 | Settlement basis stated + dispute affordance; regrade log | U1 | NOT MET |
+| U-15 | Live delay honestly disclosed; direction flashes on reopen | U1 | NOT MET |
+| U-16 | ≤2 taps to any market; search teams AND markets; sims separated | U1 | NOT MET |
+| U-17 | Progressive density: few home cards; grouped market tabs on match | U1 | NOT MET |
+| U-18 | Thumb-zone: CTA + slip bar in reach; bottom sheets on phone | U1 | NOT MET |
+| U-19 | Always-live balance: auto-refresh, available vs in-bets split | U1 | NOT MET |
+| U-20 | Session continuity: restore scroll/market position on return | U1 | NOT MET |
+| U-21 | RG parity: limits/cool-off visible toggles + reality check | U1 | NOT MET |
+| U-22 | Stake cap / verification state shown pre-deposit on slip | U1 | NOT MET |
+| U-23 | Failure-proof My Bets: cached tabs, retryable error, never silent-empty | U1 | NOT MET |
+| U-24 | Delight checklist (24 named patterns) applied where scoped | U1 | NOT MET |
+| U-25 | Pale-cyan fill CTAs (judge's system token); neon cyan only text/glow | U2 | NOT MET |
+| U-26 | Oxanium (tabular) on every betting numeral | U2 | NOT MET |
+| U-27 | Amber suspended band treatment | U2 | NOT MET |
+| U-28 | "All markets N" final tab; market counts upfront everywhere | U2 | NOT MET |
+| U-29 | Phone slip pill shows the pick (not just count) | U2 | NOT MET |
+| U-30 | 4 terminal slip states (placed/failed/suspended/changed) designed | U2 | NOT MET |
+| U-31 | Terse sentence-case dry copy voice ("at least this good") | U2 | NOT MET |
+| U-32 | Prize-ticker chrome kept; house-glyph cameo ≤1 per view | U2 | NOT MET |
+| U-33 | Odds cross-fade + blur(2px) bridge + directional tint ≤260ms | U3 | NOT MET |
+| U-34 | Exact curves: enter/exit (0.23,1,0.32,1), movement (0.77,0,0.175,1) | U3 | NOT MET |
+| U-35 | Slip tray originates from tapped cell; sheets differ in height; one action per sheet | U3 | NOT MET |
+| U-36 | Bet indicator travels to Open Bets (result elements go home) | U3 | NOT MET |
+| U-37 | Entrances ≥scale(0.95); chrome fades only; closes faster than opens | U3 | NOT MET |
+| U-38 | Pinned minimal match header (crests+score+minute); depth in tabs | U3 | NOT MET |
+| U-39 | Pre-match shows countdown, never 0–0 | U3 | NOT MET |
+| U-40 | Density via rhythm, no nested cards; one encoding reused everywhere | U3 | NOT MET |
+| U-41 | Low-amplitude ambient live-surface motion; LIVE/frozen = word+icon never color alone | U3 | NOT MET |
+| U-42 | Optimistic-first; skeleton 150–300ms delay, ≥300ms hold | U3 | NOT MET |
+| U-43 | Repeat actions get zero animation; real :active ≤0.98, no tap flash | U3 | NOT MET |
+| U-44 | Undo or in-place confirm for destructive; busy button keeps label+indicator | U3 | NOT MET |
+| U-45 | Numbers never truncate; names middle-truncate; slip/tab/filter state in URL | U3 | NOT MET |
+| U-46 | ONE signature move (selection flies to slip); discipline elsewhere | U3 | NOT MET |
+| U-47 | Implied probability shown on every price | U4 | NOT MET |
+| U-48 | Stake + return + net-if-lost shown in currency before confirm | U4 | NOT MET |
+| U-49 | Ambient session line + acknowledged reality check (not interrupt modal) | U4 | NOT MET |
+| U-50 | Odds movement presented as delta-fact, never momentum bait | U4 | NOT MET |
+| U-51 | Neutral non-pulsing cash-out quote | U4 | NOT MET |
+| U-52 | No post-loss promoted action or deposit trigger | U4 | NOT MET |
+| U-53 | Safer-gambling ≤2 taps with 4 rungs (limits/cool-off/break/self-exclusion) | U4 | NOT MET |
+| U-54 | Quiet wins, factual losses (no LDW-style celebration) | U4 | NOT MET |
+| U-55 | Decision quality as stated success metric | U4 | NOT MET |
+| U-56 | Motion: newest-state-wins, transform/opacity only on money paths | U5 | NOT MET |
+| U-57 | Skeleton shimmer = opacity-only, exact geometry, max 2 loops | U5 | NOT MET |
+| U-58 | Container transform reserved for pick→ticket + receipt only | U5 | NOT MET |
+| U-59 | While stake pending, ambient board motion dims (calm-live budget) | U5 | NOT MET |
+| U-60 | Every effect: bespoke curve + interruption rule + RM twin + video artifact | U5 | NOT MET |
