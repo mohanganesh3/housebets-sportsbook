@@ -13,7 +13,7 @@ Created: 2026-11-09 ~23:2x IST (real `date` at each status change). Statuses: PL
 | T3.01–T3.12 | Books/sources, one reader each | — | PLANNED (wave 2, as limits allow) | research/books/<source>.md → research/50-rules.md |
 | T4 | Attention & reach | `7a8e39ea` | RUNNING (launched ~00:12 IST) | research/51-attention-and-reach.md |
 | T5 | Gambling psych + ethics | `818aa5fe` | DONE ~23:25 (ethics charter, UKGC refs, 2 code bugs flagged) | research/52-gambling-psych.md (ethics charter) |
-| T6 | Colour | `b7d3cf68` | RUNNING | research/53-colour.md |
+| T6 | Colour | `b7d3cf68` | DONE — per-token table + 24 asks; error-500 AA fail on s2/s3; error/warn/gold collapse under CVD | research/53-colour.md |
 | T7 | Type & space | `2b021b1f` | RUNNING | research/54-type-and-space.md |
 | T8 | Motion | `a4ea688a` | RUNNING | research/55-motion.md |
 | T9 | Library frontier | — | PARTIAL-seeded | research/25b-frontier-verified-2026-11-09.md done (lead); full research/25-library-frontier.md refresh in wave 2 |
