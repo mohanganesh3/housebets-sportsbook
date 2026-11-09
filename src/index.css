@@ -5,6 +5,8 @@
 @import "./styles/tokens.css";
 /* D1 shell helpers — skip link, focus pair, live pulse, edge fades */
 @import "./styles/shell.css";
+/* D2+D4 board helpers — coupon hairlines, group heads, hero snap, skeletons */
+@import "./styles/board.css";
 
 /* ── Housebets brand fonts (self-hosted, extracted from live site) ── */
 @font-face {

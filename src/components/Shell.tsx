@@ -19,7 +19,7 @@ import {
 import { AnimatePresence, motion, useDragControls } from "motion/react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { isMatchFollowed } from "../lib/selectors";
-import { useBets } from "../lib/store/bets";
+import { sessionNet, useBets } from "../lib/store/bets";
 import { useSlip } from "../lib/store/slip";
 import { useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
@@ -109,14 +109,7 @@ const liveCountSel = (s: {
 // slip sheet and My bets (DATA-CANON invariant 2). Canon grammar:
 // `Session {m} min · net {±} USDT` — value is the live ledger.
 function useSession() {
-  const net = useBets((s) =>
-    s.bets.reduce((a, b) => {
-      if (b.result === "won" || b.result === "cashedout")
-        return a + b.returns - b.stake;
-      if (b.result === "lost") return a - b.stake;
-      return a;
-    }, 0),
-  );
+  const net = useBets((s) => sessionNet(s.bets));
   const mins = Math.max(1, Math.floor((Date.now() - SESSION_START) / 60_000));
   return { mins, net };
 }
@@ -609,6 +602,15 @@ export function TopBar({ onSearch }: { onSearch: () => void }) {
   const breakUntil = useUI((s) => s.breakUntil);
   const onBreak = breakUntil > Date.now();
   const [sheet, setSheet] = useState<"wallet" | "deposit" | null>(null);
+  // "Add funds (demo)" inside the stake error asks for the deposit sheet
+  // cross-component — the flag routes through the store (D3 wiring)
+  const depositOpen = useUI((s) => s.depositOpen);
+  const setDepositOpen = useUI((s) => s.setDepositOpen);
+  useEffect(() => {
+    if (!depositOpen) return;
+    setSheet("deposit");
+    setDepositOpen(false);
+  }, [depositOpen, setDepositOpen]);
   const balance = useUI((s) => s.balance);
   const inBets = useBets((s) =>
     s.bets.filter((b) => b.result === "open").reduce((a, b) => a + b.stake, 0),
@@ -1486,6 +1488,8 @@ export function SlipPill() {
   const openBets = bets.filter((b) => b.result === "open");
   const setMobileOpen = useSlip((s) => s.setMobileOpen);
   const setPanelTab = useUI((s) => s.setPanelTab);
+  const offline = useUI((s) => s.offline);
+  const breakUntil = useUI((s) => s.breakUntil);
   const mt = useWorld((s) =>
     openBets.length
       ? s.matches.find((m) => m.id === openBets[0].matchId)
@@ -1496,6 +1500,11 @@ export function SlipPill() {
   const openBet = openBets[0];
   // pill shows only when something exists — canon always has ≥1 open bet
   const show = hasPicks || Boolean(openBet);
+  // the pill is a state surface, not just a count (U-04): moved legs
+  // flag amber, suspended legs flag the lock, offline/break name it
+  const changed = sels.some((x) => x.status === "changed");
+  const susp = sels.some((x) => x.status === "suspended");
+  const onBreak = breakUntil > Date.now();
   const payload = hasPicks
     ? `●${sels.length} ${sels[0].pick} @${sels[0].livePrice.toFixed(2)}`
     : openBet && mt
@@ -1505,6 +1514,15 @@ export function SlipPill() {
             : (mt.period ?? "—")
         } · CO ${openBet.cashout?.value.toFixed(2) ?? "—"}`
       : "";
+  const flag = onBreak
+    ? `On a break · back ${fmtClock(breakUntil)}`
+    : offline
+      ? "Offline — frozen"
+      : susp
+        ? "Suspended pick"
+        : changed
+          ? "Odds moved"
+          : null;
   return (
     <AnimatePresence>
       {show && (
@@ -1528,16 +1546,20 @@ export function SlipPill() {
           data-on-cta={hasPicks || undefined}
           aria-label={
             hasPicks
-              ? `Bet slip · ${sels.length} selection${sels.length > 1 ? "s" : ""}`
+              ? `Bet slip · ${sels.length} selection${sels.length > 1 ? "s" : ""}${flag ? ` · ${flag}` : ""}`
               : "Open bets"
           }
-          className={`fixed inset-x-4 bottom-[calc(var(--layout-bottombar)+env(safe-area-inset-bottom)+var(--s-2))] z-40 flex h-12 items-center gap-2 rounded-hb-pill border border-c-hairline px-4 lg:hidden ${
-            hasPicks ? "bg-c-cta text-c-cta-fg" : "bg-c-surface-1 text-c-text"
+          className={`fixed inset-x-4 bottom-[calc(var(--layout-bottombar)+env(safe-area-inset-bottom)+var(--s-2))] z-40 flex h-12 items-center gap-2 rounded-hb-pill border px-4 lg:hidden ${
+            flag && hasPicks
+              ? "border-c-suspend bg-c-surface-1 text-c-text"
+              : hasPicks
+                ? "border-c-hairline bg-c-cta text-c-cta-fg"
+                : "border-c-hairline bg-c-surface-1 text-c-text"
           }`}
         >
           <span
             className={`hb-live-pulse size-1.5 shrink-0 rounded-hb-pill ${
-              hasPicks ? "bg-c-cta-fg" : "bg-c-live"
+              flag ? "bg-c-suspend" : hasPicks ? "bg-c-cta-fg" : "bg-c-live"
             }`}
             aria-hidden
           />
@@ -1547,6 +1569,11 @@ export function SlipPill() {
           >
             {payload}
           </span>
+          {flag && (
+            <span className="ms-auto shrink-0 rounded-hb-sm bg-c-suspend px-1.5 py-0.5 font-hb-ui text-hb-micro font-semibold text-c-suspend-fg">
+              {flag}
+            </span>
+          )}
         </motion.button>
       )}
     </AnimatePresence>

@@ -432,6 +432,7 @@ export function ScenarioDock() {
     switch (s) {
       case "clean":
         slip.clear();
+        slip.dropUndo(); // scenario resets skip the ticket undo affordance
         world.setLiveEmpty(false);
         useUI.getState().setOffline(false);
         // restore seed truth: open markets reopen, seed-suspended and
@@ -449,11 +450,13 @@ export function ScenarioDock() {
         break;
       case "prefilled":
         slip.clear();
+        slip.dropUndo();
         pickSome();
         toast("Slip pre-filled · 3 singles", "info");
         break;
       case "odds-change": {
         slip.clear();
+        slip.dropUndo();
         pickSome();
         setTimeout(() => {
           const ids = useSlip
@@ -502,6 +505,7 @@ export function ScenarioDock() {
         break;
       case "suspended": {
         slip.clear();
+        slip.dropUndo();
         pickSome();
         const first = useSlip.getState().selections[0];
         if (first) {
@@ -569,6 +573,7 @@ export function ScenarioDock() {
         break;
       case "mixed": {
         slip.clear();
+        slip.dropUndo();
         pickSome();
         setTimeout(() => {
           const sels = useSlip.getState().selections;

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { SUSP_UNKNOWN } from "../matchBook";
-import { MATCHES } from "../seed";
+import { MATCHES, SEED_SUSP_REASONS } from "../seed";
 import type { MarketStatus, Match } from "../types";
 import { useBets } from "./bets";
 import { useSlip } from "./slip";
@@ -39,7 +39,7 @@ export const useWorld = create<WorldState>()(
       MATCHES.flatMap((mt) =>
         mt.markets
           .filter((mk) => mk.status === "suspended")
-          .map((mk) => [mk.id, SUSP_UNKNOWN]),
+          .map((mk) => [mk.id, SEED_SUSP_REASONS[mk.id] ?? SUSP_UNKNOWN]),
       ),
     ),
     liveEmpty: false,

@@ -17,35 +17,29 @@ const saveBets = (bets: Bet[]) => {
   } catch {}
 };
 
-// bet refs avoid 0/O/1/I — Oxanium has no disambiguating zero glyph.
-// Deterministic: a judge sees the same refs every load.
-const REF_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-// resume the sequence past persisted refs — a reload must never mint a
-// ref that already exists in hb-bets
+// DATA-CANON ref grammar: placed receipts mint `HB-90xxx` (HB-90210 is
+// the canon's demo receipt — the sequence starts there). Deterministic:
+// a judge sees the same refs every load; a reload resumes past the
+// persisted sequence so a ref is never reused (invariant 3).
 let refSeq = (() => {
   try {
     const prev = loadBets();
-    return prev ? prev.filter((b) => /^HB-[A-Z0-9]{3}$/.test(b.id)).length : 0;
+    return prev
+      ? prev
+          .filter((b) => /^HB-90\d{3}$/.test(b.id))
+          .reduce((a, b) => Math.max(a, Number(b.id.slice(4)) - 209), 0)
+      : 0;
   } catch {
     return 0;
   }
 })();
-const mkRef = () => {
-  refSeq += 1;
-  let n = refSeq * 137 + 29;
-  let out = "";
-  for (let i = 0; i < 3; i++) {
-    out += REF_CHARS[n % REF_CHARS.length];
-    n = Math.floor(n / REF_CHARS.length) + refSeq * 11;
-  }
-  return `HB-${out}`;
-};
+const mkRef = () => `HB-90${String(209 + ++refSeq)}`;
 const hashOf = (s: string) => {
   let h = 7;
   for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0;
   return h;
 };
-const mkBet = (s: SlipSelection): Bet => {
+const mkBet = (s: SlipSelection, idemKey?: string): Bet => {
   const stake = parseFloat(s.stake) || 0;
   const factor = +(0.9 + (hashOf(s.outcomeId) % 6) / 100).toFixed(4);
   // Fair cash-out ≈ stake × (bet price / current price) × book margin.
@@ -64,8 +58,20 @@ const mkBet = (s: SlipSelection): Bet => {
     returns: +(stake * s.livePrice).toFixed(2),
     result: "open",
     cashout: { value, was: value, factor, status: "available" },
+    idemKey,
   };
 };
+
+/** Session net P/L — computed from the settled ledger, identical on
+ *  every surface (DATA-CANON invariant 2). Won/cashed-out pay net,
+ *  lost costs the stake, void is a wash. Canon: −12.00 at seed. */
+export const sessionNet = (bets: Bet[]) =>
+  bets.reduce((a, b) => {
+    if (b.result === "won" || b.result === "cashedout")
+      return a + b.returns - b.stake;
+    if (b.result === "lost") return a - b.stake;
+    return a;
+  }, 0);
 
 // The open bet must reference the real seeded outcome so cash-out ticks with
 // the live feed — wireframe parity: Arsenal 1.80 · $20.00 · $36.00
@@ -154,94 +160,101 @@ const seedHistory: Bet[] = [
         },
       ]
     : []),
+  // ── Settled ledger — DATA-CANON: HB-091 won / HB-068 lost /
+  // HB-104 void, net reconciled to canon's session −12.00 (D3):
+  //   +16.00 +12.00 −20.00 −10.00 −8.00 −2.00 +0.00 = −12.00.
+  // Rows on seeded fixtures carry real outcome ids (Same again resolves
+  // → the disabled "fixture has ended" honesty state); the two canon
+  // fixtures the book doesn't model carry a `fixture` label instead.
   {
-    id: "HB-087",
-    placedAt: Date.now() - 86400000,
-    matchId: "juv-rom",
-    marketId: "juv-rom-h2h",
-    outcomeId: ocId("juv-rom", "h2h", "Draw"),
-    pick: "Draw",
+    id: "HB-091",
+    placedAt: Date.now() - 86400000 * 2,
+    matchId: "",
+    marketId: "",
+    outcomeId: "",
+    fixture: "Arsenal v Brentford",
+    pick: "Arsenal",
     marketName: "Match result",
-    odds: 3.4,
-    stake: 10,
-    returns: 34,
-    result: "won",
-    settledNote: "Settled · FT 1-1",
-  },
-  {
-    id: "HB-082",
-    placedAt: Date.now() - 172800000,
-    matchId: "nap-mil",
-    pick: "Milan",
-    marketName: "Match result",
-    odds: 2.9,
-    stake: 15,
-    returns: 43.5,
-    result: "lost",
-    settledNote: "Settled · FT 2-0",
-    marketId: "nap-mil-h2h",
-    outcomeId: ocId("nap-mil", "h2h", "Milan"),
-  },
-  {
-    id: "HB-075",
-    placedAt: Date.now() - 259200000,
-    matchId: "atm-sev",
-    marketId: "atm-sev-tg25",
-    outcomeId: ocId("atm-sev", "tg25", "Over"),
-    pick: "Over 2.5",
-    marketName: "Total goals",
-    odds: 2.1,
+    odds: 1.8,
     stake: 20,
-    returns: 38.4,
-    result: "cashedout",
-    cashout: undefined,
-    settledNote: "Cashed out · net +18.40 USDT",
+    returns: 36,
+    result: "won",
+    settledNote: "Settled · won 36.00 USDT",
   },
   {
-    id: "HB-071",
-    placedAt: Date.now() - 345600000,
-    matchId: "rma-bay",
-    marketId: "rma-bay-btts",
-    outcomeId: ocId("rma-bay", "btts", "Yes"),
-    pick: "Yes",
-    marketName: "Both teams to score",
-    odds: 1.95,
-    stake: 12,
-    returns: 12,
-    result: "void",
-    settledNote: "Void · match abandoned at 63' · stake returned",
-  },
-  {
-    id: "HB-068",
-    placedAt: Date.now() - 432000000,
+    id: "HB-089",
+    placedAt: Date.now() - 86400000 * 2 - 3600000,
     matchId: "liv-tot",
     marketId: "liv-tot-h2h",
     outcomeId: ocId("liv-tot", "h2h", "Liverpool"),
     pick: "Liverpool",
     marketName: "Match result",
-    odds: 1.65,
-    stake: 25,
-    returns: 41.25,
+    odds: 2.2,
+    stake: 10,
+    returns: 22,
     result: "won",
     settledNote: "Settled · FT 3-1",
   },
   {
-    id: "HB-064",
-    placedAt: Date.now() - 518400000,
-    matchId: "new-eve",
-    marketId: "new-eve-tg25",
-    outcomeId: ocId("new-eve", "tg25", "Under"),
-    pick: "Under 2.5",
-    marketName: "Total goals 2.5",
-    odds: 2.0,
-    stake: 8,
-    returns: 16,
+    id: "HB-076",
+    placedAt: Date.now() - 86400000 * 3,
+    matchId: "int-psg",
+    marketId: "int-psg-h2h",
+    outcomeId: ocId("int-psg", "h2h", "Paris Saint-Germain"),
+    pick: "Paris Saint-Germain",
+    marketName: "Match result",
+    odds: 2.1,
+    stake: 20,
+    returns: 0,
     result: "lost",
-    settledNote: "Settled · FT 2-1",
+    settledNote: "Settled · FT 2-0",
+  },
+  {
+    id: "HB-068",
+    placedAt: Date.now() - 86400000 * 3 - 3600000,
+    matchId: "liv-tot",
+    marketId: "liv-tot-h2h",
+    outcomeId: ocId("liv-tot", "h2h", "Draw"),
+    pick: "Draw",
+    marketName: "Match result",
+    odds: 4.8,
+    stake: 10,
+    returns: 0,
+    result: "lost",
+    settledNote: "Settled · FT 3-1",
+  },
+  {
+    id: "HB-071",
+    placedAt: Date.now() - 86400000 * 4,
+    matchId: "liv-tot",
+    marketId: "liv-tot-h2h",
+    outcomeId: ocId("liv-tot", "h2h", "Tottenham Hotspur"),
+    pick: "Tottenham Hotspur",
+    marketName: "Match result",
+    odds: 4.2,
+    stake: 8,
+    returns: 0,
+    result: "lost",
+    settledNote: "Settled · FT 3-1",
+  },
+  {
+    id: "HB-104",
+    placedAt: Date.now() - 86400000 * 4 - 3600000,
+    matchId: "",
+    marketId: "",
+    outcomeId: "",
+    fixture: "Brighton v Aston Villa",
+    pick: "Brighton & Hove Albion",
+    marketName: "Match result",
+    odds: 11.0,
+    stake: 12,
+    returns: 12,
+    result: "void",
+    settledNote: "Void — abandoned 63' · 12.00 USDT returned",
   },
   {
     id: "HB-060",
-    placedAt: Date.now() - 604800000,
+    placedAt: Date.now() - 86400000 * 5,
     matchId: "int-psg",
     marketId: "int-psg-h2h",
     outcomeId: ocId("int-psg", "h2h", "Inter"),
@@ -249,16 +262,16 @@ const seedHistory: Bet[] = [
     marketName: "Match result",
     odds: 2.4,
     stake: 10,
-    returns: 16.9,
+    returns: 8,
     result: "cashedout",
     cashout: undefined,
-    settledNote: "Cashed out · net +6.90 USDT",
+    settledNote: "Cashed out · 8.00 USDT",
   },
 ];
 
 interface BetsState {
   bets: Bet[];
-  addBets: (sel: SlipSelection[]) => Bet[];
+  addBets: (sel: SlipSelection[], idemKey?: string) => Bet[];
   cashOut: (id: string, fraction?: number) => void;
   settleMatch: (matchId: string, sh: number, sa: number) => void;
   suspendCashout: (matchId: string) => void;
@@ -266,7 +279,7 @@ interface BetsState {
   tickCashout: (outcomeId: string, newPrice: number) => void;
 }
 
-export const useBets = create<BetsState>()((set) => ({
+export const useBets = create<BetsState>()((set, get) => ({
   bets:
     typeof window !== "undefined"
       ? (loadBets()?.map((b) => {
@@ -278,8 +291,14 @@ export const useBets = create<BetsState>()((set) => ({
             : b;
         }) ?? seedHistory)
       : seedHistory,
-  addBets: (sel) => {
-    const made = sel.map(mkBet).reverse();
+  addBets: (sel, idemKey) => {
+    // D-19: a retried submit carries the same key — if the ledger
+    // already holds it, return the existing bets and mint nothing
+    if (idemKey) {
+      const seen = get().bets.filter((b) => b.idemKey === idemKey);
+      if (seen.length) return seen;
+    }
+    const made = sel.map((s) => mkBet(s, idemKey)).reverse();
     set((s) => {
       const bets = [...made, ...s.bets];
       saveBets(bets);
@@ -293,19 +312,24 @@ export const useBets = create<BetsState>()((set) => ({
         if (b.id !== id || b.cashout?.status !== "available") return b;
         const co = b.cashout;
         const paid = +(co.value * fraction).toFixed(2);
-        useUI.getState().credit(paid);
+        // total-wallet model (balance = available + in-bets): the quote
+        // arrives in available while stakeRemoved leaves the in-bets
+        // bucket — credit the NET so the wallet never double-counts.
+        const stakeLeft =
+          fraction >= 1 ? 0 : +(b.stake * (1 - fraction)).toFixed(2);
+        const stakeRemoved = +(b.stake - stakeLeft).toFixed(2);
+        useUI.getState().credit(+(paid - stakeRemoved).toFixed(2));
         if (fraction >= 1) {
-          const net = +(co.value - b.stake).toFixed(2);
           return {
             ...b,
             result: "cashedout" as const,
-            settledNote: `Cashed out · net ${net >= 0 ? "+" : "−"}${Math.abs(net).toFixed(2)} USDT`,
+            settledNote: `Cashed out · ${co.value.toFixed(2)} USDT`,
             returns: co.value,
             cashout: undefined,
           };
         }
-        // partial: bank the offered fraction, the rest of the stake rides on
-        const stakeLeft = +(b.stake * (1 - fraction)).toFixed(2);
+        // partial: bank the offered fraction, the rest of the stake rides
+        // on — the row stays honest (spec grammar, never a vanished row)
         return {
           ...b,
           stake: stakeLeft,
@@ -315,7 +339,7 @@ export const useBets = create<BetsState>()((set) => ({
             value: +(co.value * (1 - fraction)).toFixed(2),
             was: +(co.value * (1 - fraction)).toFixed(2),
           },
-          settledNote: `${Math.round(fraction * 100)}% cashed out · ${paid.toFixed(2)} banked · ${stakeLeft.toFixed(2)} rides`,
+          settledNote: `Cashed out ${paid.toFixed(2)} USDT · ${stakeLeft.toFixed(2)} riding at ${b.odds.toFixed(2)}`,
         };
       });
       saveBets(bets);
@@ -348,6 +372,10 @@ export const useBets = create<BetsState>()((set) => ({
       const bets = s.bets.map((b) => {
         if (b.matchId !== matchId || b.result !== "open") return b;
         const verdict = evalSettle(b, mt, sh, sa);
+        // total-wallet model: won pays (returns − stake), lost forfeits
+        // the stake out of the wallet, void just releases it back
+        if (verdict === "won") credit += b.returns - b.stake;
+        else if (verdict === "lost") credit -= b.stake;
         notes.push(
           verdict === "won"
             ? {
@@ -362,7 +390,6 @@ export const useBets = create<BetsState>()((set) => ({
                 },
         );
         if (verdict === "won") {
-          credit += b.returns;
           return {
             ...b,
             result: "won" as const,
@@ -379,8 +406,7 @@ export const useBets = create<BetsState>()((set) => ({
           };
         }
         // markets that can't be graded from the score (scorers, corners,
-        // halves) void honestly — stake comes straight back
-        credit += b.stake;
+        // halves) void honestly — the stake releases back on its own
         return {
           ...b,
           result: "void" as const,
@@ -389,7 +415,7 @@ export const useBets = create<BetsState>()((set) => ({
           cashout: undefined,
         };
       });
-      if (credit > 0) useUI.getState().credit(+credit.toFixed(2));
+      if (credit !== 0) useUI.getState().credit(+credit.toFixed(2));
       // settlement must never be silent — each graded bet announces itself
       notes.forEach((n, i) => {
         setTimeout(() => useUI.getState().toast(n.msg, n.kind), 300 + i * 900);

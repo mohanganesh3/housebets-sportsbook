@@ -1,217 +1,345 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronDown, ChevronRight, Star } from "lucide-react";
-import { useState } from "react";
-import { groupByComp, LeagueSection } from "../components/MatchRow";
-import { FollowStar } from "../components/primitives";
-import { SportGlyph } from "../components/SportGlyph";
-import { COMPS, compShort } from "../lib/seed";
-import { isMatchFollowed } from "../lib/selectors";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { SlidersHorizontal } from "lucide-react";
+import { useMemo } from "react";
+import {
+  BoardHeader,
+  BoardMenu,
+  BoardSessionLine,
+  BreakBanner,
+  CheckOption,
+  ContentSearchBar,
+  EmptyModule,
+  MenuOption,
+  SegmentedTabs,
+} from "../components/board-ui";
+import {
+  BoardSkeleton,
+  groupByComp,
+  LeagueGroup,
+} from "../components/MatchRow";
+import { useScrollMemory } from "../lib/scrollMemory";
+import { compById } from "../lib/seed";
 import { useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
 
-export const Route = createFileRoute("/football")({ component: Football });
+/* "Live & Upcoming" window — near-term kickoffs: 48h keeps every one
+   of the five canonical groups populated on the default tab while still
+   excluding the day-out tail (All Soccer shows the full scheduled+live
+   book, per FB-01 "scheduled+live only; count honest") */
+const LU_WINDOW = 48 * 3_600_000;
 
-const MARKET_OPTS = [
+/* FB-01 — exactly five league groups, canonical order, always shown */
+const FIVE_COMPS = ["epl", "ucl", "laliga", "seriea", "bundes"] as const;
+
+/* market selector (FB-03): rebinds every row's cells, same geometry */
+const MARKETS: { key: string; label: string }[] = [
   { key: "h2h", label: "Match result" },
-  { key: "dc", label: "Double chance" },
   { key: "btts", label: "Both teams to score" },
-  { key: "tg25", label: "Total goals 2.5" },
-] as const;
+  { key: "tg25", label: "Total goals" },
+];
 
-function Football() {
+const TABS: { key: string; label: string }[] = [
+  { key: "lu", label: "Live & Upcoming" },
+  { key: "all", label: "All Soccer" },
+];
+
+export const Route = createFileRoute("/football")({
+  /* FB-05 — tab + market + competition filter serialize in the URL.
+     Optional keys only — absent params mean the default board. */
+  validateSearch: (s) => {
+    const out: { market?: string; comp?: string; tab?: string } = {};
+    if (s.market === "btts" || s.market === "tg25")
+      out.market = s.market as string;
+    if (typeof s.comp === "string") out.comp = s.comp;
+    if (s.tab === "all") out.tab = "all";
+    return out;
+  },
+  pendingComponent: () => (
+    <div className="mx-auto w-full max-w-5xl px-3 py-4 lg:px-5">
+      <BoardSkeleton />
+    </div>
+  ),
+  component: FootballPage,
+});
+
+/* selected competitions: absent param = all five; "epl,ucl" = subset */
+const parseComps = (raw?: string) =>
+  raw == null
+    ? [...FIVE_COMPS]
+    : raw
+        .split(",")
+        .filter((c) => (FIVE_COMPS as readonly string[]).includes(c));
+
+function FootballPage() {
+  useScrollMemory("/football");
+  const nav = useNavigate({ from: "/football" });
+  const { market = "h2h", comp: compRaw, tab = "lu" } = Route.useSearch();
   const matches = useWorld((s) => s.matches);
-  const soccer = matches.filter((m) => m.sport === "soccer");
+  const liveEmpty = useWorld((s) => s.liveEmpty);
   const follows = useUI((s) => s.follows);
-  const [tab, setTab] = useState<"liveup" | "all" | "favs">("liveup");
-  const [marketKey, setMarketKey] = useState<string>("h2h");
-  const [compFilter, setCompFilter] = useState<string>("all");
 
-  const liveUp = soccer.filter(
-    (m) => m.status === "live" || m.status === "scheduled",
+  const selComps = useMemo(() => parseComps(compRaw), [compRaw]);
+  const marketLabel = MARKETS.find((m) => m.key === market)!.label;
+
+  // the five-competition book — finished rows only ever appear under
+  // "All Soccer"; Live & Upcoming = live + kickoffs inside 24h
+  const book = useMemo(
+    () =>
+      matches.filter(
+        (m) =>
+          (FIVE_COMPS as readonly string[]).includes(m.competitionId) &&
+          m.status !== "finished",
+      ),
+    [matches],
   );
-  const liveCount = soccer.filter((m) => m.status === "live").length;
+  const liveCount = liveEmpty
+    ? 0
+    : book.filter((m) => m.status === "live").length;
 
-  const base = tab === "liveup" ? liveUp : tab === "favs" ? liveUp : soccer;
-  const shown = base
-    .filter((m) => (tab === "favs" ? isMatchFollowed(m, follows) : true))
-    .filter((m) => compFilter === "all" || m.competitionId === compFilter);
+  const tabbed = useMemo(() => {
+    let ms = book.filter((m) => selComps.includes(m.competitionId));
+    if (tab === "lu")
+      ms = ms.filter((m) =>
+        m.status === "scheduled"
+          ? m.kickoffAt - Date.now() < LU_WINDOW
+          : !liveEmpty,
+      );
+    return ms;
+  }, [book, selComps, tab, liveEmpty]);
+  const luCount = useMemo(
+    () =>
+      book.filter(
+        (m) =>
+          selComps.includes(m.competitionId) &&
+          (m.status === "scheduled"
+            ? m.kickoffAt - Date.now() < LU_WINDOW
+            : !liveEmpty),
+      ).length,
+    [book, liveEmpty, selComps],
+  );
+  const allCount = useMemo(
+    () => book.filter((m) => selComps.includes(m.competitionId)).length,
+    [book, selComps],
+  );
 
-  const soccerComps = Object.values(COMPS).filter((c) => c.sport === "soccer");
-  const shownComps = new Set(shown.map((m) => m.competitionId)).size;
+  const groups = useMemo(() => {
+    const grouped = groupByComp(tabbed, follows);
+    // canonical five-comp order, never encounter order
+    return grouped.sort(
+      ([a], [b]) =>
+        FIVE_COMPS.indexOf(a as (typeof FIVE_COMPS)[number]) -
+        FIVE_COMPS.indexOf(b as (typeof FIVE_COMPS)[number]),
+    );
+  }, [tabbed, follows]);
 
-  return (
-    <div className="mx-auto max-w-[860px] space-y-4 px-3 pt-4 lg:px-4">
-      {/* Breadcrumb pills */}
-      <nav
-        className="flex items-center gap-1.5 text-[12px] font-semibold"
-        aria-label="Breadcrumb"
-      >
-        <Link
-          to="/"
-          className="rounded-full border border-border-soft bg-surface-primary px-3 py-1.5 text-text-secondary transition-colors hover:text-text-primary"
-        >
-          Home
-        </Link>
-        <ChevronRight size={13} className="text-text-disabled" />
-        <span className="flex items-center gap-1.5 rounded-full border border-brand-a30 bg-secondary-a20 px-3 py-1.5 text-brand-300">
-          <SportGlyph sport="soccer" size={13} /> Football
-        </span>
-      </nav>
+  const setSearch = (next: { market?: string; comp?: string; tab?: string }) =>
+    nav({
+      search: {
+        market: next.market === "h2h" ? undefined : next.market,
+        comp: next.comp,
+        tab: next.tab === "lu" ? undefined : next.tab,
+      },
+      replace: true,
+    });
 
-      <div className="flex flex-wrap items-center gap-2">
-        <h1 className="flex items-center gap-2 px-1 text-[18px] font-bold">
-          Football
-        </h1>
-        <span className="text-[12px] text-text-tertiary">
-          {shownComps} competitions · {liveCount} live
-        </span>
-        <div className="ml-auto flex items-center gap-2">
-          {/* Market selector — rebinds the odds shown on every row */}
-          <label className="relative flex items-center gap-1.5 rounded-full border border-border-soft bg-surface-primary px-3 py-1.5 text-[12px] font-semibold text-text-secondary">
-            <span className="text-text-tertiary">Market:</span>
-            <select
-              value={marketKey}
-              onChange={(e) => setMarketKey(e.target.value)}
-              aria-label="Row market"
-              className="appearance-none bg-transparent pr-4 font-semibold text-text-primary outline-none"
-            >
-              {MARKET_OPTS.map((o) => (
-                <option
-                  key={o.key}
-                  value={o.key}
-                  className="bg-surface-primary"
-                >
-                  {o.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              size={13}
-              className="pointer-events-none absolute right-2.5 text-text-tertiary"
-            />
-          </label>
-          <label className="relative flex items-center rounded-full border border-border-soft bg-surface-primary px-3 py-1.5 text-[12px] font-semibold">
-            <select
-              value={compFilter}
-              onChange={(e) => setCompFilter(e.target.value)}
-              aria-label="Competition filter"
-              className="appearance-none bg-transparent pr-4 outline-none"
-            >
-              <option value="all" className="bg-surface-primary">
-                All competitions
-              </option>
-              {soccerComps.map((c) => (
-                <option key={c.id} value={c.id} className="bg-surface-primary">
-                  {c.name}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              size={13}
-              className="pointer-events-none absolute right-2.5 text-text-tertiary"
-            />
-          </label>
-        </div>
-      </div>
+  const toggleComp = (cid: string) => {
+    const next = selComps.includes(cid)
+      ? selComps.filter((c) => c !== cid)
+      : [...selComps, cid];
+    const ordered = FIVE_COMPS.filter((c) => (next as string[]).includes(c));
+    setSearch({
+      market,
+      tab,
+      comp:
+        ordered.length === FIVE_COMPS.length ? undefined : ordered.join(","),
+    });
+  };
 
-      {/* Competitions rail */}
-      <nav
-        className="no-scrollbar -mx-3 flex snap-x gap-2 overflow-x-auto px-3 lg:mx-0 lg:px-0"
-        aria-label="Competitions"
-      >
-        {soccerComps.map((c) => (
-          <div
-            key={c.id}
-            className={`flex shrink-0 snap-start items-center gap-1 rounded-xl border py-2 pl-3 pr-1.5 transition-colors ${
-              compFilter === c.id
-                ? "border-brand-a30 bg-secondary-a20"
-                : "border-border-soft bg-surface-primary"
-            }`}
+  const compButton =
+    selComps.length === FIVE_COMPS.length
+      ? "All competitions"
+      : `${selComps.length} competitions`;
+
+  const compChecklist = (close: () => void) => (
+    <>
+      {FIVE_COMPS.map((cid) => {
+        const c = compById(cid);
+        const n = book.filter((m) => m.competitionId === cid).length;
+        return (
+          <CheckOption
+            key={cid}
+            checked={selComps.includes(cid)}
+            count={n}
+            onClick={() => toggleComp(cid)}
           >
-            <button
-              type="button"
-              onClick={() => setCompFilter(c.id === compFilter ? "all" : c.id)}
-              className="flex items-center gap-2"
-            >
-              <span className="grid size-6 place-items-center rounded-md bg-secondary-a30 font-odds text-[9px] font-bold uppercase text-brand-300">
-                {compShort(c.id)}
-              </span>
-              <span className="text-[13px] font-medium">{c.name}</span>
-            </button>
-            <FollowStar id={c.id} size={14} />
-          </div>
-        ))}
-      </nav>
-
-      {/* Segmented control + following */}
-      <div
-        className="flex items-center gap-2"
-        role="tablist"
-        aria-label="Fixture filter"
-      >
-        <div className="flex rounded-full border border-border-soft bg-surface-primary p-0.5">
-          {(
-            [
-              ["liveup", `Live & upcoming ${liveUp.length}`],
-              ["all", "All football"],
-            ] as const
-          ).map(([k, label]) => (
-            <button
-              key={k}
-              type="button"
-              role="tab"
-              aria-selected={tab === k}
-              onClick={() => setTab(k)}
-              className={`rounded-full px-4 py-1.5 text-[12.5px] font-semibold transition-colors ${
-                tab === k
-                  ? "bg-secondary-a20 text-brand-300"
-                  : "text-text-secondary hover:text-text-primary"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+            {c.name}
+          </CheckOption>
+        );
+      })}
+      <div className="mt-1 border-t border-c-hairline p-1">
         <button
           type="button"
-          role="tab"
-          aria-selected={tab === "favs"}
-          onClick={() => setTab("favs")}
-          className={`flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-[12.5px] font-semibold transition-colors ${
-            tab === "favs"
-              ? "border-gold-500/40 bg-gold-500/10 text-gold-500"
-              : "border-border-soft text-text-secondary hover:text-text-primary"
-          }`}
+          onClick={() => {
+            setSearch({ market, tab, comp: undefined });
+            close();
+          }}
+          className="w-full rounded-hb-sm px-2.5 py-2 text-left font-hb-ui text-hb-body-sec font-semibold text-c-neon transition-colors hover:bg-c-surface-3"
         >
-          <Star
-            size={12}
-            className={tab === "favs" ? "fill-gold-500 text-gold-500" : ""}
-          />
-          Following
+          Select all five
         </button>
       </div>
+    </>
+  );
 
-      <div className="space-y-3">
-        {shown.length === 0 && (
-          <p className="rounded-xl border border-dashed border-border-very-strong px-4 py-10 text-center text-[13px] text-text-tertiary">
-            {tab === "favs"
-              ? "Star a competition or match to pin it here."
-              : "Nothing in this view right now."}
-          </p>
-        )}
-        {groupByComp(shown).map(([cid, ms]) => (
-          <LeagueSection
-            key={cid}
-            compId={cid}
-            matches={ms}
-            marketKey={marketKey}
+  const marketMenu = (close: () => void) => (
+    <>
+      {MARKETS.map((mk) => (
+        <MenuOption
+          key={mk.key}
+          active={market === mk.key}
+          onClick={() => {
+            setSearch({ market: mk.key, comp: compRaw, tab });
+            close();
+          }}
+        >
+          {mk.label}
+        </MenuOption>
+      ))}
+    </>
+  );
+
+  return (
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-3 py-4 lg:px-5">
+      <BoardHeader
+        title={
+          <>
+            Soccer
+            <BoardMenu
+              label="Switch sport"
+              button={<span className="sr-only">switch sport</span>}
+            >
+              {(close) => (
+                <>
+                  <MenuOption active onClick={close}>
+                    Soccer
+                  </MenuOption>
+                  {[
+                    "Tennis",
+                    "Basketball",
+                    "Baseball",
+                    "Am. Football",
+                    "Esports",
+                  ].map((s) => (
+                    <MenuOption key={s} disabled onClick={() => {}}>
+                      {s}
+                    </MenuOption>
+                  ))}
+                </>
+              )}
+            </BoardMenu>
+          </>
+        }
+        meta={`${FIVE_COMPS.length} competitions · ${liveCount} live`}
+      >
+        {/* desk: the market select rides the header (FB-01);
+            phone: ≡ opens market + comp controls (FB-02) */}
+        <div className="hidden lg:block">
+          <BoardMenu
+            label={`Market: ${marketLabel}`}
+            button={
+              <>
+                <span className="text-c-text-2">Market:</span> {marketLabel}
+              </>
+            }
+          >
+            {marketMenu}
+          </BoardMenu>
+        </div>
+        <div className="lg:hidden">
+          <BoardMenu
+            label="Markets and competitions"
+            button={<SlidersHorizontal size={15} aria-hidden="true" />}
+          >
+            {(close) => (
+              <>
+                <p className="px-2.5 py-1 font-hb-ui text-hb-micro font-bold uppercase text-c-text-3">
+                  Market
+                </p>
+                {marketMenu(close)}
+                <p className="mt-1 border-t border-c-hairline px-2.5 py-1 font-hb-ui text-hb-micro font-bold uppercase text-c-text-3">
+                  Competitions
+                </p>
+                {compChecklist(close)}
+              </>
+            )}
+          </BoardMenu>
+        </div>
+        <BoardSessionLine className="hidden xl:block" />
+      </BoardHeader>
+      <ContentSearchBar />
+      <BreakBanner />
+
+      {/* tabs + competition checklist on one row (FB-01) */}
+      <div className="flex items-center gap-2">
+        <div className="min-w-0 flex-1 sm:max-w-96">
+          <SegmentedTabs
+            label="Fixture window"
+            tabs={[
+              { ...TABS[0], count: luCount },
+              { ...TABS[1], count: allCount },
+            ]}
+            value={tab}
+            onChange={(k) => setSearch({ market, comp: compRaw, tab: k })}
           />
-        ))}
+        </div>
+        <BoardMenu label="Filter competitions" button={compButton}>
+          {compChecklist}
+        </BoardMenu>
       </div>
-      <p className="pb-6 text-center text-[11px] text-text-tertiary">
-        {MARKET_OPTS.find((o) => o.key === marketKey)?.label} odds shown · tap
-        +N for all markets
-      </p>
+
+      {/* five league groups — canonical order, stars on every head */}
+      {groups.length > 0 ? (
+        <div className="flex flex-col gap-4">
+          {groups.map(([cid, ms]) => (
+            <LeagueGroup
+              key={cid}
+              compId={cid}
+              matches={ms}
+              marketKey={market}
+              marketLabel={marketLabel}
+            />
+          ))}
+        </div>
+      ) : selComps.length === 0 ? (
+        /* FB-04 — deselect all five: the module names the fix */
+        <EmptyModule
+          title="No competitions selected"
+          line="Select at least one ›"
+          action={
+            <button
+              type="button"
+              onClick={() => setSearch({ market, tab, comp: undefined })}
+              className="mt-1 flex h-11 items-center rounded-hb-pill border border-c-hairline px-4 font-hb-ui text-hb-label font-semibold text-c-text transition-colors duration-(--dur-feedback) hover:bg-c-surface-2"
+            >
+              Reset filter
+            </button>
+          }
+        />
+      ) : (
+        <EmptyModule
+          title="No fixtures in this window"
+          line="Widen the window or clear the competition filter."
+          action={
+            <button
+              type="button"
+              onClick={() => setSearch({ market, tab: "all", comp: undefined })}
+              className="mt-1 flex h-11 items-center rounded-hb-pill border border-c-hairline px-4 font-hb-ui text-hb-label font-semibold text-c-text transition-colors duration-(--dur-feedback) hover:bg-c-surface-2"
+            >
+              Show all soccer
+            </button>
+          }
+        />
+      )}
     </div>
   );
 }

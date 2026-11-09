@@ -82,9 +82,21 @@ export interface SlipSelection {
   livePrice: number;
   status: "active" | "changed" | "suspended";
   stake: string;
+  /** Auto-accepted move fact (E-06): consent pre-given by the mode
+   *  control, announced on the leg — better under "Better only"/"Any",
+   *  worse under "Any". Persists until the next event on this leg. */
+  moved?: { from: number; to: number; kind: "better" | "worse" };
 }
 
-export type SlipStatus = "idle" | "placing" | "placed" | "failed";
+export type SlipStatus =
+  | "idle"
+  | "placing"
+  | "placed"
+  | "failed"
+  // D-19: the response was lost (offline blip / suspend mid-flight / killed
+  // tab). The request may have LANDED — never claim "untouched", never
+  // blind-retry. Reconcile in My bets first.
+  | "unconfirmed";
 
 export interface Bet {
   id: string;
@@ -105,4 +117,10 @@ export interface Bet {
     status: "available" | "suspended" | "unavailable";
   };
   settledNote?: string;
+  /** Idempotency key (D-19): a retried submit carries the same key, so
+   *  the ledger can never mint the same bet twice. */
+  idemKey?: string;
+  /** Fixture label for ledger records whose match isn't in this book
+   *  (settled seed bets on fixtures the demo doesn't model). */
+  fixture?: string;
 }

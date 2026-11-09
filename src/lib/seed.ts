@@ -1291,6 +1291,13 @@ const newEve = MATCHES.find((x) => x.id === "new-eve")!;
 newEve.markets.find((x) => x.key === "h2h")!.status = "suspended";
 const atmSev = MATCHES.find((x) => x.id === "atm-sev")!;
 atmSev.markets.find((x) => x.key === "h2h")!.status = "suspended";
+// Named seed-suspension reasons (LV-01 canon vocabulary — every suspended
+// surface names a reason, never a bare lock). Engine suspensions write
+// live reasons into world.suspReasons; these cover the seed-suspended books.
+export const SEED_SUSP_REASONS: Record<string, string> = {
+  "new-eve-h2h": "dangerous attack",
+  "atm-sev-h2h": "re-pricing",
+};
 
 // Arsenal-Brighton: DATA-CANON prices (D-21). 1/1.30 + 1/4.80 + 1/11.00 =
 // 76.92 + 20.83 + 9.09 = 106.85% — inside the 103–107% book law; the

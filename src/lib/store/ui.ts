@@ -56,6 +56,11 @@ interface UIState {
   breakUntil: number;
   takeBreak: (mins: number) => void;
   endBreak: () => void;
+  /** "Add funds (demo)" — a one-shot flag the TopBar maps onto its
+   *  deposit sheet (recovery action in the stake error needs a real
+   *  destination, D3). */
+  depositOpen: boolean;
+  setDepositOpen: (v: boolean) => void;
 }
 
 const loadFollows = (): Set<string> => {
@@ -176,7 +181,9 @@ export const useUI = create<UIState>()((set, get) => ({
       localStorage.getItem("hb-odds-pref") ?? "",
     )
       ? (localStorage.getItem("hb-odds-pref") as "ask" | "higher" | "any")
-      : "ask",
+      : // D-03/U-02: default is "Accept better prices only" — consent
+        // pre-given for good news, a real ask on bad news
+        "higher",
   setOddsPref: (p) => {
     try {
       localStorage.setItem("hb-odds-pref", p);
@@ -214,6 +221,8 @@ export const useUI = create<UIState>()((set, get) => ({
     }),
   offline: false,
   setOffline: (v) => set({ offline: v }),
+  depositOpen: false,
+  setDepositOpen: (v) => set({ depositOpen: v }),
   // "Take a break" is real, not theatre: placements lock until the
   // timestamp passes and the state survives reload
   breakUntil:

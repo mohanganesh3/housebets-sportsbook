@@ -1,0 +1,126 @@
+/* ==================================================================
+   BOARD.css — D2+D4 coupon/board mechanics (STORYBOARDS/boards.md).
+   Values resolve through the canonical --c-* / --s-* / --r-* / --dur-*
+   vars; this file owns only what utilities can't express.
+   ================================================================== */
+
+/* ── Row hairlines — the coupon is hairline-separated rows inside an
+   s1 region on c-bg, never nested cards (SA4-01) ─────────────────── */
+.hb-coupon > .hb-row + .hb-row {
+  border-top: 1px solid var(--c-surface-2);
+}
+/* first/last row pick up the region's rounding so hover fills don't
+   square the corners */
+.hb-coupon > .hb-row:first-child {
+  border-start-start-radius: var(--r-md);
+  border-start-end-radius: var(--r-md);
+}
+.hb-coupon > .hb-row:last-child {
+  border-end-start-radius: var(--r-md);
+  border-end-end-radius: var(--r-md);
+}
+
+/* ── Sticky group header — 32–36px, sticks under bar (+sportrow on
+   phone); hairline only, never a shadow pop (E-BRD-02) ───────────── */
+.hb-grouphead {
+  position: sticky;
+  top: calc(var(--layout-header) + var(--layout-sportrow));
+  z-index: 20;
+  min-height: var(--s-8);
+  background: var(--c-surface-1);
+  border-bottom: 1px solid var(--c-surface-2);
+  border-start-start-radius: var(--r-md);
+  border-start-end-radius: var(--r-md);
+}
+@media (min-width: 1024px) {
+  .hb-grouphead {
+    top: var(--layout-header);
+  }
+}
+
+/* ── Skeleton rows — real markup + is-loading, exact geometry, opacity
+   only, ≤2 shimmer loops then hold (E-BRD-10, X04, U-57) ─────────── */
+@keyframes hb-sk {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.hb-sk {
+  background: var(--c-surface-2);
+  border-radius: var(--r-sm);
+  animation: hb-sk 1.4s ease-in-out 2 both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hb-sk { animation: none; }
+}
+
+/* ── Hero snap rail — CSS scroll-snap only (S6). Phone slide peeks the
+   next card's edge; desk slides 2/3 width. No autoplay, no bounce. ── */
+.hb-hero-rail {
+  display: flex;
+  gap: var(--s-4);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.hb-hero-rail::-webkit-scrollbar { display: none; }
+.hb-hero-slide {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  flex: 0 0 calc(100% - var(--s-6));
+}
+@media (min-width: 1024px) {
+  .hb-hero-slide { flex-basis: calc(66.6667% - var(--s-2)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hb-hero-rail { scroll-behavior: auto; }
+}
+
+/* ── Suspended odds zone — phone: the amber chip rides as a band over
+   the dimmed last-price cells (LV-02 "over dimmed last prices") ──── */
+.hb-susp-band {
+  position: absolute;
+  inset-inline-start: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: max-content;
+  max-width: calc(100% - var(--s-2));
+  z-index: 10;
+}
+
+/* ── Segmented control fill — 120ms swap, repeat-tap = 0 animation ── */
+.hb-seg {
+  transition:
+    background-color var(--dur-feedback) var(--ease-standard),
+    color var(--dur-feedback) var(--ease-standard);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hb-seg { transition: none; }
+}
+
+/* ── Empty module enter — opacity + 2px y, 200ms out-expo (E-BRD-09) ─ */
+@keyframes hb-empty-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hb-empty-in {
+  animation: hb-empty-in var(--dur-enter) var(--ease-out-expo) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hb-empty-in { animation: none; }
+}
+
+/* ── Popover/dropdown — desk popover grammar: s2 + hairline + r-md,
+   enter 200ms out-expo, close faster (E-BRD-06). The ONE sheet shadow
+   is not used — popovers get hairlines only (TOKENS elevation law) ── */
+@keyframes hb-pop-in {
+  from { opacity: 0; transform: translateY(calc(-1 * var(--s-1))); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hb-pop-in {
+  animation: hb-pop-in var(--dur-enter) var(--ease-out-expo) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hb-pop-in { animation: none; }
+}
