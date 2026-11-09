@@ -21,5 +21,5 @@ Legend: ✅ landed (pre-scrap corpus, kept) · 🟡 running · ⬜ queued · ❌
 - U5 9b7893ef died (rate limit); lead-covered ✅ → research/74-motion-mastery.md
 
 ## Queued after U-wave
-- Synthesis v5 → research/75-synthesis-v5.md → design v2 (tokens/principles/storyboards/cards)
+- Synthesis v5 ✅ → research/75-synthesis-v5.md (6 moats, screen theses, build order)
 - Coverage checker vs qc/ASKS.md (~610 rows); sentence-level audit vs qc/RESET_BRIEF.md
