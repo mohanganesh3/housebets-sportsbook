@@ -220,3 +220,29 @@ F1–F8 ⬜ + F9–F16 appended from §R below.
 - V4 Law-citation spot-checks (lawsofux.com, nngroup.com, Scheibehenne, sludge=Final Ed.).
 - V5 BetRivers CO label, Hard Rock Flex Parlay anatomy, ESPN BET accent/product names.
 - V6 Oxanium `tnum` feature presence (font inspection).
+
+---
+
+## STATUS — implementation rounds 1–3 (2026-11-09, commits ff00fe68 → da59d1c5)
+
+**DONE — verified at runtime + deployed:**
+- §R.A (all 12) — sticky selections, LDW, cashedout type, CO confirm, reason propagation, ticking CO values, EmptyState icons, shared follow predicate + liveCount, Returns/Payout swap, chip row, kickoff flip, instant CTA disable.
+- §R.B: B1 (pale-cyan CTAs), B2/B14 (prize widget), B3 (icon rail), B5 (real footer), B6 (canned chat), B8 (All-markets-last), B15 (chips), B20 (fill-flip adopted).
+- §R.C: C2 (remove-suspended), C3◐ (session+net line + take-a-break toast; limits sheet still open), C4◐ (payout/profit/balance-after), C1◐ (progress bar; staged labels open), C5◐ (implied-% title attr).
+- §R.D: D1 (reason vocab), D2 (9s arrows), D3 (kickoff transitions), D4 (stoppage 45+N′), D8 (tab counts), D7◐ (h2h settlement title).
+- §R.E: E2–E4 (bell reminders + countdowns + mobile star), E6–E11 (badges, search ranking/recents/quick-picks/persistence/kickoff), E5◐ hub.
+- §R.F: F1 (MotionConfig), F2 (flash expiry).
+- §R.H: session line, take-a-break, CO honesty, no near-miss/dark patterns — mostly covered; H1/H2 (limits sheet, reality check) still open.
+- §R.I: I1 (honest feed), I3 (net line), I4 (quick-rebet w/ reconfirm), I2◐ (copy-ref button).
+
+**STILL OPEN — next pass:**
+- §R.B: B7 (full suspended band on list rows), B9 (pill shows the pick), B10–B13 (wireframe signatures: fav chips, market selector rebind, breadcrumb pills, MyBets column table), B11 (football "Market:" selector), B16–B19.
+- §R.C: C1 staged labels, C3 Set-limits sheet (F11), C6–C9.
+- §R.D: D5 sibling CAROUSEL (list exists), D6 My-markets pinning (F2).
+- §R.F: F3 fly-to-slip, F4 accordion, F5 skeleton wiring.
+- §R.G: deeper a11y sweep (focus visibility audit, hit-area audit).
+- §R.H: H1 reality-check interval, H6 connectivity toast.
+- §R.J: F10 insufficient-funds, F16 wireframe pass.
+- Verification queue V1–V6 (web_search still down session-wide).
+
+Deployed: https://mohanganesh3.github.io/housebets-sportsbook/ (gh-pages 3c02a80a).
