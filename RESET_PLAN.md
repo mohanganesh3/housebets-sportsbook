@@ -475,8 +475,84 @@ The entry is ready only when the evidence manifest establishes:
 - `SUBMISSION.md` includes exact public URL, verified 80-800-character big idea, sixty-second tour, all tools/models actually used including Devin, honest limitations and dark-pattern refusals.
 - A concise handover tells Mohan what is live, the recovery SHA, the evidence locations, remaining risks if any, and that ONLY HE submits.
 
-## 16. Immediate Next Action
+## 16. The Standard: What First Place Looks Like on 9 Nov 2026
 
-The requested replacement plan is this file. No visual code was changed to write it.
-Next: execute P0.02/P0.04/P0.05 and build the verbatim requirements ledger before research/design execution.
-Do not claim Phase 0 complete: the baseline recovery exists, but the fresh ledger, regression register and research dispatch are still pending.
+Mohan's verdict: the current build would be desk-rejected. Accept it. Template-quality UI is now free:
+every serious rival has frontier models, v0-class generators, Figma tooling and shadcn-style kits.
+A polished dark sportsbook with cyan accents is the FLOOR, not a differentiator.
+
+What a 131-entry field cannot all fake, and therefore what wins:
+
+1. Authorship. A composition a judge recognises as designed by a person with a point of view:
+   editorial typography, deliberate density, an asymmetric grid with a reason, custom art.
+2. Truth under pressure. Prices, suspensions, placement, cash-out and settlement behave like a real
+   trading product in every state, at both widths, with no seam a judge can find in 90 seconds.
+3. Invisible craft. Interruptible motion, hit areas, focus, timing and numerals so consistent the
+   product feels inevitable (Freiberg, Kowalski in `research/25b-frontier-verified-2026-11-09.md`).
+4. Housebets nativeness. It must look like the next Housebets release, not a generic book reskinned.
+5. A system. Tokens, components and a hidden design-system route that a Head of Design can audit.
+
+Every decision answers: why would Housebets rank this #1 over the best rival? No evidence, not done.
+
+## 17. The Magician's Playbook (UX as stagecraft, ethically)
+
+Magic works by directing attention, hiding the machinery and staging one unforgettable reveal.
+A sportsbook is the same act, with one hard rule: we direct attention to INFORM a decision,
+never to make it for the player (A7, Schull charter in T5).
+
+| Magic principle | Sportsbook translation | Where it lives | Proof |
+|---|---|---|---|
+| Direction of attention | One focal point per state; the attention budget is written per screen | Every screen | Blur test in `qc/blur/` |
+| The pledge | The board is instantly familiar: 1X2 rows, live badge, slip right/bottom (Jakob's law) | Home, Live, Football | Familiar list in `design/FAMILIAR-VS-MORE.md` |
+| The turn | Change made legible: direction glyphs, same-frame locks, goal-to-reprice causality | Odds cells, Match page | Recordings per effect |
+| The prestige | One designed peak per flow (peak-end): the placed receipt, the cash-out confirmation, FT settlement | Ticket, My bets | First-impression and recall tests |
+| Palming | Complexity concealed until asked for: 90+ markets behind groups, search, pins | Match page | Taps-to-market measurements |
+| Ethical forcing | Defaults protect the player: ask-before-accepting moved odds, visible returns, break controls | Ticket | Card + regression B07/B11 |
+| Time misdirection | Perceived speed: geometry-true skeletons, ease-out under 300ms, honest live acceptance progress | All lists, placement | INP/CLS traces |
+| Continuity | Objects travel: pick -> ticket -> receipt -> My bets, one spatial story on phone and desktop | Shell, ticket | Mental-map recall test |
+| Never repeat the trick | Frequent actions stay quiet; personality only in rare moments | Motion spec | Frequency column in `design/MOTION.md` |
+
+## 18. Signature Moments (HYPOTHESES to validate in P1, specify in P2)
+
+Each moment must pass: in scope, player benefit in one sentence, reduced-motion twin, measurable test.
+None ships unless its storyboard and cards exist. Reject any that fails critique.
+
+| ID | Moment | Player benefit | Mechanism (smallest tool) | Reduced-motion twin |
+|---|---|---|---|---|
+| S1 | The price as instrument: fixed-width tabular odds that morph digit-by-digit with a direction glyph | Read every move without re-reading the row | CSS + `@number-flow/react` candidate (measure); aria-live batched | Instant swap + glyph + label |
+| S2 | Pick-to-ticket flight: the chosen price travels to the panel or phone bar | Certainty the pick landed, and where | Motion `layoutId` or same-document View Transition | Bar count pulses once, no travel |
+| S3 | Honest lock: suspension shutters in the same frame with a reason; last price stays visible, dimmed | Trust: nothing hidden, no stale tap | CSS state + token; 0ms by rule | Identical (no motion needed) |
+| S4 | Goal cascade: score roll, one-line event, markets lock then reprice in visible order | Cause and effect in one glance | Store sequence + CSS | Static event line + lock labels |
+| S5 | The prestige receipt: the bet stamps into My bets with ref and exact returns; quiet glow under 3s | Peak-end confidence, honest record | Motion presence | Static receipt, no glow |
+| S6 | Matchday masthead: an editorial slideshow of featured fixtures, custom crest art, kinetic team type, no promos | A memorable first five seconds that is still a usable board | CSS scroll-snap first; scroll-driven `view()` reveal (Baseline Oct 2026) | Static slides, manual controls |
+| S7 | Cash-out as live instrument: value ticks; a changed value demands reconfirmation | No surprise money | NumberFlow candidate + store guard (B09) | Instant value + "changed" label |
+| S8 | Calm live: clocks and flashes never compete with an open ticket | Focus on the decision in hand | Attention budget: dim board motion while staking | Same rule, no motion |
+
+Reference bar for T11 to OPEN and verify before citing (no URLs assumed here): live-score clarity
+(Apple Sports, FotMob, Sofascore), price-as-product (prediction-market and brokerage apps),
+craft systems (Linear, Vercel Geist, Raycast, Family). Learn patterns; never copy visuals or assets.
+
+## 19. Stack Decisions (verified seed: `research/25b-frontier-verified-2026-11-09.md`)
+
+- Keep: React 19.3.1, TanStack Router 1.170.46, Zustand 5.1.0, Tailwind 4.3.5 (`@theme`, OKLCH),
+  Base UI 1.9.0 primitives, Motion 14.10.1 (14.11.1 was published today: under the 7-day rule).
+- Native first: same-document View Transitions (feature-detect types; Firefox 144 lacks them),
+  CSS scroll-driven animations for non-money reveals only, container queries for panel-width cells.
+- Candidates to measure: `@number-flow/react` 0.6.2, React Compiler 1.0.0, sonner 2.0.8 (adopt or remove).
+- Dev-only gates: `@axe-core/playwright` 4.14.0, `@playwright/test`, lighthouse 13.6.0, web-vitals 6.2.3,
+  culori 4.0.2 for measured contrast, react-scan 0.5.7 for render audits.
+- Rejected: Lenis/smooth-scroll (hijack), GSAP ScrollSmoother, React Three Fiber/WebGL, live shaders,
+  Lottie/Rive without authored assets, vaul (stale since 2024-12), @use-gesture (stale since 2024-03).
+
+## 20. Taste Enforcement for SWE-2
+
+- Load the skill `housebets-craft` (`.devin/skills/housebets-craft/SKILL.md`) before any UI work.
+- P2 extends it with screen skills once tokens exist: odds-cell, ticket, motion, copy, anti-template.
+- A diff that breaks a skill rule is a FAIL logged in `qc/BUGS.md`, not a nit.
+
+## 21. Immediate Next Action
+
+No visual code was changed to write this plan.
+Next: P0.02 verbatim RESET brief, P0.04 baseline rows B01-B12, P0.05 the atomic ledger `qc/ASKS.md`,
+then dispatch the T1-T12 research tree with real agent IDs logged in `research/TREE.md`.
+Phase 0 is NOT complete: the recovery tag exists; the ledger, regression register and research dispatch do not.
