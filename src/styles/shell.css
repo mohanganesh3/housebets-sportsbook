@@ -1,0 +1,132 @@
+/* ==================================================================
+   SHELL.css — D1 chrome helpers (STORYBOARDS/shell.md).
+   Not a token file: every value below resolves through the canonical
+   vars in tokens.css. Token-lint scans src/components + src/routes
+   only — raw values never leave this file anyway.
+   ================================================================== */
+
+/* Skip link — visible on focus only (SH-09 focus order #1). */
+.hb-skip {
+  position: fixed;
+  top: var(--s-2);
+  inset-inline-start: var(--s-2);
+  z-index: 100;
+  transform: translateY(-200%);
+  padding: var(--s-2) var(--s-4);
+  border-radius: var(--r-md);
+  background: var(--c-surface-2);
+  color: var(--c-text);
+  font-family: var(--font-hb-ui, "Figtree", sans-serif);
+  font-size: var(--hb-label);
+  font-weight: 600;
+  line-height: var(--hb-label-lh);
+  transition: transform var(--dur-feedback) var(--ease-out-expo);
+}
+.hb-skip:focus-visible {
+  transform: translateY(0);
+}
+
+/* Focus ring — --c-focus 2px + 2px offset inside the shell.
+   The pale-cyan pair (C-11): on cta fills the ring goes dark —
+   mark those controls with data-on-cta. */
+.hb-shell :where(button, a, input, [tabindex], [role="tab"]):focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 2px;
+}
+.hb-shell :where(button, a, input, [tabindex], [role="tab"])[data-on-cta]:focus-visible {
+  outline-color: var(--c-cta-fg);
+}
+
+/* Live pulse — ONE synchronized class so every dot in the viewport
+   breathes in phase and counts once toward the motion budget
+   (E-BRD-08). Tint-only ~2s; RM strips it. */
+@keyframes hb-live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+.hb-live-pulse {
+  animation: hb-live-pulse 2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hb-live-pulse {
+    animation: none;
+  }
+}
+
+/* Rail active indicator — the 3px leading-edge bar (E-SHL-03). Width
+   is a spec literal, not a scale step — it lives here, not in markup. */
+.hb-rail-ind {
+  width: 3px;
+  height: var(--s-6);
+}
+
+/* Sport-row edge fades — scrolls x, content dies into the bg at both
+   edges instead of clipping mid-pill (P51-09). */
+.hb-edge-fade {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black var(--s-5),
+    black calc(100% - var(--s-5)),
+    transparent
+  );
+}
+[dir="rtl"] .hb-edge-fade {
+  mask-image: linear-gradient(
+    to left,
+    transparent,
+    black var(--s-5),
+    black calc(100% - var(--s-5)),
+    transparent
+  );
+}
+
+/* Offline banner — docked band, enter = rise 8px out-expo 200ms,
+   close faster (E-SHL-05). */
+@keyframes hb-band-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--s-2)));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.hb-band-in {
+  animation: hb-band-in var(--dur-enter) var(--ease-out-expo) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hb-band-in {
+    animation: none;
+  }
+}
+
+/* Slip-pill mount — enter rise + fade (≤260ms), exit 160ms. */
+@keyframes hb-pill-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--s-4));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.hb-pill-enter {
+  animation: hb-pill-in var(--dur-enter) var(--ease-out-expo) both;
+}
+.hb-pill-exit {
+  animation: hb-pill-in var(--dur-close) var(--ease-standard) reverse both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hb-pill-enter,
+  .hb-pill-exit {
+    animation: none;
+  }
+}

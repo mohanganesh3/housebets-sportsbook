@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
+import { SUSP_UNKNOWN } from "../matchBook";
 import { MATCHES } from "../seed";
 import type { MarketStatus, Match } from "../types";
 import { useBets } from "./bets";
@@ -32,13 +33,13 @@ export const useWorld = create<WorldState>()(
   subscribeWithSelector((set, get) => ({
     matches: MATCHES,
     goalFlashes: {},
-    // seed-suspended markets carry a generic reason — engine suspensions
-    // write specific ones via setMarketStatus
+    // seed-suspended markets carry the honest fallback reason (E-M-09:
+    // never invent one) — engine suspensions write specifics
     suspReasons: Object.fromEntries(
       MATCHES.flatMap((mt) =>
         mt.markets
           .filter((mk) => mk.status === "suspended")
-          .map((mk) => [mk.id, "Suspended by trader"]),
+          .map((mk) => [mk.id, SUSP_UNKNOWN]),
       ),
     ),
     liveEmpty: false,

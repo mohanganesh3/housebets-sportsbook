@@ -22,6 +22,20 @@ interface UIState {
   setPanelTab: (t: UIState["panelTab"]) => void;
   setScenario: (s: Scenario) => void;
   setScenarioOpen: (v: boolean) => void;
+  // D1 shell chrome — panel/rail visibility, demo auth, RG sheet,
+  // odds-animation preference (user-facing reduced-motion twin)
+  panelOpen: boolean;
+  railOpen: boolean;
+  signedIn: boolean;
+  rgOpen: boolean;
+  supportOpen: boolean;
+  oddsAnim: "flash" | "instant";
+  setPanelOpen: (v: boolean) => void;
+  setRailOpen: (v: boolean) => void;
+  setSignedIn: (v: boolean) => void;
+  setRgOpen: (v: boolean) => void;
+  setSupportOpen: (v: boolean) => void;
+  setOddsAnim: (p: "flash" | "instant") => void;
   follows: Set<string>;
   toggleFollow: (id: string) => void;
   reminds: Set<string>;
@@ -84,6 +98,33 @@ export const useUI = create<UIState>()((set, get) => ({
   setPanelTab: (t) => set({ panelTab: t }),
   setScenario: (s) => set({ scenario: s }),
   setScenarioOpen: (v) => set({ scenarioOpen: v }),
+  panelOpen: true,
+  railOpen: true,
+  // demo auth resolves async on first load — SH-02's logged-out frame
+  // is the pre-resolve state, "Sign in" settles it instantly
+  signedIn: false,
+  rgOpen: false,
+  supportOpen: false,
+  oddsAnim:
+    typeof window !== "undefined" &&
+    ["flash", "instant"].includes(localStorage.getItem("hb-odds-anim") ?? "")
+      ? (localStorage.getItem("hb-odds-anim") as "flash" | "instant")
+      : "flash",
+  setPanelOpen: (v) => set({ panelOpen: v }),
+  setRailOpen: (v) => set({ railOpen: v }),
+  setSignedIn: (v) => set({ signedIn: v }),
+  setRgOpen: (v) => set({ rgOpen: v }),
+  setSupportOpen: (v) => set({ supportOpen: v }),
+  setOddsAnim: (p) => {
+    try {
+      localStorage.setItem("hb-odds-anim", p);
+    } catch {}
+    // DOM flag so the tick-flash classes can honour it without a
+    // React re-render of every odds cell (RM twin, P55-21)
+    if (typeof document !== "undefined")
+      document.documentElement.dataset.oddsAnim = p;
+    set({ oddsAnim: p });
+  },
   follows:
     typeof window !== "undefined"
       ? loadFollows()
@@ -142,11 +183,12 @@ export const useUI = create<UIState>()((set, get) => ({
     } catch {}
     set({ oddsPref: p });
   },
-  // a stored 0.00 must read back as 0.00 — `|| 1250` revived it
+  // a stored 0.00 must read back as 0.00 — `||` would revive a default.
+  // Default = DATA-CANON: 240.00 total (180.00 available + 60.00 in bets)
   balance:
     typeof window !== "undefined" && localStorage.getItem("hb-balance") !== null
       ? Number(localStorage.getItem("hb-balance"))
-      : 1250,
+      : 240,
   setBalance: (v) => {
     const balance = +v.toFixed(2);
     try {
@@ -204,3 +246,8 @@ export const useUI = create<UIState>()((set, get) => ({
   dismissToast: (id) =>
     set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
 }));
+
+// publish the persisted odds-animation preference before first paint —
+// odds ticks read it as a DOM flag (RM twin honoured without store subs)
+if (typeof document !== "undefined")
+  document.documentElement.dataset.oddsAnim = useUI.getState().oddsAnim;

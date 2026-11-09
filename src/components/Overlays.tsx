@@ -349,7 +349,11 @@ const SCEN: { key: Scenario; label: string; hint: string }[] = [
     label: "Odds change",
     hint: "Slip prices move → accept",
   },
-  { key: "suspend-market", label: "Suspend market", hint: "1×2 locks for 15s" },
+  {
+    key: "suspend-market",
+    label: "Suspend market",
+    hint: "Total goals locks 15s",
+  },
   {
     key: "suspended",
     label: "Suspended pick",
@@ -357,7 +361,11 @@ const SCEN: { key: Scenario; label: string; hint: string }[] = [
   },
   { key: "place-ok", label: "Place → success", hint: "Placed state + My bets" },
   { key: "place-fail", label: "Place → fail", hint: "Placement rejected" },
-  { key: "goal", label: "Goal flash", hint: "ARS-BHA scores, odds react" },
+  {
+    key: "goal",
+    label: "Goal flash",
+    hint: "BHA equalise · lock → reprice",
+  },
   {
     key: "cashout-susp",
     label: "Cash-out susp.",
@@ -469,13 +477,15 @@ export function ScenarioDock() {
         break;
       }
       case "suspend-market":
+        // M-07: `Total goals` locks on a dangerous attack — reason chip
+        // + dimmed last price, then an honest reopen
         world.setMarketStatus(
           "ars-bha",
-          "ars-bha-h2h",
+          "ars-bha-tg25",
           "suspended",
-          "VAR check",
+          "dangerous attack",
         );
-        slip.onMarketSuspended("ars-bha-h2h");
+        slip.onMarketSuspended("ars-bha-tg25");
         bets.suspendCashout("ars-bha");
         setTimeout(() => {
           // never resurrect a finished match
@@ -484,11 +494,11 @@ export function ScenarioDock() {
               ?.status !== "live"
           )
             return;
-          world.setMarketStatus("ars-bha", "ars-bha-h2h", "open");
-          slip.onMarketResumed("ars-bha-h2h");
+          world.setMarketStatus("ars-bha", "ars-bha-tg25", "open");
+          slip.onMarketResumed("ars-bha-tg25");
           bets.resumeCashout("ars-bha");
         }, 15_000);
-        toast("Arsenal v Brighton 1×2 suspended for 15s", "info");
+        toast("Total goals 2.5 suspended for 15s", "info");
         break;
       case "suspended": {
         slip.clear();
@@ -499,7 +509,7 @@ export function ScenarioDock() {
             first.matchId,
             first.marketId,
             "suspended",
-            "Dangerous attack",
+            "dangerous attack",
           );
           slip.onMarketSuspended(first.marketId);
         }
@@ -532,18 +542,22 @@ export function ScenarioDock() {
           toast("No live match to score in", "info");
           break;
         }
-        const sc: [number, number] = [gm.score.home + 1, gm.score.away];
-        world.setScore(gm.id, sc);
-        world.goalFlash(gm.id);
+        // M-08 deterministic trigger: on the flagship, Brighton equalise
+        // at 54' → 1–1 → score roll → edge flash → score-derived markets
+        // lock same-frame → canonical reprice. The engine owns the whole
+        // arc; the dock just pushes the feed event.
+        const flagship = gm.id === "ars-bha";
+        if (flagship) world.setMinute(gm.id, 54);
+        const sc: [number, number] = [gm.score.home, gm.score.away + 1];
         useEngine.getState().pushEvent({
           kind: "goal",
           at: 0,
           matchId: gm.id,
-          scorer: "R. Ashworth",
+          scorer: flagship ? "S. Whitfield" : undefined,
           newScore: sc,
         });
         toast(
-          `GOAL · ${gm.home.short} ${sc[0]}-${sc[1]} (flash + suspension cascade)`,
+          `GOAL · ${gm.away.short} ${sc[0]}-${sc[1]} (flash + suspension cascade)`,
           "success",
         );
         break;
@@ -570,7 +584,7 @@ export function ScenarioDock() {
               last.matchId,
               last.marketId,
               "suspended",
-              "Dangerous attack",
+              "dangerous attack",
             );
             useSlip.getState().onMarketSuspended(last.marketId);
           }

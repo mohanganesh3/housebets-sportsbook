@@ -122,6 +122,52 @@ function GamepadGlyph({
   );
 }
 
+function Baseball({
+  size = 24,
+  strokeWidth,
+  className,
+}: {
+  size?: number;
+  strokeWidth?: number;
+  className?: string;
+}) {
+  return (
+    <G size={size} strokeWidth={strokeWidth} className={className}>
+      <circle cx="12" cy="12" r="9.5" />
+      {/* two opposed seams with stitch ticks — baseball, not tennis */}
+      <path d="M6.2 4.4 C9.8 7.4 9.8 16.6 6.2 19.6" />
+      <path d="M17.8 4.4 C14.2 7.4 14.2 16.6 17.8 19.6" />
+      <path d="M8.4 7.5 L10.2 8.4" />
+      <path d="M8.4 12 L10.2 12" />
+      <path d="M8.4 16.5 L10.2 15.6" />
+      <path d="M15.6 7.5 L13.8 8.4" />
+      <path d="M15.6 12 L13.8 12" />
+      <path d="M15.6 16.5 L13.8 15.6" />
+    </G>
+  );
+}
+
+function AmericanFootball({
+  size = 24,
+  strokeWidth,
+  className,
+}: {
+  size?: number;
+  strokeWidth?: number;
+  className?: string;
+}) {
+  return (
+    <G size={size} strokeWidth={strokeWidth} className={className}>
+      <path d="M20.4 3.6 C21.9 5.1 22.4 7.6 21.6 10.9 C20.4 15.7 15.7 20.4 10.9 21.6 C7.6 22.4 5.1 21.9 3.6 20.4 C2.1 18.9 1.6 16.4 2.4 13.1 C3.6 8.3 8.3 3.6 13.1 2.4 C16.4 1.6 18.9 2.1 20.4 3.6 Z" />
+      {/* lace stripe */}
+      <path d="M8.9 15.1 L15.1 8.9" />
+      <path d="M10.4 13.9 L11.9 15.4" />
+      <path d="M11.9 12.4 L13.4 13.9" />
+      <path d="M13.4 10.9 L14.9 12.4" />
+    </G>
+  );
+}
+
 function CricketBatBall({
   size = 24,
   strokeWidth,
@@ -168,6 +214,8 @@ export const SPORT_GLYPHS = {
   soccer: SoccerBall,
   tennis: TennisBall,
   basketball: Basketball,
+  baseball: Baseball,
+  americanFootball: AmericanFootball,
   esports: GamepadGlyph,
   cricket: CricketBatBall,
   hockey: HockeyStickPuck,

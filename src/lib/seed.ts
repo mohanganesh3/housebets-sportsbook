@@ -1014,6 +1014,7 @@ function marketsFor(m: Match): Market[] {
     [46, 60],
     [61, 75],
     [76, 90],
+    [90, 120],
   ];
   for (const [s, e] of bands) {
     const pBand =
@@ -1291,19 +1292,123 @@ newEve.markets.find((x) => x.key === "h2h")!.status = "suspended";
 const atmSev = MATCHES.find((x) => x.id === "atm-sev")!;
 atmSev.markets.find((x) => x.key === "h2h")!.status = "suspended";
 
-// Arsenal-Brighton: exact wireframe odds
+// Arsenal-Brighton: DATA-CANON prices (D-21). 1/1.30 + 1/4.80 + 1/11.00 =
+// 76.92 + 20.83 + 9.09 = 106.85% — inside the 103–107% book law; the
+// wireframe's 4.60 priced 107.75% and failed the band.
 const flagship = MATCHES.find((x) => x.id === "ars-bha")!;
 const h2h = flagship.markets.find((x) => x.key === "h2h")!;
 h2h.outcomes[0].price = 1.3;
-h2h.outcomes[1].price = 4.6;
+h2h.outcomes[1].price = 4.8;
 h2h.outcomes[2].price = 11.0;
+// Double chance re-derived (M-12): 1/1.02 + 1/1.16 + 1/3.34 =
+// 98.04 + 86.21 + 29.94 = 214.19% ≈ 2× the 1X2 margin — DC books sum
+// ≈2× overround by construction.
 const dc = flagship.markets.find((x) => x.key === "dc")!;
-dc.outcomes[0].price = 1.03;
-dc.outcomes[1].price = 1.18;
-dc.outcomes[2].price = 3.3;
+dc.outcomes[0].price = 1.02;
+dc.outcomes[1].price = 1.16;
+dc.outcomes[2].price = 3.34;
+// Total goals 2.5 keeps the wireframe book: 1/2.73 + 1/1.44 =
+// 36.63 + 69.44 = 106.07% ✓ in band as drawn.
 const tg = flagship.markets.find((x) => x.key === "tg25")!;
 tg.outcomes[0].price = 2.73;
 tg.outcomes[1].price = 1.44;
+
+// DATA-CANON: the flagship book is exactly 78 markets (85 wireframe minus
+// the out-of-scope Specials 7 — D-22). Per-group counts are the storyboard's
+// binding tab labels: 10 + 9 + 11 + 11 + 8 + 5 + 14 + 10 = 78.
+const FLAGSHIP_BOOK: Record<string, string[]> = {
+  popular: [
+    "h2h",
+    "dc",
+    "btts",
+    "tg25",
+    "dnb",
+    "resbtts",
+    "tth15",
+    "cs",
+    "ah1",
+    "resou",
+  ],
+  goalscorers: [
+    "anygs_h",
+    "anygs_a",
+    "firstgs_h",
+    "firstgs_a",
+    "h1gs_h",
+    "h1gs_a",
+    "lastgs",
+    "gs2plus",
+    "gs3",
+  ],
+  goals: [
+    "tg05",
+    "tg15",
+    "tg35",
+    "tg45",
+    "tg55",
+    "tth05",
+    "tth25",
+    "tta05",
+    "tta25",
+    "oddeven",
+    "firstscore",
+  ],
+  players: [
+    "motm",
+    "anyassist",
+    "tobecarded",
+    "scoreassist",
+    "firstcard",
+    "subbed",
+    "psot0",
+    "psot1",
+    "psot2",
+    "pfoul0",
+    "pfoul1",
+  ],
+  halves: [
+    "h1",
+    "h2",
+    "htft",
+    "h1ou05",
+    "h1ou15",
+    "h1btts",
+    "highhalf",
+    "h2ou15",
+  ],
+  handicaps: ["ahm05", "ah15", "ehm1", "ehp1", "atg275"],
+  corners: [
+    "tc75",
+    "tc85",
+    "tc95",
+    "tc105",
+    "c1x2",
+    "chc",
+    "cac",
+    "race5",
+    "race7",
+    "race9",
+    "cards35",
+    "cards45",
+    "cards55",
+    "redcard",
+  ],
+  minutes: [
+    "mb1",
+    "mb16",
+    "mb31",
+    "mb46",
+    "mb61",
+    "mb76",
+    "mb90",
+    "fgband",
+    "g10",
+    "m10res",
+  ],
+};
+flagship.markets = flagship.markets.filter((mk) =>
+  FLAGSHIP_BOOK[mk.group]?.includes(mk.key),
+);
 
 export const SPORTS_NAV: { key: SportKey | "home" | "live"; label: string }[] =
   [

@@ -3,6 +3,8 @@
 /* D0 canonical token layer (design/TOKENS.md) — additive; legacy vars below
    stay live until later units re-alias them to the --c and hb token names */
 @import "./styles/tokens.css";
+/* D1 shell helpers — skip link, focus pair, live pulse, edge fades */
+@import "./styles/shell.css";
 
 /* ── Housebets brand fonts (self-hosted, extracted from live site) ── */
 @font-face {
@@ -223,9 +225,9 @@ body {
   background: transparent;
 }
 
-/* Focus: cyan ring, 2px + offset (WCAG 1.4.11) */
+/* Focus: token ring, 2px + offset (WCAG 1.4.11) — --c-focus (D1) */
 :where(button, a, input, [tabindex], select, [role="button"]):focus-visible {
-  outline: 2px solid #28f3f3;
+  outline: 2px solid var(--c-focus);
   outline-offset: 2px;
   border-radius: 6px;
 }

@@ -204,7 +204,6 @@ export function TeamCrest({ team, size = 28 }: { team: Team; size?: number }) {
       viewBox="0 0 64 64"
       aria-hidden
       className="shrink-0"
-      style={{ filter: "drop-shadow(0 1px 1.5px rgba(0,0,0,0.5))" }}
     >
       <defs>
         <clipPath id={clipId}>

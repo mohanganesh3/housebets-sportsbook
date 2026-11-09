@@ -1,0 +1,124 @@
+/* ==================================================================
+   odds-cell.css — E-M-08 signature cell, motion layer.
+   CSS file: raw durations live here (check-tokens scans ts/tsx only);
+   every colour still resolves through the canonical --c vars.
+   Contract (MOTION S1/S3): transform/opacity only on money paths,
+   tint rides an overlay so borders never animate, a fresh tick
+   supersedes by remount (key change), never queues.
+   ================================================================== */
+
+/* ── Tick tint ::after-class overlay — decays ~1s linear (S1) ─────── */
+.hb-cell-tint {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  animation: hb-cell-tint 1s linear both;
+}
+.hb-cell-tint--up {
+  background: var(--c-up-a16);
+}
+.hb-cell-tint--down {
+  background: var(--c-down-a16);
+}
+@keyframes hb-cell-tint {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* ── Directional caret — flashes in, mutes, persists ~9s (T42-08) ─── */
+.hb-cell-caret {
+  opacity: 0;
+}
+.hb-cell-caret[data-live="true"] {
+  animation: hb-cell-caret 1s ease-out both;
+}
+@keyframes hb-cell-caret {
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.62;
+  }
+  100% {
+    opacity: 0.62;
+  }
+}
+
+/* ── Settled-won: quiet ✓ + --c-up edge tint, ≤3s fade (P52-10) ───── */
+.hb-cell--won::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  border-radius: 2px 0 0 2px;
+  background: var(--c-up);
+}
+.hb-cell-tint--settle {
+  background: var(--c-up-a16);
+  animation: hb-cell-tint 3s linear both;
+}
+
+/* ── Goal-cascade edge flash on the scoreboard (S4 beat 2) ────────── */
+.hb-edgeflash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 2px var(--c-live);
+  animation: hb-edgeflash 0.4s ease-out both;
+}
+@keyframes hb-edgeflash {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ── Goal event line — characters type in (S4 beat 1) ─────────────── */
+.hb-evchar {
+  opacity: 0;
+  animation: hb-evchar 0.01s linear forwards;
+  animation-delay: calc(var(--i) * 14ms);
+}
+@keyframes hb-evchar {
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── Reduced motion — every state still lands, motion drops ───────── */
+@media (prefers-reduced-motion: reduce) {
+  .hb-cell-tint {
+    animation: none;
+    opacity: 0.3;
+  }
+  .hb-cell-tint--settle {
+    opacity: 0.2;
+  }
+  .hb-cell-caret[data-live="true"] {
+    animation: none;
+    opacity: 0.62;
+  }
+  .hb-edgeflash::after {
+    animation: none;
+    opacity: 0;
+  }
+  .hb-evchar {
+    animation: none;
+    opacity: 1;
+  }
+}

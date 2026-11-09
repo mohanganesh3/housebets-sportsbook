@@ -105,6 +105,10 @@
   --layout-bottombar: 67px;  /* phone bottom bar             */
   --layout-gutter: 24px;     /* grid gutter                  */
   --target-min: 44px;        /* touch-target floor           */
+  /* shell metrics fixed by STORYBOARDS/shell.md (D1 — TOKENS.md lists
+     the four-zone metrics; the bar/row heights live in the frames)  */
+  --layout-header: 60px;     /* top bar — SH-01/SH-04        */
+  --layout-sportrow: 44px;   /* phone sticky sport row — SH-04 */
 }
 
 @theme {
@@ -176,4 +180,8 @@
 
   /* ── The ONE allowed shadow — owned by sheets ───────────────────── */
   --shadow-hb-sheet: 0 8px 24px rgb(0 8 10 / 0.45);
+
+  /* ── Breakpoint utilities (D1) — literals mirror --bp-* verbatim;
+     @media can't resolve var(), so the utility layer repeats them ── */
+  --breakpoint-desk: 1440px;   /* desk: ≥1440 fixed panel + search field */
 }

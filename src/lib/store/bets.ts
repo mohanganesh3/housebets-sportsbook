@@ -79,11 +79,13 @@ const ocId = (matchId: string, marketKey: string, pick: string): string =>
     ?.markets.find((mk) => mk.key === marketKey)
     ?.outcomes.find((o) => o.name === pick)?.id ?? "";
 
+// DATA-CANON open-bet ledger: HB-48213/48214/48215 · 20+20+20 = 60.00
+// in open bets against the 240.00 total. (D1 — canon refs + CO quotes.)
 const seedHistory: Bet[] = [
   ...(arsHome
     ? [
         {
-          id: "HB-091",
+          id: "HB-48213",
           placedAt: Date.now() - 3600000 * 4,
           matchId: "ars-bha",
           marketId: "ars-bha-h2h",
@@ -95,10 +97,59 @@ const seedHistory: Bet[] = [
           returns: 36,
           result: "open" as const,
           cashout: {
-            value: 26.03,
-            was: 26.03,
+            value: 22.4,
+            was: 22.4,
             factor: 0.94,
             status: "available" as const,
+          },
+        },
+      ]
+    : []),
+  ...(ocId("atm-sev", "btts", "Yes")
+    ? [
+        {
+          id: "HB-48214",
+          placedAt: Date.now() - 3600000 * 6,
+          matchId: "atm-sev",
+          marketId: "atm-sev-btts",
+          outcomeId: ocId("atm-sev", "btts", "Yes"),
+          pick: "Yes",
+          marketName: "Both teams to score",
+          odds: 2.1,
+          stake: 20,
+          returns: 42,
+          result: "open" as const,
+          cashout: {
+            value: 17.1,
+            was: 17.1,
+            factor: 0.9,
+            status: "available" as const,
+          },
+        },
+      ]
+    : []),
+  // Canon's third open bet is Newcastle–Villa — that fixture isn't in the
+  // seed; new-eve is the seeded Newcastle match and its 1X2 is suspended,
+  // so the canon's "CO suspended" state lands honestly on a real market.
+  ...(ocId("new-eve", "h2h", "Draw")
+    ? [
+        {
+          id: "HB-48215",
+          placedAt: Date.now() - 3600000 * 8,
+          matchId: "new-eve",
+          marketId: "new-eve-h2h",
+          outcomeId: ocId("new-eve", "h2h", "Draw"),
+          pick: "Draw",
+          marketName: "Match result",
+          odds: 4.2,
+          stake: 20,
+          returns: 84,
+          result: "open" as const,
+          cashout: {
+            value: 0,
+            was: 0,
+            factor: 0.9,
+            status: "suspended" as const,
           },
         },
       ]

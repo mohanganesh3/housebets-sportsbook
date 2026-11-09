@@ -9,10 +9,15 @@ import { type ReactNode, useEffect, useState } from "react";
 import { HouseGlyph } from "../components/BetSlip";
 import { ScenarioDock, SearchPalette, Toaster } from "../components/Overlays";
 import {
+  BOARD_PATHS,
   BottomBar,
+  GlobalSheets,
   LeftRail,
+  OfflineBanner,
   SidePanel,
+  SlipPill,
   SlipSheet,
+  SportRow,
   TopBar,
 } from "../components/Shell";
 import { useEngine } from "../lib/engine";
@@ -39,33 +44,6 @@ function NotFound() {
         Back to the action
       </Link>
     </div>
-  );
-}
-
-function OfflineBanner() {
-  const offline = useUI((s) => s.offline);
-  const setOffline = useUI((s) => s.setOffline);
-  return (
-    <AnimatePresence>
-      {offline && (
-        <motion.div
-          initial={{ y: -40, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -40, opacity: 0 }}
-          className="fixed inset-x-0 top-[var(--shell-header-h)] z-40 flex items-center justify-center gap-3 bg-warning-a15 px-4 py-2 text-[12.5px] font-semibold text-warning-400 backdrop-blur lg:left-[var(--shell-rail-w)] lg:right-[var(--panel-w)]"
-          role="alert"
-        >
-          Connection lost · odds are frozen, bets can't be placed
-          <button
-            type="button"
-            onClick={() => setOffline(false)}
-            className="rounded-full border border-warning-a40 px-2.5 py-0.5 text-[11px] hover:bg-warning-a15"
-          >
-            Reconnect
-          </button>
-        </motion.div>
-      )}
-    </AnimatePresence>
   );
 }
 
@@ -128,7 +106,7 @@ const SUPPORT_COPY: Record<SupportKind, { title: string; body: ReactNode }> = {
   },
 };
 
-function SupportSheet({
+function SupportDialog({
   kind,
   onClose,
 }: {
@@ -258,7 +236,7 @@ function Footer() {
           </ul>
           <AnimatePresence>
             {support && (
-              <SupportSheet kind={support} onClose={() => setSupport(null)} />
+              <SupportDialog kind={support} onClose={() => setSupport(null)} />
             )}
           </AnimatePresence>
         </div>
@@ -289,37 +267,103 @@ function Root() {
   const [searchOpen, setSearchOpen] = useState(false);
   const start = useEngine((s) => s.start);
   const loc = useLocation();
+  const railOpen = useUI((s) => s.railOpen);
+  const panelOpen = useUI((s) => s.panelOpen);
+  const isBoard = BOARD_PATHS.includes(loc.pathname);
 
   useEffect(() => {
     start();
   }, [start]);
+
+  // demo auth resolves shortly after first paint — SH-02's logged-out
+  // frame is the pre-resolve state, not a route
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (!useUI.getState().signedIn) useUI.getState().setSignedIn(true);
+    }, 600);
+    return () => clearTimeout(t);
+  }, []);
+
+  // ⌘K / Ctrl-K toggles the palette; "/" opens it (SH-06)
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setSearchOpen((v) => !v);
+        return;
+      }
+      const el = e.target as HTMLElement | null;
+      const typing =
+        el instanceof HTMLInputElement ||
+        el instanceof HTMLTextAreaElement ||
+        Boolean(el?.isContentEditable);
+      if (e.key === "/" && !typing) {
+        e.preventDefault();
+        setSearchOpen(true);
       }
     };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
   }, []);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [loc.pathname]);
 
+  // real connectivity drives the same flag the state-tour uses —
+  // debounced ≥2s both directions so bad networks don't flap (E-SHL-05)
+  useEffect(() => {
+    let t: number | undefined;
+    const apply = (v: boolean) => {
+      window.clearTimeout(t);
+      t = window.setTimeout(() => useUI.getState().setOffline(v), 2000);
+    };
+    const off = () => apply(true);
+    const on = () => apply(false);
+    window.addEventListener("offline", off);
+    window.addEventListener("online", on);
+    return () => {
+      window.removeEventListener("offline", off);
+      window.removeEventListener("online", on);
+      window.clearTimeout(t);
+    };
+  }, []);
+
+  // reconnect = `Back online` toast (3s auto-dismiss via the toaster)
+  useEffect(
+    () =>
+      useUI.subscribe((s, p) => {
+        if (p.offline && !s.offline) s.toast("Back online", "success");
+      }),
+    [],
+  );
+
   return (
     <MotionConfig reducedMotion="user">
-      <div className="min-h-dvh">
+      <div className="hb-shell flex min-h-dvh flex-col">
+        <a href="#board" className="hb-skip">
+          Skip to board
+        </a>
         <TopBar onSearch={() => setSearchOpen(true)} />
-        <OfflineBanner />
         <LeftRail />
-        <SidePanel />
-        <main className="pb-[calc(var(--shell-bottombar-h)+env(safe-area-inset-bottom)+16px)] pt-[var(--shell-header-h)] lg:ml-[var(--shell-rail-w)] lg:mr-[var(--panel-w)] lg:pb-0">
+        {/* DOM order = focus order: top bar → rail → board → panel → nav */}
+        <main
+          id="board"
+          tabIndex={-1}
+          className={`flex-1 pt-[var(--layout-header)] pb-[calc(var(--layout-bottombar)+env(safe-area-inset-bottom)+var(--s-16))] transition-[margin] duration-(--dur-enter) ease-standard lg:pb-0 ${
+            railOpen ? "lg:ms-[var(--layout-rail)]" : ""
+          } ${panelOpen ? "desk:me-[var(--layout-panel)]" : ""}`}
+        >
+          <SportRow />
+          <OfflineBanner underRow={isBoard} />
           <Outlet />
           <Footer />
         </main>
+        <SidePanel />
+        <SlipPill />
         <BottomBar onSearch={() => setSearchOpen(true)} />
         <SlipSheet />
+        <GlobalSheets />
         <AnimatePresence>
           {searchOpen && (
             <SearchPalette

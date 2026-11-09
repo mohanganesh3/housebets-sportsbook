@@ -1,0 +1,88 @@
+/* ==================================================================
+   match.css — flagship match page mechanics (D5).
+   Raw ms/px allowed here — check-tokens scans ts/tsx only. Every
+   colour/duration still resolves through the canonical --c-* / --dur-*
+   vars; this file owns only what utilities can't express.
+   ================================================================== */
+
+/* ── Accordion height 0↔auto, 250–280ms --ease-standard (E-M-07) ────
+   Grid-rows trick: content keeps open width during collapse, no JS
+   measuring — the close runs at the fast end of the range. */
+.hb-acc {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows var(--dur-move) var(--ease-standard);
+}
+.hb-acc[data-closed="true"] {
+  grid-template-rows: 0fr;
+  transition-duration: var(--dur-enter);
+}
+.hb-acc > .hb-acc-body {
+  overflow: hidden;
+  min-height: 0;
+  /* collapsed cells must leave the tab order — visibility hides them
+     from keyboard+SR while the grid-rows animation still plays */
+  transition: visibility 0s var(--dur-move);
+}
+.hb-acc[data-closed="true"] > .hb-acc-body {
+  visibility: hidden;
+}
+.hb-acc:not([data-closed="true"]) > .hb-acc-body {
+  transition-delay: 0s;
+}
+
+/* ── Pinned strip collapse — height+opacity 200ms out-expo (E-M-01) ─
+   The strip lives in-flow inside the sticky chrome; expanding pushes
+   the tab bar down in the same 200ms beat (M-02 combined chrome). */
+.hb-pinstrip {
+  height: var(--target-min); /* pinned strip = h44 (E-M-01) */
+  opacity: 1;
+  transition:
+    height var(--dur-enter) var(--ease-out-expo),
+    opacity var(--dur-enter) var(--ease-out-expo);
+}
+.hb-pinstrip[data-collapsed="true"] {
+  height: 0;
+  opacity: 0;
+}
+
+/* ── Event line under the score — slot is pre-allocated h20 so the
+   goal line types in with zero CLS (E-M-10 beat 1) ─────────────── */
+.hb-eventline {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Tab bar content cross-fade — opacity only on group switch
+   (repeat action, no slide theatre — E-M-06/U-43) ───────────────── */
+.hb-grouppane {
+  animation: hb-grouppane var(--dur-feedback) linear both;
+}
+@keyframes hb-grouppane {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── Settle marks fade in ≤200ms (E-M-14 first-render rule) ──────── */
+.hb-settle-in {
+  animation: hb-grouppane var(--dur-enter) linear both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-acc,
+  .hb-acc[data-closed="true"],
+  .hb-pinstrip,
+  .hb-pinstrip[data-collapsed="true"] {
+    transition: none;
+  }
+  .hb-grouppane,
+  .hb-settle-in {
+    animation: none;
+  }
+}

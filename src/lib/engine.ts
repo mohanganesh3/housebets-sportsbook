@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
+import { isScoreDerived, SUSP_ATTACK, SUSP_GOAL } from "./matchBook";
 import { liveMatches, outcomeById } from "./seed";
 import type { OddsDir } from "./types";
 
@@ -48,6 +49,20 @@ interface EngineState {
 
 let timer: ReturnType<typeof setTimeout> | null = null;
 
+// S4 cascade timers per fixture — a newer event supersedes mid-cascade:
+// pending beats are cancelled, never queued (P4).
+const cascades = new Map<string, ReturnType<typeof setTimeout>[]>();
+function cancelCascade(matchId: string) {
+  for (const t of cascades.get(matchId) ?? []) clearTimeout(t);
+  cascades.delete(matchId);
+}
+function schedule(matchId: string, ms: number, fn: () => void) {
+  const t = setTimeout(fn, ms);
+  const arr = cascades.get(matchId) ?? [];
+  arr.push(t);
+  cascades.set(matchId, arr);
+}
+
 // Script: odds drift on live matches, one market suspend/resume cycle, one goal.
 function buildScript(): EngineEvent[] {
   const evs: EngineEvent[] = [];
@@ -74,20 +89,23 @@ function buildScript(): EngineEvent[] {
     });
     t += 6000 + Math.floor(rand() * 4000);
   }
-  // suspensions around minute marks
+  // suspensions around minute marks — M-07: `Total goals` locks on a
+  // dangerous attack, reason chip tells the player why
   evs.push({
     kind: "suspend",
     at: 32_000,
     matchId: "ars-bha",
-    marketId: "ars-bha-h2h",
+    marketId: "ars-bha-tg25",
+    reason: SUSP_ATTACK,
     resumeDelay: 16_000,
   });
+  // M-08: Brighton equalise — the deterministic S4 cascade
   evs.push({
     kind: "goal",
     at: 55_000,
     matchId: "ars-bha",
-    scorer: "R. Ashworth",
-    newScore: [2, 0],
+    scorer: "S. Whitfield",
+    newScore: [1, 1],
   });
   evs.push({
     kind: "goal",
@@ -237,7 +255,7 @@ function applyEvent(e: EngineEvent) {
     useBets.getState().tickCashout(e.outcomeId, np);
   }
   if (e.kind === "suspend" && e.marketId) {
-    const reason = e.reason ?? "Dangerous attack";
+    const reason = e.reason ?? SUSP_ATTACK;
     world.setMarketStatus(e.matchId, e.marketId, "suspended", reason);
     useSlip.getState().onMarketSuspended(e.marketId);
     // cash-out locks in lockstep with the market — always
@@ -256,14 +274,21 @@ function applyEvent(e: EngineEvent) {
     }
   }
   if (e.kind === "goal" && e.newScore) {
-    // trader sequence: score lands → a beat → every open market suspends →
-    // reprices → reopens. Cash-out locks for the whole window.
+    // S4 goal cascade — the deterministic three-beat arc (M-08/E-M-10):
+    //   beat 1  t=0        score rolls, event line types in
+    //   beat 2  t≈300ms    scoreboard edge flash + every score-derived
+    //                      market locks the same frame (`Suspended —
+    //                      goal scored`); corners/cards/minutes stay open
+    //   beat 3  t≈700–2500 markets reopen one-by-one in list order,
+    //                      prices re-enter as reprice ticks
+    // Total ≤2.5s. A newer event supersedes mid-cascade — pending beats
+    // for this fixture are cancelled, newest state wins (P4/S4).
     const prev = useWorld
       .getState()
       .matches.find((m) => m.id === e.matchId)?.score;
     const homeScored = prev ? e.newScore[0] > prev.home : true;
+    cancelCascade(e.matchId);
     world.setScore(e.matchId, e.newScore);
-    world.goalFlash(e.matchId);
     useBets.getState().suspendCashout(e.matchId);
     useUI
       .getState()
@@ -271,54 +296,77 @@ function applyEvent(e: EngineEvent) {
         `GOAL ${e.newScore[0]}-${e.newScore[1]}${e.scorer ? ` · ${e.scorer}` : ""} — markets suspended, repricing`,
         "success",
       );
-    setTimeout(() => {
+    let closedByGoal = new Set<string>();
+    // beat 2 — edge flash and the lock land in the same frame
+    schedule(e.matchId, 300, () => {
       const mt = useWorld.getState().matches.find((m) => m.id === e.matchId);
       if (mt?.status !== "live" || useUI.getState().offline) return;
-      const open = mt.markets.filter((mk) => mk.status === "open");
-      // remember which markets THIS cascade closed — trader suspensions
-      // that predate the goal stay closed when we reopen
-      const closedByGoal = new Set(open.map((mk) => mk.id));
+      world.goalFlash(e.matchId);
+      const open = mt.markets.filter(
+        (mk) => mk.status === "open" && isScoreDerived(mk),
+      );
+      closedByGoal = new Set(open.map((mk) => mk.id));
       for (const mk of open) {
         useWorld
           .getState()
-          .setMarketStatus(e.matchId, mk.id, "suspended", "Goal");
+          .setMarketStatus(e.matchId, mk.id, "suspended", SUSP_GOAL);
         useSlip.getState().onMarketSuspended(mk.id);
       }
-      setTimeout(() => {
-        const mt2 = useWorld.getState().matches.find((m) => m.id === e.matchId);
-        if (mt2?.status !== "live" || useUI.getState().offline) return;
-        // reprice h2h toward the scoring side before reopening
-        const h2h = mt2.markets.find((mk) => mk.key === "h2h");
-        if (h2h) {
-          for (const oc of h2h.outcomes) {
-            const isScorer =
-              (oc.name === mt2.home.name && homeScored) ||
-              (oc.name === mt2.away.name && !homeScored);
-            // reprice from the CURRENT price, not the seed — prior ticks
-            // may have already moved it
-            const cur = useOdds.getState().price(oc.id) ?? oc.price;
-            const np = isScorer
-              ? Math.max(1.01, +(cur * 0.72).toFixed(2))
-              : oc.name === "Draw"
-                ? +(cur * 1.15).toFixed(2)
-                : +(cur * 1.4).toFixed(2);
+    });
+    // beat 3 — reprice then reopen one-by-one in list order, last beat
+    // landing by 2.5s total
+    schedule(e.matchId, 700, () => {
+      const mt2 = useWorld.getState().matches.find((m) => m.id === e.matchId);
+      if (mt2?.status !== "live" || useUI.getState().offline) return;
+      const closed = mt2.markets.filter((m) => closedByGoal.has(m.id));
+      const h2h = closed.find((mk) => mk.key === "h2h");
+      if (h2h) {
+        // flagship equaliser reprices to DATA-CANON book (M-08):
+        // 1.30→1.44 ▲ · 4.80→4.00 ▼ · 11.00→8.00 ▼ — 1/1.44+1/4+1/8 =
+        // 69.44+25.00+12.50 = 106.94% ✓ still in the 103–107 band (F2)
+        const canon =
+          e.matchId === "ars-bha" &&
+          e.newScore?.[0] === 1 &&
+          e.newScore?.[1] === 1
+            ? [1.44, 4.0, 8.0]
+            : null;
+        for (const [i, oc] of h2h.outcomes.entries()) {
+          const isScorer =
+            (oc.name === mt2.home.name && homeScored) ||
+            (oc.name === mt2.away.name && !homeScored);
+          const cur = useOdds.getState().price(oc.id) ?? oc.price;
+          const np = Math.max(
+            1.01,
+            canon?.[i] ??
+              +(
+                isScorer
+                  ? cur * 0.72
+                  : oc.name === "Draw"
+                    ? cur * 1.15
+                    : cur * 1.4
+              ).toFixed(2),
+          );
+          if (np !== cur) {
             useOdds.getState().applyChange(oc.id, np, np > cur ? "up" : "down");
             useSlip.getState().onOddsChange(oc.id, np);
             useBets.getState().tickCashout(oc.id, np);
           }
-          // raw multipliers skew the overround after big swings —
-          // stretch the long shots back to a realistic book
-          normalizeBook(e.matchId, h2h.id);
         }
-        for (const mk of mt2.markets.filter(
-          (m) => m.status === "suspended" && closedByGoal.has(m.id),
-        )) {
+        if (!canon) normalizeBook(e.matchId, h2h.id);
+      }
+      const step = closed.length > 1 ? Math.min(60, 1800 / closed.length) : 0;
+      closed.forEach((mk, i) => {
+        schedule(e.matchId, i * step, () => {
+          const mt3 = useWorld
+            .getState()
+            .matches.find((m) => m.id === e.matchId);
+          if (mt3?.status !== "live" || useUI.getState().offline) return;
           useWorld.getState().setMarketStatus(e.matchId, mk.id, "open");
           useSlip.getState().onMarketResumed(mk.id);
-        }
-        useBets.getState().resumeCashout(e.matchId);
-      }, 8_000);
-    }, 600);
+        });
+      });
+      useBets.getState().resumeCashout(e.matchId);
+    });
   }
   if (e.kind === "minute") world.bumpMinute(e.matchId);
 }

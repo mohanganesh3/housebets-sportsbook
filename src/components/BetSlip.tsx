@@ -16,7 +16,9 @@ import { useWorld } from "../lib/store/world";
 import { LiveBadge, TeamLogo } from "./primitives";
 
 const QUICK_STAKES = [1, 10, 50, 100];
-const SESSION_START = Date.now();
+// exported for the panel-footer session line — one session clock,
+// identical line on every surface (DATA-CANON invariant 2)
+export const SESSION_START = Date.now();
 
 // the house glyph — roofline h, echoes the brand mark
 export function HouseGlyph({
