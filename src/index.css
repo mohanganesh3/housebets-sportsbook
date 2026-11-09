@@ -295,6 +295,16 @@ body {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
+@keyframes hero-letterbox {
+  from {
+    clip-path: inset(46% 22% 46% 22% round 18px);
+    opacity: 0.35;
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 18px);
+    opacity: 1;
+  }
+}
 
 .flash-up {
   animation: odds-flash-up 1s cubic-bezier(0.2, 0.8, 0.3, 1) both;
@@ -320,6 +330,10 @@ body {
 .ticker-in {
   animation: ticker-in 0.25s ease-out both;
 }
+/* One-shot cinematic: hero grows out of a letterbox band on mount only */
+.hero-cine {
+  animation: hero-letterbox 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
 
 .skeleton {
   background: linear-gradient(
@@ -332,6 +346,36 @@ body {
   animation: shimmer 1.4s linear infinite;
 }
 
+/* ──────────────────────────────────────────────────────────── */
+/* View transitions — quiet 200ms root morph, gone under reduce */
+/* ──────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes vt-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes vt-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+  ::view-transition-old(root) {
+    animation: vt-out 0.16s ease-out both;
+  }
+  ::view-transition-new(root) {
+    animation: vt-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}
+
 /* Reduced motion — honest states without motion */
 @media (prefers-reduced-motion: reduce) {
   .flash-up,
@@ -340,7 +384,8 @@ body {
   .suspend-in,
   .fail-shake,
   .ticker-in,
-  .badge-pop {
+  .badge-pop,
+  .hero-cine {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }

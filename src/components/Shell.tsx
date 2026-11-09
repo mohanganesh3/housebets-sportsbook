@@ -16,7 +16,7 @@ import {
   Wallet,
   X,
 } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useDragControls } from "motion/react";
 import { type ReactNode, useEffect, useState } from "react";
 import { useSlip } from "../lib/store/slip";
 import { useUI } from "../lib/store/ui";
@@ -291,24 +291,46 @@ function PhoneSheet({
   title: string;
   children: ReactNode;
 }) {
+  // iOS-sheet physics: drag follows finger 1:1 from the handle zone, rubber-band
+  // past the top, momentum-projected dismiss, spring snap-back otherwise.
+  const controls = useDragControls();
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/60 backdrop-blur-[2px] transition-opacity data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 lg:hidden" />
-        <Dialog.Popup className="fixed inset-x-0 bottom-0 z-50 flex max-h-[72dvh] flex-col rounded-t-3xl border-t border-border-very-strong bg-surface-primary shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] data-[ending-style]:translate-y-full data-[starting-style]:translate-y-full lg:hidden">
-          <div className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-border-very-strong" />
-          <div className="flex items-center justify-between px-4 py-3">
-            <Dialog.Title className="text-[15px] font-bold">
-              {title}
-            </Dialog.Title>
-            <Dialog.Close
-              className="grid size-8 place-items-center rounded-lg text-text-tertiary hover:bg-surface-secondary"
-              aria-label="Close"
+        <Dialog.Popup className="fixed inset-x-0 bottom-0 z-50 flex max-h-[72dvh] flex-col overflow-hidden rounded-t-3xl border-t border-border-very-strong bg-surface-primary shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] data-[ending-style]:translate-y-full data-[starting-style]:translate-y-full lg:hidden">
+          <motion.div
+            drag="y"
+            dragListener={false}
+            dragControls={controls}
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0.06, bottom: 0.55 }}
+            dragMomentum={false}
+            onDragEnd={(_, info) => {
+              if (info.offset.y + info.velocity.y * 0.15 > 90)
+                onOpenChange(false);
+            }}
+            className="flex min-h-0 flex-1 flex-col"
+          >
+            <div
+              onPointerDown={(e) => controls.start(e)}
+              className="touch-none select-none"
             >
-              <X size={18} />
-            </Dialog.Close>
-          </div>
-          <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+              <div className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-border-very-strong" />
+              <div className="flex items-center justify-between px-4 py-3">
+                <Dialog.Title className="text-[15px] font-bold">
+                  {title}
+                </Dialog.Title>
+                <Dialog.Close
+                  className="grid size-8 place-items-center rounded-lg text-text-tertiary hover:bg-surface-secondary"
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </Dialog.Close>
+              </div>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+          </motion.div>
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>
@@ -531,24 +553,43 @@ export function BottomBar({ onSearch }: { onSearch: () => void }) {
 export function SlipSheet() {
   const open = useSlip((s) => s.mobileOpen);
   const setOpen = useSlip((s) => s.setMobileOpen);
+  const controls = useDragControls();
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/60 backdrop-blur-[2px] transition-opacity data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 lg:hidden" />
-        <Dialog.Popup className="fixed inset-x-0 bottom-0 z-50 flex max-h-[82dvh] flex-col rounded-t-3xl border-t border-border-very-strong bg-surface-primary shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] data-[ending-style]:translate-y-full data-[starting-style]:translate-y-full lg:hidden">
-          <div className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-border-very-strong" />
-          <div className="flex items-center justify-between px-4 py-3">
-            <Dialog.Title className="text-[15px] font-bold">
-              Bet slip
-            </Dialog.Title>
-            <Dialog.Close
-              className="grid size-8 place-items-center rounded-lg text-text-tertiary hover:bg-surface-secondary"
-              aria-label="Close"
+        <Dialog.Popup className="fixed inset-x-0 bottom-0 z-50 flex max-h-[82dvh] flex-col overflow-hidden rounded-t-3xl border-t border-border-very-strong bg-surface-primary shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] data-[ending-style]:translate-y-full data-[starting-style]:translate-y-full lg:hidden">
+          <motion.div
+            drag="y"
+            dragListener={false}
+            dragControls={controls}
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0.06, bottom: 0.55 }}
+            dragMomentum={false}
+            onDragEnd={(_, info) => {
+              if (info.offset.y + info.velocity.y * 0.15 > 90) setOpen(false);
+            }}
+            className="flex min-h-0 flex-1 flex-col"
+          >
+            <div
+              onPointerDown={(e) => controls.start(e)}
+              className="touch-none select-none"
             >
-              <X size={18} />
-            </Dialog.Close>
-          </div>
-          <BetSlipBody />
+              <div className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-border-very-strong" />
+              <div className="flex items-center justify-between px-4 py-3">
+                <Dialog.Title className="text-[15px] font-bold">
+                  Bet slip
+                </Dialog.Title>
+                <Dialog.Close
+                  className="grid size-8 place-items-center rounded-lg text-text-tertiary hover:bg-surface-secondary"
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </Dialog.Close>
+              </div>
+            </div>
+            <BetSlipBody />
+          </motion.div>
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>

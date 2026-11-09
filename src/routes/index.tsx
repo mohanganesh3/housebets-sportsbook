@@ -145,7 +145,7 @@ function HeroSpotlight({ matches }: { matches: Match[] }) {
       aria-roledescription="carousel"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      className="relative overflow-hidden rounded-2xl border border-border-soft bg-gradient-to-br from-[#0e2530] via-[#0b1920] to-[#0e202a]"
+      className="hero-cine relative overflow-hidden rounded-2xl border border-border-soft bg-gradient-to-br from-[#0e2530] via-[#0b1920] to-[#0e202a]"
     >
       <WaveArt />
       <Grain />
