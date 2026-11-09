@@ -16,13 +16,13 @@ index.css vars remain until D0). Components may use tokens only.
 | --c-cta | #C4F4F1 | judge's NEW system token | primary fills (Place bet, Deposit, Accept) |
 | --c-cta-fg | #062B31* | *derived on-CTA text | text on pale-cyan (check ≥7:1) |
 | --c-text | #F4FBFB* | *near-white derived | primary text |
-| --c-text-2 | #9FB8BC* | *derived muted | secondary text |
-| --c-text-3 | #5F7E84* | *derived dim | captions, disabled |
+| --c-text-2 | #9FB8BC* | *derived muted | secondary text — also implied-%/session/disabled-reason (post-crit: text-3 failed 2.09–3.10:1) |
+| --c-text-3 | #8AA6AB* | *bumped post-crit | ONLY decorative/hairline-adjacent text — never meaning-bearing |
 | --c-up | #26BA50 | live CSS green | odds up, won, success |
-| --c-down | #F41F50* | *derived red | odds down, lost, error |
-| --c-suspend | #E17823 | existing warning var | suspension band, changed-odds edge |
+| --c-down | #FF6B86* | *lightened post-crit (4.22→target ≥4.5 on s-1/2) | odds down, lost, error |
+| --c-suspend | #E17823 bg + #2A1200 fg* | existing warning var; chip = amber bg/dark text post-crit | suspension band, changed-odds edge |
 | --c-gold | #FFD205 | live CSS gold | prize/trophy accents only |
-| --c-live | #FF4D6D* | *derived pink-red | LIVE badge (word+icon, never color alone) |
+| --c-live | #FF4D6D bg + #14060A fg* | *derived badge pair | LIVE badge (word+icon, never color alone) |
 | --c-focus | #02F7FD ring 2px | brand | focus-visible, offset 2px |
 
 `*` = our derivation pending T6 contrast measurement (culori, dev-only). Banned: neon cyan fills,

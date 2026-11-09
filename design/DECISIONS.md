@@ -19,3 +19,10 @@ Each: chosen / rejected / evidence. Update as decisions land; never decide silen
 | D-13 | Numbers | Oxanium tabular + implied % beside price | Figtree everywhere / price alone | U2 font forensics; U4 F9/F10 RCT |
 | D-14 | Sheet library | Motion drag (own physics) | vaul (stale since 2024-12) | 25b |
 | D-15 | Scroll behavior | Native scroll + CSS scroll-snap | Lenis/ScrollSmoother | 25b; U3 (no hijack on money paths) |
+| D-16 | Phone page order | Live strip before hero on 390 (justified) | Desk order forced onto phone | boards-crit: thumb-first reach; add blur-test evidence at QC |
+| D-17 | Sample data | DATA-CANON.md is the single source | Per-file invented numbers | boards-crit B1 contradictions |
+| D-18 | CO button hierarchy | Quote = surface-3 idle; Confirm = --c-cta | All-CTA or all-surface | slip-crit split verdict; S7 no-urgency + one-primary |
+| D-19 | Placement integrity | Idempotency key + reconcile-before-retry + "Can't confirm — check My bets" variant | Blind retry (double-place risk) | slip-crit BLOCKER: offline/suspend mid-placement |
+| D-20 | Phone Live access | Live in bottom nav (mental-map "1 tap") | Rail-only | boards-crit: map rule unsupported otherwise |
+| D-21 | 1X2 flagship prices | 1.30/4.80/11.00 (106.85%) | wireframe's 4.60 (107.7%) | match-crit verified; DATA-CANON law |
+| D-22 | Specials group | Dropped; "All markets 78" honest recount | Keep out-of-scope group for parity | match-crit verified arithmetic; scope law wins |
