@@ -18,7 +18,7 @@ Legend: ✅ landed (pre-scrap corpus, kept) · 🟡 running · ⬜ queued · ❌
 - U2 88f6223f 🟡 Housebets brand DNA + judge taste → research/71-brand-dna-v2.md
 - U3 2877d70d 🟡 craft canon (Family/Linear/Stripe/Geist/Apple/live-score) → research/72-craft-canon.md
 - U4 98a699a5 🟡 bettor-behavior academic+regulator → research/73-bettor-behavior.md
-- U5 9b7893ef 🟡 sportsbook motion vocabulary → research/74-motion-mastery.md
+- U5 9b7893ef died (rate limit); lead-covered ✅ → research/74-motion-mastery.md
 
 ## Queued after U-wave
 - Synthesis v5 → research/75-synthesis-v5.md → design v2 (tokens/principles/storyboards/cards)
