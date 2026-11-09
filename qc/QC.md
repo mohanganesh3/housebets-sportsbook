@@ -42,14 +42,14 @@ One row per protected behaviour. New-format rows: real time, build SHA, verdict,
 | ID | Behaviour | Contract | 390 | 1440 | Status |
 |----|-----------|----------|-----|------|--------|
 | B01 | FT settlement | min≥93 → all markets suspend, open bets grade, cash-out dead, balance credits once | run @d7113bb3 ✓22:46 | run @d7113bb3 ✓22:46 | PARTIAL (needs re-run each new build) |
-| B02 | Void returns stake | void → stake returned exactly once, receipt+balance agree | pending | pending | NOT RUN |
+| B02 | Void returns stake | void → stake returned exactly once, receipt+balance agree | ✓09 Nov 23:20 deployed: "Void · match abandoned at 63' · stake returned", no overflow-x | ✓09 Nov 23:20 deployed: 12.00 stake → 12.00 returned, Won/Lost math correct | PASS 09 Nov 23:20 |
 | B03 | Offline honesty | place offline = explicit fail, no debit; world clock frozen; reconnect retry = single bet | frozen ✓22:47 (58′ held 31.5s) | same | PARTIAL |
 | B04 | Deposit | opens from every entry, demo credit, Escape+focus | pending | pending | NOT RUN |
 | B05 | Scenario dock | every scored state 1 tap; reset restores; no stale callbacks post-FT | FT scenario ✓22:46 | same | PARTIAL |
-| B06 | Keyboard search | ⌘K open, arrows+Enter navigate, Esc closes, world-consistent status | pending | pending | NOT RUN |
+| B06 | Keyboard search | ⌘K open, arrows+Enter navigate, Esc closes, world-consistent status | ✓09 Nov 23:20 deployed: ⌘K→"arsenal"→↓+Enter→/match/ars-bha; Esc closes | same check | PASS 09 Nov 23:20 |
 | B07 | Place-once | double-tap/tab-hide/odds-move/suspend → one debit, consent required on moved odds | pending | pending | NOT RUN |
 | B08 | Stake validation | zero/empty/malformed/6dp/above-balance explicit fail, no silent overdebit | pending | pending | NOT RUN |
 | B09 | Cash-out | changed value reconfirms; suspend during confirm rejects; single credit | pending | pending | NOT RUN |
 | B10 | Same-again honesty | valid adds only; finished fixtures disabled w/ reason; migrated old ids resolve | ✓22:45 (8 btns, 2 disabled, toast) | same | PARTIAL |
 | B11 | Break enforcement | persisted breakUntil blocks placement in store, not just disabled UI; end-break restores | ✓22:48 (locked, persisted, early-end ok) | same | PARTIAL |
-| B12 | Routes/deep-links | all 5 routes + match deep-links HTTP 200; state survives nav | pending | pending | NOT RUN |
+| B12 | Routes/deep-links | all 5 routes + match deep-links HTTP 200; state survives nav | ✓09 Nov 23:20 curl: /,/live,/football,/match/*,/bets,/following all 301→200; bad route 404 | same | PASS 09 Nov 23:20 |
