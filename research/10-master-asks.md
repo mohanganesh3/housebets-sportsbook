@@ -246,3 +246,42 @@ F1–F8 ⬜ + F9–F16 appended from §R below.
 - Verification queue V1–V6 (web_search still down session-wide).
 
 Deployed: https://mohanganesh3.github.io/housebets-sportsbook/ (gh-pages 3c02a80a).
+
+---
+
+## V3 ROLLUP — megaplan v3 (2026-11-09, plan-de247ee8bfb7121a)
+
+User verdict: still reads generic/AI. v3 treats **visual art direction + cinematic craft as the flagship gap**. `web_search` confirmed restored → verification queue + re-mines run LIVE.
+
+**Frozen defaults (0.2):** motion stack = CSS scroll-driven `scroll()/view()` (Baseline as of FF159, Oct-27-26) + GSAP ScrollTrigger+ScrollSmoother (now free) + Lenis; Motion stays for component springs; **no WebGL**; View Transitions for route morphs where React 19.3 `<ViewTransition>`/TanStack Router allow. Cinema placement: hero, reveals, transitions, score moments, sheet physics — **odds cells, live states, slip mechanics stay conventional**. Perf budget: ≤~200KB gzip incremental route JS; every cinematic element has a `prefers-reduced-motion` twin + Lenis kill-switch.
+
+### PHASE C1 — Research wave C (live)
+
+| Thread | Status | Doc | Scope |
+|---|---|---|---|
+| C1 cinematic canon | ⬜ | `24-cinematic-canon.md` | X-post genre teardown; technique→sportsbook fit |
+| C2 library frontier | ⬜ | `25-library-frontier.md` | per-lib usage recipe for OUR components |
+| C3 apply-map | ⬜ | into `31-synthesis-v3.md` | technique×surface allowed/conditional/forbidden |
+| C4 Reddit live | ⬜ | `26-reddit-live.md` | 4–5 sub-mines, real quotes |
+| C5 social live | ⬜ | `27-social-live.md` | X/YouTube/TikTok |
+| C6 V1–V6 verify | ⬜ | `28-verifications.md` | see queue above |
+| C7 competitor motion | ⬜ | `29-competitor-motion.md` | tick feels, slip physics, skeletons, loading |
+| C8 Housebets r3 | ⬜ | append `18-` | motion timings, Hubie, BETBY divergences |
+| C9 slop audit v3 | ⬜ | `30-slop-audit-v3.md` | on current screenshots |
+
+Each thread MUST emit 10–25 derived tasks appended to §R.C* below.
+
+### PHASE C2 — Synthesis v3
+- C2.1 ⬜ `31-synthesis-v3.md` ranked merge
+- C2.2 ⬜ Design spec v3 + **cinematic motion charter**
+- C2.3 ⬜ Storyboards v3 (button-by-button, 390+1440)
+
+### PHASE C3 — Build batches
+- **B1 backlog pass 2** ⬜: R.B7 band, B9 pill, B10–13 wireframe signatures, C3/F11 limits sheet, D5 carousel, D6 My-markets, F3 fly-to-slip, F5/F6 skeletons, B18 banned sweep
+- **B2 cinematic layer** ⬜: hero scroll shots, mask reveals, Lenis/ScrollSmoother, view() reveals, route morphs, goal-moment choreography, grain/vignette, sheet physics
+- **B3 art direction v3** ⬜: crests v2, per-section SVG backgrounds, motif tokens, empty/error art, anti-slop sweep vs C9
+
+### PHASE C4 — QC · PHASE C5 — Deploy (per v3 plan)
+
+### Trim order
+Cinematic extras → art variants; NEVER scorecard states, QC, or synthesis.

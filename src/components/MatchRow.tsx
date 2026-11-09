@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Lock } from "lucide-react";
 import { compById } from "../lib/seed";
 import { useWorld } from "../lib/store/world";
 import type { Match } from "../lib/types";
@@ -14,10 +14,17 @@ import {
 const fmtKick = (ts: number) =>
   new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-export function MatchRow({ match }: { match: Match }) {
+export function MatchRow({
+  match,
+  marketKey = "h2h",
+}: {
+  match: Match;
+  marketKey?: string;
+}) {
   const mt = useWorld((s) => s.matches.find((x) => x.id === match.id)) ?? match;
   const goalFlash = useWorld((s) => s.goalFlashes[mt.id]);
-  const h2h = mt.markets.find((mk) => mk.key === "h2h");
+  const mkt = mt.markets.find((mk) => mk.key === marketKey);
+  const mktSusp = mkt?.status === "suspended";
   const live = mt.status === "live";
 
   return (
@@ -68,12 +75,23 @@ export function MatchRow({ match }: { match: Match }) {
             </span>
           )}
         </div>
-        {h2h && (
-          <div className="grid w-[168px] grid-cols-3 gap-1 sm:w-[216px] sm:gap-1.5">
-            {h2h.outcomes.map((o) => (
-              <OddsCell key={o.id} outcome={o} market={h2h} compact />
-            ))}
+        {mktSusp ? (
+          <div className="flex w-[168px] items-center justify-center gap-1.5 rounded-lg border border-warning-400/35 bg-warning-400/15 py-2 sm:w-[216px]">
+            <Lock size={12} className="text-warning-400" />
+            <span className="text-[11px] font-bold uppercase tracking-wide text-warning-400">
+              Suspended
+            </span>
           </div>
+        ) : (
+          mkt && (
+            <div
+              className={`grid w-[168px] gap-1 sm:w-[216px] sm:gap-1.5 ${mkt.outcomes.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}
+            >
+              {mkt.outcomes.slice(0, 3).map((o) => (
+                <OddsCell key={o.id} outcome={o} market={mkt} compact />
+              ))}
+            </div>
+          )
         )}
         <Link
           to="/match/$matchId"
@@ -100,10 +118,12 @@ export function LeagueSection({
   compId,
   matches,
   defaultOpen = true,
+  marketKey,
 }: {
   compId: string;
   matches: Match[];
   defaultOpen?: boolean;
+  marketKey?: string;
 }) {
   const comp = compById(compId);
   if (!comp || matches.length === 0) return null;
@@ -128,7 +148,7 @@ export function LeagueSection({
       </summary>
       <div className="border-t border-border-soft px-1.5 py-1.5">
         {matches.map((mt) => (
-          <MatchRow key={mt.id} match={mt} />
+          <MatchRow key={mt.id} match={mt} marketKey={marketKey} />
         ))}
       </div>
     </details>

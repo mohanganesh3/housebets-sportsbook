@@ -24,6 +24,8 @@ interface UIState {
   toggleFollow: (id: string) => void;
   reminds: Set<string>;
   toggleRemind: (id: string) => void;
+  favMarkets: Set<string>;
+  toggleFavMarket: (key: string) => void;
   oddsPref: "ask" | "higher" | "any";
   setOddsPref: (p: "ask" | "higher" | "any") => void;
   toasts: { id: number; msg: string; kind: "info" | "success" | "error" }[];
@@ -53,6 +55,13 @@ const saveReminds = (f: Set<string>) => {
   try {
     localStorage.setItem("hb-reminds", JSON.stringify([...f]));
   } catch {}
+};
+const loadFavMarkets = (): Set<string> => {
+  try {
+    const raw = localStorage.getItem("hb-favmarkets");
+    if (raw) return new Set(JSON.parse(raw) as string[]);
+  } catch {}
+  return new Set();
 };
 
 let tid = 0;
@@ -88,6 +97,22 @@ export const useUI = create<UIState>()((set, get) => ({
     }
     saveReminds(f);
     set({ reminds: f });
+  },
+  favMarkets:
+    typeof window !== "undefined" ? loadFavMarkets() : new Set<string>(),
+  toggleFavMarket: (key) => {
+    const f = new Set(get().favMarkets);
+    if (f.has(key)) {
+      f.delete(key);
+      get().toast("Removed from My markets", "info");
+    } else {
+      f.add(key);
+      get().toast("Pinned to My markets", "success");
+    }
+    try {
+      localStorage.setItem("hb-favmarkets", JSON.stringify([...f]));
+    } catch {}
+    set({ favMarkets: f });
   },
   oddsPref: "ask",
   setOddsPref: (p) => set({ oddsPref: p }),

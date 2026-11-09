@@ -1,5 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, Lock, Volleyball } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Lock,
+  Star,
+  Volleyball,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -10,6 +17,7 @@ import {
 } from "../components/primitives";
 import { type EngineEvent, useEngine } from "../lib/engine";
 import { compById, matchById } from "../lib/seed";
+import { useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
 import type { Market, MarketGroupKey } from "../lib/types";
 
@@ -24,8 +32,8 @@ const fmtCountdown = (ms: number) => {
   return `${h}h ${mins % 60}m`;
 };
 
-// wireframe order: groups first, "All markets · N" last
-const GROUPS: { key: MarketGroupKey | "all"; label: string }[] = [
+// wireframe order: groups first, "All markets · N" last; "mine" renders first when pinned markets exist
+const GROUPS: { key: MarketGroupKey | "all" | "mine"; label: string }[] = [
   { key: "popular", label: "Popular" },
   { key: "goalscorers", label: "Goalscorers" },
   { key: "goals", label: "Goals" },
@@ -41,6 +49,8 @@ const GROUPS: { key: MarketGroupKey | "all"; label: string }[] = [
 function MarketCard({ market }: { market: Market }) {
   const susp = market.status === "suspended";
   const reason = useWorld((s) => s.suspReasons[market.id]);
+  const pinned = useUI((s) => s.favMarkets.has(market.key));
+  const togglePin = useUI((s) => s.toggleFavMarket);
   const cols = market.outcomes.length > 4 ? 2 : market.outcomes.length;
   return (
     <section
@@ -50,12 +60,29 @@ function MarketCard({ market }: { market: Market }) {
         className={`flex items-center justify-between px-3.5 py-2.5 ${susp ? "bg-warning-a15/50" : "bg-surface-secondary/50"}`}
       >
         <h3
-          className="text-[13px] font-semibold text-text-primary"
+          className="flex items-center gap-1 text-[13px] font-semibold text-text-primary"
           title={
             market.key === "h2h" ? "Settled on 90 mins + stoppage" : undefined
           }
         >
           {market.name}
+          <button
+            type="button"
+            onClick={() => togglePin(market.key)}
+            aria-label={
+              pinned
+                ? `Unpin ${market.name}`
+                : `Pin ${market.name} to My markets`
+            }
+            aria-pressed={pinned}
+            title={pinned ? "Pinned to My markets" : "Pin to My markets"}
+            className="grid size-6 place-items-center rounded-md text-text-disabled transition-colors hover:text-gold-500"
+          >
+            <Star
+              size={12}
+              className={pinned ? "fill-gold-500 text-gold-500" : ""}
+            />
+          </button>
         </h3>
         {susp && (
           <span className="suspend-in flex items-center gap-1.5 rounded-md bg-warning-a15 px-2 py-1 text-[11px] font-bold text-warning-400">
@@ -101,6 +128,8 @@ function MatchPage() {
     return () => clearTimeout(t);
   }, [goalEvent]);
   const [group, setGroup] = useState<(typeof GROUPS)[number]["key"]>("all");
+  const favMarkets = useUI((s) => s.favMarkets);
+  const navigate = useNavigate();
   const allMatches = useWorld((s) => s.matches);
   const match = mt ?? matchById(matchId);
   const comp = match ? compById(match.competitionId) : null;
@@ -119,11 +148,13 @@ function MatchPage() {
     const list =
       group === "all"
         ? match.markets
-        : match.markets.filter((m) => m.group === group);
+        : group === "mine"
+          ? match.markets.filter((m) => favMarkets.has(m.key))
+          : match.markets.filter((m) => m.group === group);
     return [...list].sort((a, b) =>
       a.popular === b.popular ? 0 : a.popular ? -1 : 1,
     );
-  }, [match, group]);
+  }, [match, group, favMarkets]);
 
   if (!match || !comp) {
     return (
@@ -143,23 +174,52 @@ function MatchPage() {
 
   return (
     <div className="mx-auto max-w-[860px] px-3 pt-3 lg:px-4">
-      {/* Breadcrumb */}
+      {/* Breadcrumb pills — wireframe: Sport ▾ / Comp ▾ / Match ▾ */}
       <nav
-        className="mb-3 flex items-center gap-1.5 px-1 text-[12px] text-text-tertiary"
+        className="mb-3 flex flex-wrap items-center gap-1.5 px-1 text-[12px] font-semibold"
         aria-label="Breadcrumb"
       >
         <Link
           to="/"
-          className="flex items-center gap-1 rounded-md py-0.5 pr-1 hover:text-text-primary"
+          className="flex items-center gap-1 rounded-full border border-border-soft bg-surface-primary px-3 py-1.5 text-text-secondary transition-colors hover:text-text-primary"
         >
-          <ChevronLeft size={14} /> Sports
+          <ChevronLeft size={13} /> Sports
         </Link>
-        <ChevronRight size={12} />
-        <Link to="/football" className="hover:text-text-primary">
-          {comp.country}
+        <ChevronRight size={12} className="text-text-disabled" />
+        <Link
+          to="/football"
+          className="rounded-full border border-border-soft bg-surface-primary px-3 py-1.5 text-text-secondary transition-colors hover:text-text-primary"
+        >
+          {comp.name}
         </Link>
-        <ChevronRight size={12} />
-        <span className="text-text-secondary">{comp.name}</span>
+        <ChevronRight size={12} className="text-text-disabled" />
+        <label className="relative flex items-center gap-1 rounded-full border border-brand-a30 bg-secondary-a20 py-1.5 pl-3 pr-2 text-brand-300">
+          <select
+            value={match.id}
+            onChange={(e) =>
+              navigate({
+                to: "/match/$matchId",
+                params: { matchId: e.target.value },
+              })
+            }
+            aria-label="Switch match"
+            className="appearance-none bg-transparent pr-4 font-semibold outline-none"
+          >
+            {[match, ...related].map((r) => (
+              <option
+                key={r.id}
+                value={r.id}
+                className="bg-surface-primary text-text-primary"
+              >
+                {r.home.short} – {r.away.short}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            size={13}
+            className="pointer-events-none absolute right-2.5"
+          />
+        </label>
       </nav>
 
       {/* Scoreboard header */}
@@ -264,6 +324,24 @@ function MatchPage() {
         role="tablist"
         aria-label="Market groups"
       >
+        {favMarkets.size > 0 && (
+          <button
+            type="button"
+            role="tab"
+            aria-selected={group === "mine"}
+            onClick={() => setGroup("mine")}
+            className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors ${
+              group === "mine"
+                ? "border-gold-500/40 bg-gold-500/10 text-gold-500"
+                : "border-border-soft text-text-secondary hover:text-text-primary"
+            }`}
+          >
+            ★ My markets{" "}
+            <span className="tnum text-[10.5px] opacity-60">
+              {match.markets.filter((m) => favMarkets.has(m.key)).length}
+            </span>
+          </button>
+        )}
         {GROUPS.map((g) => {
           const n =
             g.key === "all"
@@ -314,31 +392,58 @@ function MatchPage() {
           <h2 className="mb-2 flex items-center gap-2 px-1 text-[14px] font-bold text-text-secondary">
             <Volleyball size={15} /> Also in {comp.name}
           </h2>
-          <div className="space-y-1">
-            {related.map((r) => (
-              <Link
-                key={r.id}
-                to="/match/$matchId"
-                params={{ matchId: r.id }}
-                className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] transition-colors hover:bg-surface-secondary"
-              >
-                <TeamLogo team={r.home} size={18} />
-                <TeamLogo team={r.away} size={18} />
-                <span className="truncate">
-                  {r.home.short} v {r.away.short}
-                </span>
-                <span className="ml-auto text-[11px] text-text-tertiary">
-                  {r.status === "live" ? (
-                    <span className="text-error-300">LIVE</span>
-                  ) : (
-                    new Date(r.kickoffAt).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
+          <div className="no-scrollbar -mx-3 flex snap-x gap-2.5 overflow-x-auto px-3 pb-1 lg:mx-0 lg:px-0">
+            {related.map((r) => {
+              const rh = r.markets.find((mk) => mk.key === "h2h");
+              return (
+                <Link
+                  key={r.id}
+                  to="/match/$matchId"
+                  params={{ matchId: r.id }}
+                  className="flex w-[220px] shrink-0 snap-start flex-col gap-2 rounded-xl border border-border-soft bg-surface-primary p-3 transition-colors hover:border-border-very-strong"
+                >
+                  <span className="flex items-center justify-between text-[10.5px] text-text-tertiary">
+                    {r.status === "live" ? (
+                      <span className="flex items-center gap-1 font-bold text-error-300">
+                        <span className="live-dot size-1.5 rounded-full bg-error-400" />
+                        {r.minute}′
+                      </span>
+                    ) : (
+                      new Date(r.kickoffAt).toLocaleTimeString([], {
+                        weekday: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    )}
+                    <span className="tnum font-odds font-semibold">
+                      {r.status === "live"
+                        ? `${r.score.home}–${r.score.away}`
+                        : `+${r.markets.length}`}
+                    </span>
+                  </span>
+                  {[r.home, r.away].map((t) => (
+                    <span key={t.id} className="flex items-center gap-2">
+                      <TeamLogo team={t} size={18} />
+                      <span className="truncate text-[12.5px] font-medium">
+                        {t.name}
+                      </span>
+                    </span>
+                  ))}
+                  {rh && r.status !== "live" && (
+                    <span className="mt-1 grid grid-cols-3 gap-1">
+                      {rh.outcomes.map((o) => (
+                        <span
+                          key={o.id}
+                          className="tnum rounded-md bg-surface-secondary py-1 text-center font-odds text-[11px] font-semibold text-brand-300"
+                        >
+                          {o.price.toFixed(2)}
+                        </span>
+                      ))}
+                    </span>
                   )}
-                </span>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}

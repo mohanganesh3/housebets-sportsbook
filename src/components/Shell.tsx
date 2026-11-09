@@ -299,10 +299,14 @@ export function BottomBar({ onSearch }: { onSearch: () => void }) {
             >
               {count}
             </span>
-            <span className="text-[13px] font-semibold">Bet slip</span>
-            <span className="ml-auto flex items-center gap-1.5 text-[13px] text-text-secondary">
+            <span className="min-w-0 truncate text-[13px] font-semibold">
+              {count === 1
+                ? `${sel[0].pick} @ ${sel[0].livePrice.toFixed(2)}`
+                : "Bet slip"}
+            </span>
+            <span className="ml-auto flex shrink-0 items-center gap-1.5 text-[13px] text-text-secondary">
               <span className="tnum font-odds font-semibold text-brand-400">
-                {total.toFixed(2)}
+                Pays {total.toFixed(2)}
               </span>
               <ChevronUp size={16} />
             </span>

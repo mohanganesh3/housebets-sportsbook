@@ -6,6 +6,7 @@ import {
   Dumbbell,
   Flame,
   Gamepad2,
+  House,
   Lock,
   Medal,
   Pause,
@@ -14,13 +15,14 @@ import {
   Star,
   Trophy,
   Volleyball,
+  X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { groupByComp, LeagueSection, MatchRow } from "../components/MatchRow";
 import { LiveBadge, OddsCell, TeamLogo } from "../components/primitives";
 import { useEngine } from "../lib/engine";
-import { matchById } from "../lib/seed";
+import { compById, matchById, teamById } from "../lib/seed";
 import { isMatchFollowed } from "../lib/selectors";
 import { useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
@@ -29,6 +31,7 @@ import type { Match } from "../lib/types";
 export const Route = createFileRoute("/")({ component: Home });
 
 const PILLS = [
+  { key: "home", label: "Home", icon: House, to: "/" },
   { key: "live", label: "Live", icon: RadioTower, to: "/live" },
   { key: "soccer", label: "Soccer", icon: Volleyball, to: "/football" },
   { key: "tennis", label: "Tennis", icon: CircleDot, to: "/football" },
@@ -313,7 +316,7 @@ function FeaturedCard({ match }: { match: Match }) {
   );
 }
 
-// "For You" strip — followed teams' next matches, one tap to the hub
+// "Your matches" strip — followed teams' next matches, one tap to the hub
 function FollowingStrip() {
   const follows = useUI((s) => s.follows);
   const matches = useWorld((s) => s.matches);
@@ -325,11 +328,11 @@ function FollowingStrip() {
     .slice(0, 4);
   if (mine.length === 0) return null;
   return (
-    <section aria-label="Your follows">
+    <section aria-label="Your matches">
       <div className="mb-2.5 flex items-center justify-between px-1">
         <h2 className="flex items-center gap-2 text-[15px] font-bold">
-          <Star size={15} className="fill-warning-400 text-warning-400" /> Your
-          follows
+          <Star size={15} className="fill-gold-500 text-gold-500" /> Your
+          matches · {mine.length}
         </h2>
         <Link
           to="/following"
@@ -339,10 +342,47 @@ function FollowingStrip() {
         </Link>
       </div>
       <div className="space-y-1 rounded-xl border border-warning-a15 bg-surface-primary p-1.5">
+        <div className="flex items-center justify-between px-3 pt-1 text-[10.5px] font-semibold uppercase tracking-[0.07em] text-text-tertiary">
+          <span>Match</span>
+          <span className="hidden w-[216px] text-center sm:block">
+            Match result
+          </span>
+        </div>
         {mine.map((m) => (
           <MatchRow key={m.id} match={m} />
         ))}
       </div>
+    </section>
+  );
+}
+
+// Removable favourite chips — wireframe's quick-manage strip
+function FavChips() {
+  const follows = useUI((s) => s.follows);
+  const toggle = useUI((s) => s.toggleFollow);
+  const chips = [...follows]
+    .map((id) => ({ id, name: compById(id)?.name ?? teamById(id)?.name }))
+    .filter((c): c is { id: string; name: string } => Boolean(c.name))
+    .slice(0, 8);
+  if (chips.length === 0) return null;
+  return (
+    <section
+      className="no-scrollbar -mx-3 flex gap-2 overflow-x-auto px-3 lg:mx-0 lg:px-0"
+      aria-label="Your favourites"
+    >
+      {chips.map((c) => (
+        <button
+          key={c.id}
+          type="button"
+          onClick={() => toggle(c.id)}
+          title="Remove from favourites"
+          className="flex shrink-0 items-center gap-1.5 rounded-full border border-gold-500/25 bg-gold-500/10 px-3 py-1.5 text-[12px] font-semibold text-base-75 transition-colors hover:border-gold-500/50"
+        >
+          <Star size={11} className="fill-gold-500 text-gold-500" />
+          {c.name}
+          <X size={12} className="text-text-tertiary" />
+        </button>
+      ))}
     </section>
   );
 }
@@ -402,9 +442,31 @@ function Home() {
 
   return (
     <div className="mx-auto max-w-[860px] space-y-5 px-3 pt-4 lg:px-4">
-      {/* Sport pills */}
+      {/* Sport icon-grid — mobile signature from the wireframes */}
+      <nav className="grid grid-cols-4 gap-2 sm:hidden" aria-label="Sports">
+        {PILLS.slice(0, 8).map(({ key, label, icon: Icon, to }) => (
+          <Link
+            key={key}
+            to={to as "/"}
+            className={`relative flex flex-col items-center gap-1.5 rounded-xl border py-3 text-[11px] font-semibold transition-colors ${
+              key === "home"
+                ? "border-brand-a30 bg-secondary-a20 text-brand-300"
+                : "border-border-soft bg-surface-primary text-text-secondary"
+            }`}
+          >
+            <Icon size={18} />
+            {label}
+            {key === "live" && (
+              <span className="absolute right-1.5 top-1.5 grid min-w-4 place-items-center rounded-full bg-error-500 px-0.5 font-odds text-[9px] font-bold text-white">
+                {live.length}
+              </span>
+            )}
+          </Link>
+        ))}
+      </nav>
+      {/* Sport pills — sm+ */}
       <div
-        className="no-scrollbar -mx-3 flex snap-x gap-2 overflow-x-auto px-3 lg:mx-0 lg:px-0"
+        className="no-scrollbar -mx-3 hidden snap-x gap-2 overflow-x-auto px-3 sm:flex lg:mx-0 lg:px-0"
         role="tablist"
         aria-label="Sports"
       >
@@ -428,6 +490,8 @@ function Home() {
           </Link>
         ))}
       </div>
+
+      <FavChips />
 
       <HeroSpotlight matches={featured.length ? featured : live} />
 

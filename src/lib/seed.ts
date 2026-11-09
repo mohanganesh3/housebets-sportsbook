@@ -503,6 +503,7 @@ export const SPORTS_NAV: { key: SportKey | "home" | "live"; label: string }[] =
 export const liveMatches = () => MATCHES.filter((x) => x.status === "live");
 export const matchById = (id: string) => MATCHES.find((x) => x.id === id);
 export const compById = (id: string) => COMPS[id];
+export const teamById = (id: string) => TEAMS[id];
 export const outcomeById = (id: string) => {
   for (const mt of MATCHES)
     for (const mk of mt.markets)
