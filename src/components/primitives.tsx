@@ -1,10 +1,4 @@
-import {
-  Bell,
-  Lock,
-  Star,
-  TrendingDown,
-  TrendingUp,
-} from "lucide-react";
+import { Bell, Lock, Star, TrendingDown, TrendingUp } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useOdds } from "../lib/store/odds";
 import { useSlip } from "../lib/store/slip";
@@ -96,11 +90,14 @@ export function OddsCell({
   market,
   compact,
   tag: tagProp,
+  named,
 }: {
   outcome: Outcome;
   market: Market;
   compact?: boolean;
   tag?: string;
+  // wireframe layout: full pick name left, price right — for ≤3-outcome markets
+  named?: boolean;
 }) {
   const override = useOdds((s) => s.overrides[outcome.id]);
   const flash = useOdds((s) => s.flashes[outcome.id]);
@@ -129,9 +126,10 @@ export function OddsCell({
       whileTap={suspended ? undefined : { scale: 0.94 }}
       transition={{ type: "spring", stiffness: 500, damping: 30 }}
       aria-pressed={selected}
-      aria-label={`${outcome.name} at ${fmt(price)}${suspended ? " · suspended" : ""}`}
+      aria-label={`${tag ? `${tag} ` : ""}${fmt(price)} · ${outcome.name}${suspended ? " · suspended" : ""}`}
       className={[
-        "relative flex h-full min-h-10 items-center justify-center gap-1.5 rounded-[10px] font-odds text-[15px] font-semibold tnum transition-colors duration-150",
+        "relative flex h-full min-h-10 items-center gap-1.5 rounded-[10px] font-odds text-[15px] font-semibold tnum transition-colors duration-150",
+        named ? "justify-between" : "justify-center",
         compact ? "min-w-0 px-1 py-2 sm:px-2.5" : "min-w-0 px-3 py-2.5",
         suspended
           ? "suspend-in cursor-not-allowed bg-surface-secondary text-text-disabled"
@@ -147,7 +145,14 @@ export function OddsCell({
         <Lock size={15} className="text-warning-400" aria-label="Suspended" />
       ) : (
         <>
-          {tag && (
+          {named && (
+            <span
+              className={`min-w-0 truncate font-sans text-[12.5px] font-semibold ${selected ? "text-text-inverse/80" : "text-text-secondary"}`}
+            >
+              {outcome.name}
+            </span>
+          )}
+          {!named && tag && (
             <span
               className={`font-sans text-[10px] font-bold ${selected ? "text-text-inverse/60" : "text-text-tertiary"}`}
             >

@@ -120,22 +120,26 @@ function Football() {
         aria-label="Competitions"
       >
         {soccerComps.map((c) => (
-          <button
+          <div
             key={c.id}
-            type="button"
-            onClick={() => setCompFilter(c.id === compFilter ? "all" : c.id)}
-            className={`flex shrink-0 snap-start items-center gap-2 rounded-xl border py-2 pl-3 pr-1.5 transition-colors ${
+            className={`flex shrink-0 snap-start items-center gap-1 rounded-xl border py-2 pl-3 pr-1.5 transition-colors ${
               compFilter === c.id
                 ? "border-brand-a30 bg-secondary-a20"
                 : "border-border-soft bg-surface-primary"
             }`}
           >
-            <span className="grid size-6 place-items-center rounded-md bg-secondary-a30 font-odds text-[9px] font-bold uppercase text-brand-300">
-              {compShort(c.id)}
-            </span>
-            <span className="text-[13px] font-medium">{c.name}</span>
+            <button
+              type="button"
+              onClick={() => setCompFilter(c.id === compFilter ? "all" : c.id)}
+              className="flex items-center gap-2"
+            >
+              <span className="grid size-6 place-items-center rounded-md bg-secondary-a30 font-odds text-[9px] font-bold uppercase text-brand-300">
+                {compShort(c.id)}
+              </span>
+              <span className="text-[13px] font-medium">{c.name}</span>
+            </button>
             <FollowStar id={c.id} size={14} />
-          </button>
+          </div>
         ))}
       </nav>
 

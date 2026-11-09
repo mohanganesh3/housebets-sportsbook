@@ -4,7 +4,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Lock,
+  Search,
   Star,
+  X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
@@ -112,6 +114,7 @@ function MarketCard({ market, match }: { market: Market; match: Match }) {
             <OddsCell
               outcome={o}
               market={market}
+              named={market.outcomes.length <= 3}
               tag={market.outcomes.length <= 3 ? tagFor(o.name) : undefined}
             />
           </div>
@@ -138,7 +141,9 @@ function MatchPage() {
     return () => clearTimeout(t);
   }, [goalEvent]);
   const [group, setGroup] = useState<(typeof GROUPS)[number]["key"]>("all");
+  const [mq, setMq] = useState("");
   const favMarkets = useUI((s) => s.favMarkets);
+  const follows = useUI((s) => s.follows);
   const navigate = useNavigate();
   const allMatches = useWorld((s) => s.matches);
   const match = mt ?? matchById(matchId);
@@ -155,16 +160,23 @@ function MatchPage() {
 
   const markets = useMemo(() => {
     if (!match) return [];
-    const list =
-      group === "all"
+    const q = mq.trim().toLowerCase();
+    const list = (
+      q || group === "all"
         ? match.markets
         : group === "mine"
           ? match.markets.filter((m) => favMarkets.has(m.key))
-          : match.markets.filter((m) => m.group === group);
+          : match.markets.filter((m) => m.group === group)
+    ).filter(
+      (m) =>
+        !q ||
+        m.name.toLowerCase().includes(q) ||
+        m.outcomes.some((o) => o.name.toLowerCase().includes(q)),
+    );
     return [...list].sort((a, b) =>
       a.popular === b.popular ? 0 : a.popular ? -1 : 1,
     );
-  }, [match, group, favMarkets]);
+  }, [match, group, favMarkets, mq]);
 
   if (!match || !comp) {
     return (
@@ -196,6 +208,14 @@ function MatchPage() {
           <ChevronLeft size={13} /> Sports
         </Link>
         <ChevronRight size={12} className="text-text-disabled" />
+        {comp.country && (
+          <>
+            <span className="rounded-full border border-border-soft bg-surface-primary px-3 py-1.5 text-text-secondary">
+              {comp.country}
+            </span>
+            <ChevronRight size={12} className="text-text-disabled" />
+          </>
+        )}
         <Link
           to="/football"
           className="rounded-full border border-border-soft bg-surface-primary px-3 py-1.5 text-text-secondary transition-colors hover:text-text-primary"
@@ -238,11 +258,13 @@ function MatchPage() {
         className={`relative overflow-hidden rounded-2xl border border-border-soft bg-gradient-to-b from-surface-secondary to-surface-primary ${goalFlash ? "flash-score" : ""}`}
       >
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/40 to-transparent" />
-        <div className="flex items-center justify-between px-4 pt-3.5">
-          <span className="text-[12px] font-medium text-text-tertiary">
-            {comp.name} · {comp.country}
+        <div className="relative flex items-center justify-center px-4 pt-3.5">
+          <span className="text-[11px] font-medium uppercase tracking-[0.09em] text-text-tertiary">
+            {comp.name}
           </span>
-          <FollowStar id={match.id} />
+          <span className="absolute right-4 top-3">
+            <FollowStar id={match.id} />
+          </span>
         </div>
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 pb-4 pt-3 sm:gap-6 sm:px-8">
           <div className="flex flex-col items-center gap-1.5 text-center">
@@ -251,21 +273,31 @@ function MatchPage() {
               {match.home.name}
               <FollowStar id={match.home.id} size={13} />
             </span>
+            {follows.has(match.home.id) && (
+              <span className="flex items-center gap-1 rounded-full border border-gold-500/40 bg-warning-a15 px-2 py-0.5 text-[10px] font-bold text-gold-500">
+                <Star size={9} className="fill-gold-500" /> Following
+              </span>
+            )}
           </div>
-          <div className="flex flex-col items-center gap-1">
+          <div className="flex flex-col items-center gap-1.5">
             {live ? (
               <>
+                {/* score lives in dark boxes — wireframe signature */}
                 <AnimatePresence mode="popLayout">
                   <motion.span
                     key={`${match.score.home}-${match.score.away}`}
-                    initial={{ scale: 1.25, color: "#e17823" }}
-                    animate={{ scale: 1, color: "#f9f9fb" }}
-                    transition={{ duration: 0.5 }}
-                    className="tnum font-odds text-[34px] font-bold leading-none sm:text-[40px]"
+                    initial={{ scale: 1.12 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.45 }}
+                    className="flex items-center gap-1.5 tnum font-odds text-[26px] font-bold leading-none sm:text-[30px]"
                   >
-                    {match.score.home}
-                    <span className="mx-1.5 text-text-tertiary">-</span>
-                    {match.score.away}
+                    <span className="grid min-w-11 place-items-center rounded-lg border border-border-strong bg-bg-primary/80 px-2.5 py-2 shadow-inner">
+                      {match.score.home}
+                    </span>
+                    <span className="text-text-tertiary">-</span>
+                    <span className="grid min-w-11 place-items-center rounded-lg border border-border-strong bg-bg-primary/80 px-2.5 py-2 shadow-inner">
+                      {match.score.away}
+                    </span>
                   </motion.span>
                 </AnimatePresence>
                 <LiveBadge minute={match.minute} period={match.period} />
@@ -302,6 +334,11 @@ function MatchPage() {
               {match.away.name}
               <FollowStar id={match.away.id} size={13} />
             </span>
+            {follows.has(match.away.id) && (
+              <span className="flex items-center gap-1 rounded-full border border-gold-500/40 bg-warning-a15 px-2 py-0.5 text-[10px] font-bold text-gold-500">
+                <Star size={9} className="fill-gold-500" /> Following
+              </span>
+            )}
           </div>
         </div>
         {/* GOAL banner — transient, names the scorer */}
@@ -327,6 +364,37 @@ function MatchPage() {
           </div>
         )}
       </motion.header>
+
+      {/* Market search — wireframe: "Search markets or players" */}
+      <div className="relative mt-3">
+        <Search
+          size={15}
+          className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary"
+        />
+        <input
+          value={mq}
+          onChange={(e) => setMq(e.target.value)}
+          placeholder="Search markets or players"
+          aria-label="Search markets or players"
+          className="h-11 w-full rounded-xl border border-border-soft bg-surface-primary pl-10 pr-9 text-[13.5px] text-text-primary outline-none transition-colors placeholder:text-text-tertiary focus:border-brand-a30"
+        />
+        {mq && (
+          <button
+            type="button"
+            onClick={() => setMq("")}
+            aria-label="Clear market search"
+            className="absolute right-2.5 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-md text-text-tertiary hover:bg-surface-secondary hover:text-text-primary"
+          >
+            <X size={14} />
+          </button>
+        )}
+      </div>
+      {mq && (
+        <p className="mt-1.5 px-1 text-[11px] text-text-tertiary">
+          {markets.length} market{markets.length === 1 ? "" : "s"} match "
+          {mq.trim()}" across all groups
+        </p>
+      )}
 
       {/* Market group tabs — sticky */}
       <div
