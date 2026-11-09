@@ -1149,14 +1149,17 @@ export function SidePanel() {
   ];
   return (
     <>
-      {/* scrim — panel is an overlay sheet at 1024–1439 (SH-03) */}
+      {/* scrim — panel is an overlay sheet at 1024–1439 (SH-03).
+          lg:max-desk: is ONE range rule — plain `lg:block desk:hidden`
+          loses at exactly 1440 because the custom `desk` breakpoint
+          sorts before `lg` in the emitted sheet (cascade, not intent) */}
       {panelOpen && (
         <button
           type="button"
           aria-label="Close ticket panel"
           tabIndex={-1}
           onClick={() => setPanelOpen(false)}
-          className="fixed inset-0 top-[var(--layout-header)] z-30 hidden bg-black/50 lg:block desk:hidden"
+          className="fixed inset-0 top-[var(--layout-header)] z-30 hidden bg-black/50 lg:max-desk:block"
         />
       )}
       <aside
