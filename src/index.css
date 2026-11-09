@@ -138,6 +138,19 @@
   --color-warning-a15: #e1782326;
   --color-warning-a40: #e1782366;
 
+  /* ── hb-* type scale (T7 measured: research/54) — 11px floor, explicit lh, no `normal` ── */
+  --text-hb-score: 22px;      --text-hb-score--line-height: 26px;
+  --text-hb-odds: 15px;       --text-hb-odds--line-height: 20px;
+  --text-hb-odds-sm: 13px;    --text-hb-odds-sm--line-height: 16px;
+  --text-hb-clock: 12px;      --text-hb-clock--line-height: 14px;
+  --text-hb-display: 28px;    --text-hb-display--line-height: 32px;
+  --text-hb-title: 20px;      --text-hb-title--line-height: 24px;
+  --text-hb-h1: 16px;         --text-hb-h1--line-height: 20px;
+  --text-hb-body: 14px;       --text-hb-body--line-height: 20px;
+  --text-hb-body-sec: 13px;   --text-hb-body-sec--line-height: 18px;
+  --text-hb-label: 12px;      --text-hb-label--line-height: 16px;
+  --text-hb-micro: 11px;      --text-hb-micro--line-height: 14px;
+
   /* ── Tick (odds motion channel — separate from brand cyan) ── */
   --color-tick-up: #47d496;
   --color-tick-up-a20: #47d49633;
