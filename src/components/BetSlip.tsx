@@ -154,7 +154,7 @@ function SlipItem({
           <button
             type="button"
             onClick={() => accept(sel.outcomeId)}
-            className="rounded-md bg-brand-500 px-2.5 py-1 text-[12px] font-bold text-text-inverse transition-transform active:scale-95"
+            className="btn-primary rounded-md px-2.5 py-1 text-[12px] font-bold"
           >
             Accept {sel.livePrice.toFixed(2)}
           </button>
@@ -360,9 +360,9 @@ export function BetSlipBody() {
               resetStatus();
               clear();
             }}
-            className="rounded-lg bg-brand-500 px-4 py-2 text-[13px] font-bold text-text-inverse"
+            className="btn-primary rounded-lg px-4 py-2 text-[13px] font-bold"
           >
-            View My bets
+            View my bets
           </button>
         </div>
       </motion.div>
@@ -494,7 +494,7 @@ export function BetSlipBody() {
                   : suspended.length > 0
                     ? "cursor-not-allowed bg-warning-a15 text-warning-400"
                     : ready
-                      ? "bg-brand-500 text-text-inverse shadow-[0_0_20px_#02f8f833] hover:bg-brand-400"
+                      ? "btn-primary shadow-[0_0_20px_#c4f4f12e]"
                       : "cursor-not-allowed bg-surface-tertiary text-text-disabled"
               }`}
             >

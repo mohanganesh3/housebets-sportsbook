@@ -17,11 +17,19 @@ export function LiveBadge({
   minute: number | null;
   period: string | null;
 }) {
+  const clock =
+    period === "HT"
+      ? "HT"
+      : period === "1st half" && (minute ?? 0) > 45
+        ? `45+${(minute ?? 45) - 45}′`
+        : period === "2nd half" && (minute ?? 0) > 90
+          ? `90+${(minute ?? 90) - 90}′`
+          : `${minute ?? ""}′`;
   return (
     <span className="inline-flex items-center gap-1.5">
       <span className="live-dot size-1.5 rounded-full bg-error-400 shadow-[0_0_6px_#f41f50]" />
       <span className="tnum font-odds text-[13px] font-semibold text-error-300">
-        {period === "HT" ? "HT" : `${minute ?? ""}′`}
+        {clock}
       </span>
     </span>
   );
@@ -91,7 +99,7 @@ export function OddsCell({
         suspended
           ? "suspend-in cursor-not-allowed bg-surface-secondary text-text-disabled"
           : selected
-            ? "bg-brand-500 text-text-inverse shadow-[0_0_18px_#02f8f844,inset_0_0_0_1px_#02f8f8]"
+            ? "bg-interactive-primary text-text-inverse shadow-[0_0_14px_#c4f4f133]"
             : "bg-secondary-a15 text-text-primary hover:bg-secondary-a30 active:bg-secondary-a20",
         flash?.dir === "up" && !selected && !suspended ? "flash-up" : "",
         flash?.dir === "down" && !selected && !suspended ? "flash-down" : "",
@@ -104,7 +112,7 @@ export function OddsCell({
         <>
           {tag && (
             <span
-              className={`font-sans text-[10px] font-bold ${selected ? "text-text-inverse/70" : "text-text-tertiary"}`}
+              className={`font-sans text-[10px] font-bold ${selected ? "text-text-inverse/60" : "text-text-tertiary"}`}
             >
               {tag}
             </span>

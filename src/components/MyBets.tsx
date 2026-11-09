@@ -114,7 +114,7 @@ function BetCard({ b }: { b: import("../lib/types").Bet }) {
                     cashOut(b.id);
                     setConfirming(false);
                   }}
-                  className="h-8 shrink-0 rounded-lg bg-brand-500 px-3 text-[12px] font-bold text-text-inverse transition-transform active:scale-95"
+                  className="btn-primary h-8 shrink-0 rounded-lg px-3 text-[12px] font-bold"
                 >
                   Confirm
                 </button>
@@ -201,39 +201,55 @@ export function MyBetsBody() {
   const open = bets.filter((b) => b.result === "open");
   const settled = bets.filter((b) => b.result !== "open");
   const coAvail = open.filter((b) => b.cashout?.status === "available");
+  const [tab, setTab] = useState<"open" | "settled">("open");
+  const shown = tab === "open" ? open : settled;
   return (
-    <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-3 pb-4">
-      <section>
-        <h3 className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-text-tertiary">
-          Open · {open.length}
-        </h3>
-        <div className="space-y-2">
-          {open.length === 0 && (
-            <p className="rounded-lg border border-dashed border-border-very-strong px-3 py-5 text-center text-[12px] text-text-tertiary">
-              No open bets — placed bets appear here live.
-            </p>
-          )}
-          {open.map((b) => (
-            <BetCard key={b.id} b={b} />
-          ))}
-        </div>
-      </section>
-      {coAvail.length > 0 && (
-        <p className="px-1 text-[11px] text-text-tertiary">
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-3 pb-4">
+      <div
+        className="sticky top-0 z-10 -mx-3 flex gap-1 bg-surface-primary px-3 pb-2 pt-2"
+        role="tablist"
+        aria-label="Bet filter"
+      >
+        {(
+          [
+            ["open", `Open · ${open.length}`],
+            ["settled", `Settled · ${settled.length}`],
+          ] as const
+        ).map(([k, label]) => (
+          <button
+            key={k}
+            type="button"
+            role="tab"
+            aria-selected={tab === k}
+            onClick={() => setTab(k)}
+            className={`h-8 flex-1 rounded-lg text-[12.5px] font-semibold transition-colors ${
+              tab === k
+                ? "bg-secondary-a20 text-brand-300"
+                : "text-text-tertiary hover:text-text-secondary"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <div className="space-y-2 pt-1">
+        {shown.length === 0 && (
+          <p className="rounded-lg border border-dashed border-border-very-strong px-3 py-5 text-center text-[12px] text-text-tertiary">
+            {tab === "open"
+              ? "No open bets — placed bets appear here live."
+              : "Nothing settled yet — results land here."}
+          </p>
+        )}
+        {shown.map((b) => (
+          <BetCard key={b.id} b={b} />
+        ))}
+      </div>
+      {tab === "open" && coAvail.length > 0 && (
+        <p className="px-1 pt-3 text-[11px] text-text-tertiary">
           Cash-out values track live odds — they can fall as well as rise.
           Sample data.
         </p>
       )}
-      <section>
-        <h3 className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-text-tertiary">
-          Settled · {settled.length}
-        </h3>
-        <div className="space-y-2">
-          {settled.map((b) => (
-            <BetCard key={b.id} b={b} />
-          ))}
-        </div>
-      </section>
     </div>
   );
 }

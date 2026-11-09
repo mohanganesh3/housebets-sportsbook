@@ -69,7 +69,7 @@ export function MatchRow({ match }: { match: Match }) {
           +{mt.markets.length}
           <ChevronRight size={13} />
         </Link>
-        <span className="hidden sm:block">
+        <span>
           <FollowStar id={mt.id} />
         </span>
       </div>

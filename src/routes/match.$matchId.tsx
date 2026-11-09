@@ -17,8 +17,15 @@ export const Route = createFileRoute("/match/$matchId")({
   component: MatchPage,
 });
 
+const fmtCountdown = (ms: number) => {
+  const mins = Math.max(0, Math.ceil(ms / 60_000));
+  if (mins < 60) return `${mins}m`;
+  const h = Math.floor(mins / 60);
+  return `${h}h ${mins % 60}m`;
+};
+
+// wireframe order: groups first, "All markets · N" last
 const GROUPS: { key: MarketGroupKey | "all"; label: string }[] = [
-  { key: "all", label: "All" },
   { key: "popular", label: "Popular" },
   { key: "goalscorers", label: "Goalscorers" },
   { key: "goals", label: "Goals" },
@@ -28,6 +35,7 @@ const GROUPS: { key: MarketGroupKey | "all"; label: string }[] = [
   { key: "corners", label: "Corners & cards" },
   { key: "minutes", label: "Minutes" },
   { key: "specials", label: "Specials" },
+  { key: "all", label: "All markets" },
 ];
 
 function MarketCard({ market }: { market: Market }) {
@@ -41,7 +49,12 @@ function MarketCard({ market }: { market: Market }) {
       <header
         className={`flex items-center justify-between px-3.5 py-2.5 ${susp ? "bg-warning-a15/50" : "bg-surface-secondary/50"}`}
       >
-        <h3 className="text-[13px] font-semibold text-text-primary">
+        <h3
+          className="text-[13px] font-semibold text-text-primary"
+          title={
+            market.key === "h2h" ? "Settled on 90 mins + stoppage" : undefined
+          }
+        >
           {market.name}
         </h3>
         {susp && (
@@ -206,7 +219,9 @@ function MatchPage() {
                   })}
                 </span>
                 <span className="rounded-md bg-secondary-a20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-300">
-                  Pre-match
+                  {match.kickoffAt - Date.now() < 86_400_000
+                    ? `Starts in ${fmtCountdown(match.kickoffAt - Date.now())}`
+                    : "Pre-match"}
                 </span>
               </>
             )}

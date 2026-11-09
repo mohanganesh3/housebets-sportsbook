@@ -9,6 +9,7 @@ import {
   Search,
   Star,
   Ticket,
+  Trophy,
   Volleyball,
   Wallet,
   X,
@@ -33,10 +34,24 @@ export function TopBar({ onSearch }: { onSearch: () => void }) {
   return (
     <header className="fixed inset-x-0 top-0 z-40 flex h-[var(--shell-header-h)] items-center gap-3 border-b border-border-soft bg-bg-primary/95 px-3 backdrop-blur-md lg:px-5">
       <Logo />
+      {/* centered prize widget — Housebets chrome signature */}
+      <Link
+        to="/"
+        className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-gold-500/25 bg-[#1a1505]/60 px-3.5 py-1.5 lg:flex"
+        aria-label="Weekly race leaderboard"
+      >
+        <Trophy size={13} className="text-gold-500" />
+        <span className="text-[12px] font-semibold text-base-75">
+          Weekly race
+        </span>
+        <span className="tnum font-odds text-[12px] font-bold text-gold-500">
+          $50,000
+        </span>
+      </Link>
       <button
         type="button"
         onClick={onSearch}
-        className="mx-auto flex h-10 w-full max-w-md items-center gap-2.5 rounded-xl border border-border-strong bg-surface-secondary px-3.5 text-[14px] text-text-tertiary transition-colors hover:border-border-very-strong hover:text-text-secondary lg:ml-8"
+        className="mx-auto flex h-10 w-full max-w-md items-center gap-2.5 rounded-xl border border-border-strong bg-surface-secondary px-3.5 text-[14px] text-text-tertiary transition-colors hover:border-border-very-strong hover:text-text-secondary lg:mx-0 lg:ml-10"
       >
         <Search size={16} />
         <span className="truncate">Search teams, players, competitions…</span>
@@ -58,7 +73,7 @@ export function TopBar({ onSearch }: { onSearch: () => void }) {
         </div>
         <button
           type="button"
-          className="flex h-10 items-center gap-2 rounded-xl bg-brand-500 px-4 text-[14px] font-bold text-text-inverse transition-all hover:bg-brand-400 active:scale-[0.97]"
+          className="btn-primary flex h-10 items-center gap-2 rounded-xl px-4 text-[14px] font-bold"
         >
           <Wallet size={16} className="sm:hidden" />
           <span className="hidden sm:inline">Deposit</span>
@@ -98,17 +113,18 @@ export function LeftRail() {
           <Link
             key={to}
             to={to}
-            className={`relative flex w-14 flex-col items-center gap-1 rounded-xl py-2.5 text-[10px] font-medium transition-colors ${active ? "bg-secondary-a20 text-brand-300" : "text-text-tertiary hover:bg-surface-secondary hover:text-text-secondary"}`}
+            title={label}
+            className={`relative grid size-11 place-items-center rounded-xl transition-colors ${active ? "bg-secondary-a20 text-brand-300" : "text-text-tertiary hover:bg-surface-secondary hover:text-text-secondary"}`}
           >
             <Icon size={20} strokeWidth={active ? 2.2 : 1.8} />
-            {label}
+            <span className="sr-only">{label}</span>
             {badge && (
-              <span className="absolute right-1 top-1.5 grid min-w-4 place-items-center rounded-full bg-error-500 px-1 font-odds text-[9px] font-bold text-white">
+              <span className="absolute -right-0.5 -top-0.5 grid min-w-4 place-items-center rounded-full bg-error-500 px-1 font-odds text-[9px] font-bold text-white">
                 {n}
               </span>
             )}
             {to === "/following" && followCount > 0 && (
-              <span className="absolute right-1 top-1.5 grid min-w-4 place-items-center rounded-full bg-warning-400 px-1 font-odds text-[9px] font-bold text-text-inverse">
+              <span className="absolute -right-0.5 -top-0.5 grid min-w-4 place-items-center rounded-full bg-warning-400 px-1 font-odds text-[9px] font-bold text-text-inverse">
                 {followCount}
               </span>
             )}
@@ -118,9 +134,11 @@ export function LeftRail() {
       <div className="mt-auto flex flex-col items-center gap-1">
         <Link
           to="/bets"
-          className={`flex w-14 flex-col items-center gap-1 rounded-xl py-2.5 text-[10px] font-medium transition-colors ${loc.pathname === "/bets" ? "bg-secondary-a20 text-brand-300" : "text-text-tertiary hover:bg-surface-secondary"}`}
+          title="My bets"
+          className={`relative grid size-11 place-items-center rounded-xl transition-colors ${loc.pathname === "/bets" ? "bg-secondary-a20 text-brand-300" : "text-text-tertiary hover:bg-surface-secondary"}`}
         >
-          <ReceiptText size={20} /> My bets
+          <ReceiptText size={20} />
+          <span className="sr-only">My bets</span>
         </Link>
       </div>
     </nav>
@@ -179,15 +197,66 @@ export function SidePanel() {
       </div>
       {panelTab === "slip" && <BetSlipBody />}
       {panelTab === "bets" && <MyBetsBody />}
-      {panelTab === "chat" && (
-        <div className="flex flex-1 flex-col items-center justify-center gap-2 p-6 text-center">
-          <MessageCircle size={24} className="text-text-tertiary" />
-          <p className="text-[13px] text-text-secondary">
-            Match chat opens on the match page.
-          </p>
-        </div>
-      )}
+      {panelTab === "chat" && <ChatBody />}
     </aside>
+  );
+}
+
+const CHAT_SEED: { who: string; when: string; text: string }[] = [
+  { who: "Rico", when: "2m", text: "that Arsenal press is suffocating today" },
+  { who: "Amara", when: "2m", text: "2-0 already, havertz was due" },
+  { who: "Dele", when: "4m", text: "anyone tracking the Newcastle game?" },
+  { who: "Mags", when: "4m", text: "over 2.5 looking good there" },
+  {
+    who: "Rico",
+    when: "6m",
+    text: "Brighton can't string two passes together",
+  },
+  { who: "Kofi", when: "8m", text: "gg to whoever caught the 2.20 on arsenal" },
+];
+
+function ChatBody() {
+  return (
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="border-b border-border-soft px-3 py-2">
+        <p className="text-[11px] text-text-tertiary">
+          Community · sample conversation — messages are illustrative
+        </p>
+      </div>
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-3">
+        {CHAT_SEED.map((c, i) => (
+          <div key={i} className="flex flex-col gap-0.5">
+            <span className="flex items-baseline gap-1.5 text-[11px]">
+              <span
+                className={`font-semibold ${i % 3 === 0 ? "text-brand-300" : i % 3 === 1 ? "text-gold-500" : "text-success-400"}`}
+              >
+                {c.who}
+              </span>
+              <span className="text-[10px] text-text-disabled">{c.when}</span>
+            </span>
+            <p className="text-[12.5px] leading-snug text-text-secondary">
+              {c.text}
+            </p>
+          </div>
+        ))}
+      </div>
+      <div className="border-t border-border-soft p-2.5">
+        <div className="flex items-center gap-2 rounded-lg border border-border-strong bg-surface-secondary px-3 py-2">
+          <input
+            placeholder="Join the conversation"
+            aria-label="Chat message"
+            className="w-full bg-transparent text-[13px] outline-none placeholder:text-text-disabled"
+            onKeyDown={(e) => {
+              if (e.key === "Enter")
+                useUI
+                  .getState()
+                  .toast("Chat is read-only in this demo", "info");
+            }}
+          />
+          <MessageCircle size={15} className="shrink-0 text-text-tertiary" />
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -196,15 +265,19 @@ export function BottomBar({ onSearch }: { onSearch: () => void }) {
   const count = useSlip((s) => s.selections.length);
   const setOpen = useSlip((s) => s.setMobileOpen);
   const sel = useSlip((s) => s.selections);
+  const liveCount = useWorld(
+    (s) => s.matches.filter((m) => m.status === "live").length,
+  );
+  const followCount = useUI((s) => s.follows.size);
   const total = sel.reduce(
     (a, s) => a + (parseFloat(s.stake) || 0) * s.livePrice,
     0,
   );
   const items = [
-    { to: "/", icon: House, label: "Home" },
-    { to: "/live", icon: RadioTower, label: "Live" },
-    { to: "/following", icon: Star, label: "Following" },
-    { to: "/football", icon: Volleyball, label: "Football" },
+    { to: "/", icon: House, label: "Home", badge: 0 },
+    { to: "/live", icon: RadioTower, label: "Live", badge: liveCount },
+    { to: "/following", icon: Star, label: "Following", badge: followCount },
+    { to: "/football", icon: Volleyball, label: "Football", badge: 0 },
   ] as const;
   return (
     <>
@@ -241,7 +314,7 @@ export function BottomBar({ onSearch }: { onSearch: () => void }) {
         className="fixed inset-x-0 bottom-0 z-40 flex h-[calc(var(--shell-bottombar-h)+env(safe-area-inset-bottom))] items-stretch border-t border-border-soft bg-bg-primary/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden"
         aria-label="Main"
       >
-        {items.map(({ to, icon: Icon, label }) => {
+        {items.map(({ to, icon: Icon, label, badge }) => {
           const active = loc.pathname === to;
           return (
             <Link
@@ -249,7 +322,20 @@ export function BottomBar({ onSearch }: { onSearch: () => void }) {
               to={to}
               className={`relative flex flex-1 flex-col items-center justify-center gap-1 text-[10px] font-medium ${active ? "text-brand-400" : "text-text-tertiary"}`}
             >
-              <Icon size={21} strokeWidth={active ? 2.2 : 1.8} />
+              <span className="relative">
+                <Icon size={21} strokeWidth={active ? 2.2 : 1.8} />
+                {badge != null && badge > 0 && (
+                  <span
+                    className={`absolute -right-2 -top-1.5 grid min-w-3.5 place-items-center rounded-full px-0.5 font-odds text-[8px] font-bold ${
+                      to === "/live"
+                        ? "bg-error-500 text-white"
+                        : "bg-warning-400 text-text-inverse"
+                    }`}
+                  >
+                    {badge}
+                  </span>
+                )}
+              </span>
               {label}
               {active && (
                 <motion.span
