@@ -53,7 +53,6 @@ export function TopBar({ onSearch }: { onSearch: () => void }) {
       <Link
         to="/"
         className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-gold-500/25 bg-[#1a1505]/60 px-3.5 py-1.5 lg:flex"
-        aria-label="Weekly race leaderboard"
       >
         <Trophy size={13} className="text-gold-500" />
         <span className="text-[12px] font-semibold text-base-75">

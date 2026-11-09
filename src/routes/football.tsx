@@ -144,12 +144,12 @@ function Football() {
       </nav>
 
       {/* Segmented control + following */}
-      <div className="flex items-center gap-2">
-        <div
-          className="flex rounded-full border border-border-soft bg-surface-primary p-0.5"
-          role="tablist"
-          aria-label="Fixture filter"
-        >
+      <div
+        className="flex items-center gap-2"
+        role="tablist"
+        aria-label="Fixture filter"
+      >
+        <div className="flex rounded-full border border-border-soft bg-surface-primary p-0.5">
           {(
             [
               ["liveup", `Live & upcoming ${liveUp.length}`],

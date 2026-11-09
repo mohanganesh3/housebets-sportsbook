@@ -155,7 +155,7 @@ export function OddsCell({
             <span
               className={`min-w-0 max-w-full truncate font-sans text-[11px] font-medium leading-tight ${selected ? "text-text-inverse/75" : "text-text-tertiary"}`}
             >
-              {outcome.name}
+              {outcome.name}{" "}
             </span>
           )}
           <span className="flex items-center gap-1.5">
@@ -163,7 +163,7 @@ export function OddsCell({
               <span
                 className={`font-sans text-[10px] font-bold ${selected ? "text-text-inverse/60" : "text-text-tertiary"}`}
               >
-                {tag}
+                {tag}{" "}
               </span>
             )}
             <motion.span

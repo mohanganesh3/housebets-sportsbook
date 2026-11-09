@@ -515,9 +515,8 @@ function Home() {
         )}
       </nav>
       {/* Sport pills — sm+ */}
-      <div
+      <nav
         className="no-scrollbar -mx-3 hidden snap-x gap-2 overflow-x-auto px-3 sm:flex lg:mx-0 lg:px-0"
-        role="tablist"
         aria-label="Sports"
       >
         {PILLS.map(({ key, label, icon: Icon, to }, i) =>
@@ -555,7 +554,7 @@ function Home() {
             </button>
           ),
         )}
-      </div>
+      </nav>
 
       <FavChips />
 
