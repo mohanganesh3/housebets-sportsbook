@@ -154,7 +154,18 @@ export function OddsCell({
               {tag}
             </span>
           )}
-          <span>{fmt(price)}</span>
+          <motion.span
+            key={price}
+            initial={
+              flash
+                ? { y: flash.dir === "up" ? 5 : -5, opacity: 0.3 }
+                : false
+            }
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.16, ease: "easeOut" }}
+          >
+            {fmt(price)}
+          </motion.span>
           <AnimatePresence>
             {flash?.dir === "up" && (
               <motion.span
