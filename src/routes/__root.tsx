@@ -1,4 +1,9 @@
-import { createRootRoute, Outlet, useLocation } from "@tanstack/react-router";
+import {
+  createRootRoute,
+  Link,
+  Outlet,
+  useLocation,
+} from "@tanstack/react-router";
 import { AnimatePresence, MotionConfig } from "motion/react";
 import { useEffect, useState } from "react";
 import { ScenarioDock, SearchPalette, Toaster } from "../components/Overlays";
@@ -10,6 +15,7 @@ import {
   TopBar,
 } from "../components/Shell";
 import { useEngine } from "../lib/engine";
+import { useUI } from "../lib/store/ui";
 
 export const Route = createRootRoute({
   component: Root,
@@ -24,10 +30,38 @@ function Footer() {
             Sportsbook
           </p>
           <ul className="space-y-1.5">
-            <li>Live</li>
-            <li>Football</li>
-            <li>Following</li>
-            <li>My bets</li>
+            <li>
+              <Link
+                to="/live"
+                className="transition-colors hover:text-text-secondary"
+              >
+                Live
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/football"
+                className="transition-colors hover:text-text-secondary"
+              >
+                Football
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/following"
+                className="transition-colors hover:text-text-secondary"
+              >
+                Following
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/bets"
+                className="transition-colors hover:text-text-secondary"
+              >
+                My bets
+              </Link>
+            </li>
           </ul>
         </div>
         <div className="space-y-2">
@@ -35,9 +69,27 @@ function Footer() {
             Support
           </p>
           <ul className="space-y-1.5">
-            <li>Bet settlement rules</li>
-            <li>Responsible gambling</li>
-            <li>Contact support</li>
+            {[
+              "Bet settlement rules",
+              "Responsible gambling",
+              "Contact support",
+            ].map((label) => (
+              <li key={label}>
+                <button
+                  type="button"
+                  className="transition-colors hover:text-text-secondary"
+                  onClick={() =>
+                    useUI
+                      .getState()
+                      .toast(
+                        `${label} isn't wired in this prototype · demo only`,
+                      )
+                  }
+                >
+                  {label}
+                </button>
+              </li>
+            ))}
           </ul>
         </div>
         <div className="space-y-2">
@@ -52,7 +104,7 @@ function Footer() {
       </div>
       <div className="mx-auto mt-8 flex max-w-5xl flex-col gap-2 border-t border-border-soft pt-4">
         <p className="leading-relaxed">
-          Prototype — sample data only, no real money, no real odds. Built for
+          Prototype · sample data only, no real money, no real odds. Built for
           the Housebets sportsbook design contest.
         </p>
         <p className="text-text-disabled">

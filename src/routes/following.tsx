@@ -35,7 +35,7 @@ function FollowingPage() {
           {follows.size}
         </span>
         <p className="ml-auto hidden text-[12px] text-text-tertiary sm:block">
-          Star teams, matches or leagues — they live here
+          Star teams, matches or leagues · they live here
         </p>
       </div>
 
@@ -44,8 +44,8 @@ function FollowingPage() {
           <Star size={30} className="text-warning-400/60" />
           <p className="text-[15px] font-semibold">Nothing followed yet</p>
           <p className="max-w-xs text-[13px] leading-relaxed text-text-tertiary">
-            Tap the star on any match, team or league. Your picks collect here —
-            live first, kickoffs next — so you never hunt for your bet twice.
+            Tap the star on any match, team or league. Your picks collect here ·
+            live first, kickoffs next · so you never hunt for your bet twice.
           </p>
           <div className="mt-1 flex items-center gap-2">
             <Link
@@ -59,7 +59,7 @@ function FollowingPage() {
               onClick={() => useUI.getState().toggleFollow("epl")}
               className="rounded-lg border border-gold-500/40 bg-warning-a15 px-4 py-2 text-[13px] font-semibold text-gold-500 transition-colors hover:bg-warning-a15/70"
             >
-              ★ Premier League
+              <Star size={13} className="inline fill-gold-500" /> Premier League
             </button>
           </div>
         </div>

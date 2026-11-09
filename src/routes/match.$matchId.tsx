@@ -323,7 +323,7 @@ function MatchPage() {
         {live && (
           <div className="flex items-center justify-center gap-1.5 border-t border-border-soft py-2 text-[11px] text-text-tertiary">
             <span className="live-dot size-1.5 rounded-full bg-error-400" />
-            Live scores may be delayed — markets can suspend at any time
+            Live scores may be delayed · markets can suspend at any time
           </div>
         )}
       </motion.header>

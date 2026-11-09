@@ -161,7 +161,7 @@ function applyEvent(e: EngineEvent) {
         useWorld.getState().setMarketStatus(e.matchId, e.marketId!, "open");
         useSlip.getState().onMarketResumed(e.marketId!);
         useBets.getState().resumeCashout(e.matchId);
-        useUI.getState().toast("Market reopened — prices live again", "info");
+        useUI.getState().toast("Market reopened · prices live again", "info");
       }, e.resumeDelay);
     }
   }

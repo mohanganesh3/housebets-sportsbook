@@ -129,7 +129,7 @@ export function OddsCell({
       whileTap={suspended ? undefined : { scale: 0.94 }}
       transition={{ type: "spring", stiffness: 500, damping: 30 }}
       aria-pressed={selected}
-      aria-label={`${outcome.name} at ${fmt(price)}${suspended ? " — suspended" : ""}`}
+      aria-label={`${outcome.name} at ${fmt(price)}${suspended ? " · suspended" : ""}`}
       className={[
         "relative flex h-full min-h-10 items-center justify-center gap-1.5 rounded-[10px] font-odds text-[15px] font-semibold tnum transition-colors duration-150",
         compact ? "min-w-0 px-1 py-2 sm:px-2.5" : "min-w-0 px-3 py-2.5",

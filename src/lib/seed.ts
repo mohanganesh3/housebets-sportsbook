@@ -840,7 +840,7 @@ function marketsFor(m: Match): Market[] {
   );
   push(
     "scorecast",
-    "Scorecast — scorer & team win",
+    "Scorecast · scorer Scorecast — scorer & team win team win",
     "goalscorers",
     [sqH[0], sqH[1], sqA[0], sqA[1]].flatMap((nm) => {
       const isH = sqH.includes(nm);
@@ -1292,6 +1292,23 @@ export const liveMatches = () => MATCHES.filter((x) => x.status === "live");
 export const matchById = (id: string) => MATCHES.find((x) => x.id === id);
 export const compById = (id: string) => COMPS[id];
 export const teamById = (id: string) => TEAMS[id];
+// league badges: explicit abbreviations, never name.slice() guesses
+const COMP_SHORT: Record<string, string> = {
+  epl: "PL",
+  ucl: "UCL",
+  laliga: "LAL",
+  seriea: "SA",
+  bundes: "BL",
+  ligue1: "L1",
+  erediv: "ERE",
+  liga: "LP",
+  nba: "NBA",
+  atp: "ATP",
+  nfl: "NFL",
+  lol: "W",
+};
+export const compShort = (id: string) =>
+  COMP_SHORT[id] ?? id.slice(0, 3).toUpperCase();
 export const outcomeById = (id: string) => {
   for (const mt of MATCHES)
     for (const mk of mt.markets)

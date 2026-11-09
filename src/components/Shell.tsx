@@ -18,7 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { useSlip } from "../lib/store/slip";
 import { useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
@@ -35,6 +35,16 @@ export function Logo() {
 }
 
 export function TopBar({ onSearch }: { onSearch: () => void }) {
+  // Weekly-race pot ticks gently upward — live-venue feel, honest sample data
+  const [pot, setPot] = useState(50000);
+  useEffect(() => {
+    const t = setInterval(
+      () => setPot((p) => p + (17 + (((p / 7) % 41) | 0))),
+      9000,
+    );
+    return () => clearInterval(t);
+  }, []);
+
   return (
     <header className="fixed inset-x-0 top-0 z-40 flex h-[var(--shell-header-h)] items-center gap-3 border-b border-border-soft bg-bg-primary/95 px-3 backdrop-blur-md lg:px-5">
       <Logo />
@@ -49,7 +59,7 @@ export function TopBar({ onSearch }: { onSearch: () => void }) {
           Weekly race
         </span>
         <span className="tnum font-odds text-[12px] font-bold text-gold-500">
-          $50,000
+          ${pot.toLocaleString()}
         </span>
       </Link>
       {/* Search: icon on phone (space is for money chrome), pill on desktop */}
@@ -138,7 +148,7 @@ export function LeftRail() {
               </span>
             )}
             {to === "/following" && followCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 grid min-w-4 place-items-center rounded-full bg-warning-400 px-1 font-odds text-[9px] font-bold text-text-inverse">
+              <span className="absolute -right-0.5 -top-0.5 grid min-w-4 place-items-center rounded-full bg-gold-500 px-1 font-odds text-[9px] font-bold text-text-inverse">
                 {followCount}
               </span>
             )}
@@ -241,11 +251,7 @@ function ChatBody() {
         {CHAT_SEED.map((c, i) => (
           <div key={i} className="flex flex-col gap-0.5">
             <span className="flex items-baseline gap-1.5 text-[11px]">
-              <span
-                className={`font-semibold ${i % 3 === 0 ? "text-brand-300" : i % 3 === 1 ? "text-gold-500" : "text-success-400"}`}
-              >
-                {c.who}
-              </span>
+              <span className="font-semibold text-text-secondary">{c.who}</span>
               <span className="text-[10px] text-text-disabled">{c.when}</span>
             </span>
             <p className="text-[12.5px] leading-snug text-text-secondary">

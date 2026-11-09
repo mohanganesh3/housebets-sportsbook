@@ -3,7 +3,7 @@ import { ChevronDown, ChevronRight, Star, Volleyball } from "lucide-react";
 import { useState } from "react";
 import { groupByComp, LeagueSection } from "../components/MatchRow";
 import { FollowStar } from "../components/primitives";
-import { COMPS } from "../lib/seed";
+import { COMPS, compShort } from "../lib/seed";
 import { isMatchFollowed } from "../lib/selectors";
 import { useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
@@ -130,7 +130,7 @@ function Football() {
             }`}
           >
             <span className="grid size-6 place-items-center rounded-md bg-secondary-a30 font-odds text-[9px] font-bold uppercase text-brand-300">
-              {c.name.slice(0, 2)}
+              {compShort(c.id)}
             </span>
             <span className="text-[13px] font-medium">{c.name}</span>
             <FollowStar id={c.id} size={14} />

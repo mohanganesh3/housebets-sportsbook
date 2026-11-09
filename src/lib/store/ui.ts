@@ -93,7 +93,7 @@ export const useUI = create<UIState>()((set, get) => ({
       get().toast("Kickoff reminder removed", "info");
     } else {
       f.add(id);
-      get().toast("Reminder set — we'll flag kickoff", "success");
+      get().toast("Reminder set · we'll flag kickoff", "success");
     }
     saveReminds(f);
     set({ reminds: f });

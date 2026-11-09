@@ -131,7 +131,7 @@ function SlipItem({
       {susp && (
         <div className="mt-2 flex items-center gap-2 rounded-lg bg-warning-a15 px-2.5 py-2 text-[12px] font-medium text-warning-400">
           <Lock size={13} /> Selection suspended
-          {suspReason ? ` · ${suspReason}` : " — waiting for market to reopen"}
+          {suspReason ? ` · ${suspReason}` : " · waiting for market to reopen"}
         </div>
       )}
       {changed && !susp && (
@@ -211,7 +211,7 @@ function SlipItem({
         </div>
       )}
       {changed && (
-        <span className="sr-only">Odds changed — requires acceptance</span>
+        <span className="sr-only">Odds changed, requires acceptance</span>
       )}
       {/* hidden easter egg: triple-tap the card to arm fail-demo */}
       <span
@@ -429,7 +429,7 @@ export function BetSlipBody() {
             >
               <TriangleAlert size={14} className="text-warning-400" />
               Odds changed on {changed.length} selection
-              {changed.length > 1 ? "s" : ""} — Accept all
+              {changed.length > 1 ? "s" : ""} · Accept all
             </button>
           )}
           <div className="min-h-0 flex-1 space-y-2 overflow-y-auto px-3 pb-3">
@@ -524,7 +524,7 @@ export function BetSlipBody() {
               ) : status === "failed" ? (
                 "Tap to retry"
               ) : suspended.length > 0 ? (
-                `${suspended.length} suspended — remove it or wait for markets`
+                `${suspended.length} suspended · remove it or wait for markets`
               ) : (
                 "Place bet"
               )}
@@ -533,10 +533,10 @@ export function BetSlipBody() {
               <p className="mt-2 flex items-center justify-center gap-1.5 text-[12px] text-error-300">
                 <TriangleAlert size={12} />
                 {failReason === "suspended"
-                  ? "Market suspended while confirming — nothing was placed"
+                  ? "Market suspended while confirming · nothing was placed"
                   : failReason === "odds-moved"
-                    ? "Odds moved during confirmation — review and retry"
-                    : "Placement failed — your balance is unchanged"}
+                    ? "Odds moved during confirmation · review and retry"
+                    : "Placement failed · your balance is unchanged"}
               </p>
             )}
             {changed.length > 0 && oddsPref === "ask" && (
@@ -553,7 +553,7 @@ export function BetSlipBody() {
                   useUI
                     .getState()
                     .toast(
-                      "Session reminder — take a break anytime. Bets never expire in demo.",
+                      "Session reminder · take a break anytime. Bets never expire in demo.",
                       "info",
                     )
                 }

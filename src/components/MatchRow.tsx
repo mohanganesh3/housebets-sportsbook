@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ChevronRight, Lock } from "lucide-react";
-import { compById } from "../lib/seed";
+import { compById, compShort } from "../lib/seed";
 import { useWorld } from "../lib/store/world";
 import type { Match } from "../lib/types";
 import {
@@ -12,7 +12,13 @@ import {
 } from "./primitives";
 
 const fmtKick = (ts: number) =>
-  new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  new Date(ts).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+const fmtDay = (ts: number) =>
+  new Date(ts).toLocaleDateString([], { weekday: "short" });
 
 export function MatchRow({
   match,
@@ -58,11 +64,35 @@ export function MatchRow({
         </div>
       </Link>
       <div className="flex items-center gap-2">
+        {/* compact status col on phone — minute/HT/kickoff always visible */}
+        <div className="flex w-7 shrink-0 flex-col items-end justify-center leading-tight sm:hidden">
+          {live ? (
+            <span className="tnum text-[10.5px] font-bold text-error-300">
+              {mt.period === "HT" ? "HT" : `${mt.minute ?? ""}′`}
+            </span>
+          ) : (
+            <>
+              {mt.kickoffAt - Date.now() > 86_400_000 && (
+                <span className="text-[9px] text-text-disabled">
+                  {fmtDay(mt.kickoffAt)}
+                </span>
+              )}
+              <span className="tnum text-[10.5px] text-text-tertiary">
+                {fmtKick(mt.kickoffAt)}
+              </span>
+            </>
+          )}
+        </div>
         <div className="hidden w-16 justify-end sm:flex">
           {live ? (
             <LiveBadge minute={mt.minute} period={mt.period} />
           ) : (
             <span className="flex flex-col items-end leading-tight">
+              {mt.kickoffAt - Date.now() > 86_400_000 && (
+                <span className="text-[10px] text-text-disabled">
+                  {fmtDay(mt.kickoffAt)}
+                </span>
+              )}
               <span className="tnum text-[13px] text-text-tertiary">
                 {fmtKick(mt.kickoffAt)}
               </span>
@@ -134,7 +164,7 @@ export function LeagueSection({
     >
       <summary className="flex cursor-pointer list-none items-center gap-2.5 px-4 py-3 transition-colors hover:bg-surface-secondary/50 [&::-webkit-details-marker]:hidden">
         <span className="grid size-6 place-items-center rounded-md bg-secondary-a30 font-odds text-[10px] font-bold uppercase text-brand-300">
-          {comp.flag === "eu" ? "EU" : comp.name.slice(0, 2)}
+          {compShort(comp.id)}
         </span>
         <span className="text-[12px] text-text-tertiary">{comp.country}</span>
         <span className="text-[14px] font-semibold">{comp.name}</span>

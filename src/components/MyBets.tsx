@@ -108,7 +108,7 @@ function CashOutBlock({ b }: { b: import("../lib/types").Bet }) {
       )}
       {co.value < b.stake && (
         <span className="mt-0.5 block text-[10px] font-normal text-text-tertiary">
-          Below stake {b.stake.toFixed(2)} — settles immediately
+          Below stake {b.stake.toFixed(2)} · settles immediately
         </span>
       )}
     </button>
@@ -210,7 +210,7 @@ function BetCard({ b }: { b: import("../lib/types").Bet }) {
               useUI
                 .getState()
                 .toast(
-                  "Same pick added — review the price before placing",
+                  "Same pick added · review the price before placing",
                   "info",
                 );
             }}
@@ -438,8 +438,8 @@ export function MyBetsBody({ full = false }: { full?: boolean }) {
       {shown.length === 0 && (
         <p className="rounded-lg border border-dashed border-border-very-strong px-3 py-5 text-center text-[12px] text-text-tertiary">
           {tab === "open"
-            ? "No open bets — placed bets appear here live."
-            : "Nothing settled yet — results land here."}
+            ? "No open bets · placed bets appear here live."
+            : "Nothing settled yet · results land here."}
         </p>
       )}
       {tab === "open" && coAvail.length > 0 && (

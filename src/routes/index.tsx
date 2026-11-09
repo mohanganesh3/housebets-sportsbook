@@ -30,16 +30,21 @@ import type { Match } from "../lib/types";
 
 export const Route = createFileRoute("/")({ component: Home });
 
-const PILLS = [
+const PILLS: {
+  key: string;
+  label: string;
+  icon: typeof House;
+  to?: "/" | "/live" | "/football";
+}[] = [
   { key: "home", label: "Home", icon: House, to: "/" },
   { key: "live", label: "Live", icon: RadioTower, to: "/live" },
   { key: "soccer", label: "Soccer", icon: Volleyball, to: "/football" },
-  { key: "tennis", label: "Tennis", icon: CircleDot, to: "/football" },
-  { key: "basketball", label: "Basketball", icon: Dumbbell, to: "/football" },
-  { key: "esports", label: "Esports", icon: Gamepad2, to: "/football" },
-  { key: "cricket", label: "Cricket", icon: Trophy, to: "/football" },
-  { key: "hockey", label: "Ice hockey", icon: Medal, to: "/football" },
-] as const;
+  { key: "tennis", label: "Tennis", icon: CircleDot },
+  { key: "basketball", label: "Basketball", icon: Dumbbell },
+  { key: "esports", label: "Esports", icon: Gamepad2 },
+  { key: "cricket", label: "Cricket", icon: Trophy },
+  { key: "hockey", label: "Ice hockey", icon: Medal },
+];
 
 // Wave motif — Housebets' aquatic promo language, quiet version
 function WaveArt() {
@@ -279,7 +284,7 @@ function FeaturedCard({ match }: { match: Match }) {
         aria-label={`${mt.home.name} v ${mt.away.name}`}
         className="absolute inset-0 z-0 rounded-2xl"
       />
-      <div className="pointer-events-none absolute -right-10 -top-10 size-32 rounded-full bg-brand-a05 blur-2xl transition-opacity group-hover:opacity-150" />
+      <div className="pointer-events-none absolute -right-10 -top-10 size-32 rounded-full bg-brand-a05 blur-2xl transition-opacity group-hover:opacity-100" />
       <div className="mb-3 flex items-center justify-between">
         <span className="text-[11px] font-medium uppercase tracking-[0.06em] text-text-tertiary">
           {mt.competitionId === "epl" ? "Premier League" : "Champions League"}
@@ -436,33 +441,77 @@ function HouseFeed() {
 
 function Home() {
   const matches = useWorld((s) => s.matches);
+  const [sport, setSport] = useState<string | null>(null);
   const live = matches.filter((m) => m.status === "live");
   const featured = matches.filter((m) => m.featured);
   const upcoming = matches.filter((m) => m.status === "scheduled");
 
+  // Sports without demo fixtures render an honest empty state, never a dead link
+  if (sport) {
+    const pill = PILLS.find((p) => p.key === sport);
+    return (
+      <div className="mx-auto max-w-[860px] space-y-5 px-3 pt-10 lg:px-4">
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border-very-strong px-6 py-16 text-center">
+          {pill && <pill.icon size={30} className="text-text-disabled" />}
+          <p className="text-[15px] font-semibold">
+            {pill?.label} isn't in this demo feed
+          </p>
+          <p className="max-w-xs text-[13px] leading-relaxed text-text-tertiary">
+            The contest scope is football · the demo feed carries soccer
+            fixtures only. This is where {pill?.label} markets would land.
+          </p>
+          <button
+            type="button"
+            onClick={() => setSport(null)}
+            className="btn-primary mt-1 rounded-lg px-4 py-2 text-[13px] font-bold"
+          >
+            Back to football
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-[860px] space-y-5 px-3 pt-4 lg:px-4">
+      <h1 className="sr-only">Housebets sportsbook</h1>
       {/* Sport icon-grid — mobile signature from the wireframes */}
       <nav className="grid grid-cols-4 gap-2 sm:hidden" aria-label="Sports">
-        {PILLS.slice(0, 8).map(({ key, label, icon: Icon, to }) => (
-          <Link
-            key={key}
-            to={to as "/"}
-            className={`relative flex flex-col items-center gap-1.5 rounded-xl border py-3 text-[11px] font-semibold transition-colors ${
-              key === "home"
-                ? "border-brand-a30 bg-secondary-a20 text-brand-300"
-                : "border-border-soft bg-surface-primary text-text-secondary"
-            }`}
-          >
-            <Icon size={18} />
-            {label}
-            {key === "live" && (
-              <span className="absolute right-1.5 top-1.5 grid min-w-4 place-items-center rounded-full bg-error-500 px-0.5 font-odds text-[9px] font-bold text-white">
-                {live.length}
-              </span>
-            )}
-          </Link>
-        ))}
+        {PILLS.slice(0, 8).map(({ key, label, icon: Icon, to }) =>
+          to ? (
+            <Link
+              key={key}
+              to={to}
+              className={`relative flex flex-col items-center gap-1.5 rounded-xl border py-3 text-[11px] font-semibold transition-colors ${
+                key === "home"
+                  ? "border-brand-a30 bg-secondary-a20 text-brand-300"
+                  : "border-border-soft bg-surface-primary text-text-secondary"
+              }`}
+            >
+              <Icon size={18} />
+              {label}
+              {key === "live" && (
+                <span className="absolute right-1.5 top-1.5 grid min-w-4 place-items-center rounded-full bg-error-500 px-0.5 font-odds text-[9px] font-bold text-white">
+                  {live.length}
+                </span>
+              )}
+            </Link>
+          ) : (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setSport(key)}
+              className={`flex flex-col items-center gap-1.5 rounded-xl border py-3 text-[11px] font-semibold transition-colors ${
+                sport === key
+                  ? "border-brand-a30 bg-secondary-a20 text-brand-300"
+                  : "border-border-soft bg-surface-primary text-text-secondary"
+              }`}
+            >
+              <Icon size={18} />
+              {label}
+            </button>
+          ),
+        )}
       </nav>
       {/* Sport pills — sm+ */}
       <div
@@ -470,25 +519,41 @@ function Home() {
         role="tablist"
         aria-label="Sports"
       >
-        {PILLS.map(({ key, label, icon: Icon, to }, i) => (
-          <Link
-            key={key}
-            to={to as "/"}
-            className={`flex shrink-0 snap-start items-center gap-2 rounded-full border px-4 py-2 text-[13px] font-semibold transition-colors ${
-              i === 0
-                ? "border-brand-a30 bg-secondary-a20 text-brand-300"
-                : "border-border-soft bg-surface-primary text-text-secondary hover:border-border-very-strong hover:text-text-primary"
-            }`}
-          >
-            <Icon size={15} />
-            {label}
-            {key === "live" && (
-              <span className="grid min-w-4.5 place-items-center rounded-full bg-error-500 px-1 font-odds text-[10px] font-bold text-white">
-                {live.length}
-              </span>
-            )}
-          </Link>
-        ))}
+        {PILLS.map(({ key, label, icon: Icon, to }, i) =>
+          to ? (
+            <Link
+              key={key}
+              to={to}
+              className={`flex shrink-0 snap-start items-center gap-2 rounded-full border px-4 py-2 text-[13px] font-semibold transition-colors ${
+                i === 0
+                  ? "border-brand-a30 bg-secondary-a20 text-brand-300"
+                  : "border-border-soft bg-surface-primary text-text-secondary hover:border-border-very-strong hover:text-text-primary"
+              }`}
+            >
+              <Icon size={15} />
+              {label}
+              {key === "live" && (
+                <span className="grid min-w-4.5 place-items-center rounded-full bg-error-500 px-1 font-odds text-[10px] font-bold text-white">
+                  {live.length}
+                </span>
+              )}
+            </Link>
+          ) : (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setSport(key)}
+              className={`flex shrink-0 snap-start items-center gap-2 rounded-full border px-4 py-2 text-[13px] font-semibold transition-colors ${
+                sport === key
+                  ? "border-brand-a30 bg-secondary-a20 text-brand-300"
+                  : "border-border-soft bg-surface-primary text-text-secondary hover:border-border-very-strong hover:text-text-primary"
+              }`}
+            >
+              <Icon size={15} />
+              {label}
+            </button>
+          ),
+        )}
       </div>
 
       <FavChips />
@@ -502,9 +567,9 @@ function Home() {
       {/* Featured rail */}
       <section aria-label="Featured matches">
         <div className="mb-2.5 flex items-center justify-between px-1">
-          <h1 className="flex items-center gap-2 text-[16px] font-bold">
+          <h2 className="flex items-center gap-2 text-[16px] font-bold">
             <RadioTower size={17} className="text-error-400" /> In play now
-          </h1>
+          </h2>
           <Link
             to="/live"
             className="flex items-center gap-0.5 text-[12px] font-semibold text-brand-300 hover:text-brand-200"
@@ -525,19 +590,13 @@ function Home() {
       </section>
 
       {/* Live sections */}
-      <motion.section
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-        className="space-y-3"
-        aria-label="Live matches"
-      >
+      <section className="space-y-3" aria-label="Live matches">
         {groupByComp(live.filter((m) => !featured.includes(m))).map(
           ([cid, ms]) => (
             <LeagueSection key={cid} compId={cid} matches={ms} />
           ),
         )}
-      </motion.section>
+      </section>
 
       {/* Upcoming */}
       <section className="space-y-3" aria-label="Upcoming matches">

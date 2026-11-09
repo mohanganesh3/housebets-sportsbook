@@ -162,20 +162,33 @@ export function TeamCrest({ team, size = 28 }: { team: Team; size?: number }) {
   const tier = size < 20 ? "S" : size < 36 ? "M" : "L";
 
   if (!spec) {
-    // fallback: tinted shield + short initials (only for unknown future teams)
+    // fallback: generic heater shield in the team hue — never a flat disc
     return (
-      <span
-        className="grid shrink-0 place-items-center rounded-full font-odds font-semibold text-white/95"
-        style={{
-          width: size,
-          height: size,
-          fontSize: size * 0.36,
-          background: `hsl(${team.hue} 60% 32%)`,
-        }}
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        className="shrink-0"
         aria-hidden
       >
-        {team.short.slice(0, 2)}
-      </span>
+        <path
+          d="M12 1.6 L21 5.4 V13.4 C21 18.4 17.1 22 12 23.6 C6.9 22 3 18.4 3 13.4 V5.4 Z"
+          fill={`hsl(${team.hue} 55% 30%)`}
+          stroke={`hsl(${team.hue} 60% 55%)`}
+          strokeWidth="1"
+        />
+        <text
+          x="12"
+          y="15.2"
+          textAnchor="middle"
+          fontSize="7.5"
+          fontWeight="700"
+          fill="rgba(255,255,255,0.92)"
+          fontFamily="inherit"
+        >
+          {team.short.slice(0, 2)}
+        </text>
+      </svg>
     );
   }
 

@@ -3,7 +3,7 @@ import { Clock, FlaskConical, Search, Star, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useEngine } from "../lib/engine";
-import { COMPS, MATCHES } from "../lib/seed";
+import { COMPS, compShort, MATCHES } from "../lib/seed";
 import { isMatchFollowed } from "../lib/selectors";
 import { useBets } from "../lib/store/bets";
 import { armFailOnce, useSlip } from "../lib/store/slip";
@@ -148,7 +148,7 @@ export function SearchPalette({
               className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[14px] hover:bg-surface-secondary"
             >
               <span className="grid size-7 place-items-center rounded-md bg-secondary-a30 font-odds text-[10px] font-bold text-brand-300">
-                {c.name.slice(0, 2).toUpperCase()}
+                {compShort(c.id)}
               </span>
               {c.name}
               <span className="ml-auto text-[12px] text-text-tertiary">
@@ -276,12 +276,12 @@ export function ScenarioDock() {
               world.setMarketStatus(mt.id, mk.id, "open");
           });
         });
-        toast("Reset — clean state", "success");
+        toast("Reset · clean state", "success");
         break;
       case "prefilled":
         slip.clear();
         pickSome();
-        toast("Slip pre-filled — 3 singles", "info");
+        toast("Slip pre-filled · 3 singles", "info");
         break;
       case "odds-change": {
         slip.clear();
@@ -299,7 +299,7 @@ export function ScenarioDock() {
             useSlip.getState().onOddsChange(id, np);
           });
         }, 400);
-        toast("Odds moved on 2 selections — accept to place", "info");
+        toast("Odds moved on 2 selections · accept to place", "info");
         break;
       }
       case "suspend-market":
@@ -357,7 +357,7 @@ export function ScenarioDock() {
           scorer: "R. Ashworth",
           newScore: [2, 0],
         });
-        toast("GOAL — Arsenal 2-0 (flash + suspension cascade)", "success");
+        toast("GOAL · Arsenal 2-0 (flash + suspension cascade)", "success");
         world.setMarketStatus("ars-bha", "ars-bha-h2h", "suspended", "Goal");
         slip.onMarketSuspended("ars-bha-h2h");
         setTimeout(() => {
@@ -371,7 +371,7 @@ export function ScenarioDock() {
         toast("Cash out suspended on open bets", "info");
         break;
       case "empty-live":
-        toast("Live page filter demo — see 'Starting soon' rail", "info");
+        toast("Live page filter demo · see 'Starting soon' rail", "info");
         break;
     }
   };
@@ -421,7 +421,7 @@ export function ScenarioDock() {
         type="button"
         onClick={() => setScenarioOpen(!scenarioOpen)}
         aria-label="Demo states"
-        className="fixed bottom-[calc(var(--shell-bottombar-h)+env(safe-area-inset-bottom)+14px)] right-3 z-[70] grid size-10 place-items-center rounded-full border border-border-very-strong bg-surface-secondary text-text-tertiary shadow-lg transition-colors hover:border-border-interactive hover:text-brand-300 lg:bottom-4 lg:right-[calc(var(--panel-w)+14px)]"
+        className="fixed bottom-[calc(var(--shell-bottombar-h)+env(safe-area-inset-bottom)+74px)] left-3 z-[70] grid size-10 place-items-center rounded-full border border-border-very-strong bg-surface-secondary text-text-tertiary shadow-lg transition-colors hover:border-border-interactive hover:text-brand-300 lg:bottom-4 lg:left-auto lg:right-[calc(var(--panel-w)+14px)]"
       >
         <FlaskConical size={17} />
       </button>
