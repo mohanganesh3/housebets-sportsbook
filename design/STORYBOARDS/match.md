@@ -167,10 +167,9 @@ nobody else shows *why* (42-teardown "ours" column).
   simultaneously (same frame) every goal-linked market locks: Match result, Next goal, Total goals,
   Correct score, Goalscorers — `Suspended — goal scored` chips, cells dim.
 - **Beat 3 (t≈700ms–2.5s):** markets reopen one-by-one in list order; prices re-enter as reprice
-  ticks (Arsenal 1.30→1.44 ▲ is wrong direction — Arsenal drifts UP in price = ▲ red for backers?
-  No: price ↑ means worse return for the backer but longer odds = "up" glyph green? RESOLVE: our
-  encoding = odds-number direction, not bettor fortune — ▲ green when the number rises (C-02
-  convention, honest delta-fact U-50). Arsenal 1.30→1.44 ▲, Draw 4.60→3.75 ▼, Brighton 11.00→7.50 ▼.
+  ticks. Encoding = odds-number direction, never bettor fortune (C-02 convention, U-50
+  delta-fact): Arsenal 1.30→1.44 ▲, Draw 4.60→3.75 ▼, Brighton 11.00→7.50 ▼ — the number rose or
+  fell, the glyph says which; what it means for a backer is the implied %'s job, not the glyph's.
 
 **Interrupt:** a second event (VAR disallowal, second goal) supersedes mid-cascade — newest state
 wins, nothing queues (P4, S4). RM: score updates + event line only — no roll, no flash, no cascade
