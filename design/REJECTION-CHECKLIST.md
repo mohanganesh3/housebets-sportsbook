@@ -26,6 +26,7 @@ QC runs this on every screen diff. ANY box failing = the diff is rejected, no se
 
 ## Craft sweep
 - [ ] every number tabular lining; every row on the 4pt grid
+- [ ] type uses hb-* tokens only — no `text-[Npx]`, nothing below hb-micro (11px floor), no `line-height: normal`
 - [ ] contrast: text-2† measured ≥4.5 on actual surface (not assumed)
 - [ ] all touch targets ≥44px incl. icon buttons and ✕
 - [ ] motion: registry duration/easing, PRM twin exists, interruptible
