@@ -177,9 +177,11 @@ function HeroSpotlight({ matches }: { matches: Match[] }) {
                   ? "Premier League"
                   : "Champions League"}
               </span>
-              <span className="rounded bg-secondary-a20 px-1.5 py-0.5 text-[10px] font-semibold text-secondary-25">
-                Match of the day
-              </span>
+              {i === 0 && (
+                <span className="rounded bg-secondary-a20 px-1.5 py-0.5 text-[10px] font-semibold text-secondary-25">
+                  Match of the day
+                </span>
+              )}
             </div>
             <Link
               to="/match/$matchId"

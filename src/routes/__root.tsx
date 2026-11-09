@@ -4,7 +4,7 @@ import {
   Outlet,
   useLocation,
 } from "@tanstack/react-router";
-import { AnimatePresence, MotionConfig } from "motion/react";
+import { AnimatePresence, MotionConfig, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { ScenarioDock, SearchPalette, Toaster } from "../components/Overlays";
 import {
@@ -20,6 +20,33 @@ import { useUI } from "../lib/store/ui";
 export const Route = createRootRoute({
   component: Root,
 });
+
+function OfflineBanner() {
+  const offline = useUI((s) => s.offline);
+  const setOffline = useUI((s) => s.setOffline);
+  return (
+    <AnimatePresence>
+      {offline && (
+        <motion.div
+          initial={{ y: -40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -40, opacity: 0 }}
+          className="fixed inset-x-0 top-[var(--shell-header-h)] z-40 flex items-center justify-center gap-3 bg-warning-a15 px-4 py-2 text-[12.5px] font-semibold text-warning-400 backdrop-blur lg:left-[var(--shell-rail-w)] lg:right-[var(--panel-w)]"
+          role="alert"
+        >
+          Connection lost · odds are frozen, bets can't be placed
+          <button
+            type="button"
+            onClick={() => setOffline(false)}
+            className="rounded-full border border-warning-a40 px-2.5 py-0.5 text-[11px] hover:bg-warning-a15"
+          >
+            Reconnect
+          </button>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
 
 function Footer() {
   return (
@@ -141,6 +168,7 @@ function Root() {
     <MotionConfig reducedMotion="user">
       <div className="min-h-dvh">
         <TopBar onSearch={() => setSearchOpen(true)} />
+        <OfflineBanner />
         <LeftRail />
         <SidePanel />
         <main className="pb-[calc(var(--shell-bottombar-h)+env(safe-area-inset-bottom)+16px)] pt-[var(--shell-header-h)] lg:ml-[var(--shell-rail-w)] lg:mr-[var(--panel-w)] lg:pb-0">

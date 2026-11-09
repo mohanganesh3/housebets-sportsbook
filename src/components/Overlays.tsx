@@ -242,9 +242,19 @@ const SCEN: { key: Scenario; label: string; hint: string }[] = [
     hint: "Open bet cash-out locks",
   },
   {
+    key: "mixed",
+    label: "Mixed slip",
+    hint: "Active + moved + suspended",
+  },
+  {
     key: "empty-live",
     label: "Nothing live",
     hint: "Starting-soon empty state",
+  },
+  {
+    key: "offline",
+    label: "Go offline",
+    hint: "Odds freeze · placement fails",
   },
 ];
 
@@ -270,6 +280,8 @@ export function ScenarioDock() {
     switch (s) {
       case "clean":
         slip.clear();
+        world.setLiveEmpty(false);
+        useUI.getState().setOffline(false);
         world.matches.forEach((mt) => {
           mt.markets.forEach((mk) => {
             if (mk.status === "suspended")
@@ -370,8 +382,44 @@ export function ScenarioDock() {
         setTimeout(() => useBets.getState().resumeCashout("juv-rom"), 15_000);
         toast("Cash out suspended on open bets", "info");
         break;
+      case "mixed": {
+        slip.clear();
+        pickSome();
+        setTimeout(() => {
+          const sels = useSlip.getState().selections;
+          if (sels[0])
+            useSlip
+              .getState()
+              .onOddsChange(
+                sels[0].outcomeId,
+                +(sels[0].livePrice + 0.22).toFixed(2),
+              );
+          const last = sels[sels.length - 1];
+          if (last) {
+            world.setMarketStatus(
+              last.matchId,
+              last.marketId,
+              "suspended",
+              "Dangerous attack",
+            );
+            useSlip.getState().onMarketSuspended(last.marketId);
+          }
+        }, 400);
+        toast("Mixed slip · moved, suspended and live picks together", "info");
+        break;
+      }
       case "empty-live":
-        toast("Live page filter demo · see 'Starting soon' rail", "info");
+        world.setLiveEmpty(true);
+        toast("Live list emptied · 'Starting soon' takes over", "info");
+        break;
+      case "offline":
+        useUI.getState().setOffline(!useUI.getState().offline);
+        toast(
+          useUI.getState().offline
+            ? "Connection lost · odds frozen, placement will fail"
+            : "Back online · prices resumed",
+          useUI.getState().offline ? "error" : "success",
+        );
         break;
     }
   };

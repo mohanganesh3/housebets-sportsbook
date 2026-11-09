@@ -37,6 +37,7 @@ export function Logo() {
 
 export function TopBar({ onSearch }: { onSearch: () => void }) {
   // Weekly-race pot ticks gently upward — live-venue feel, honest sample data
+  const balance = useUI((s) => s.balance);
   const [pot, setPot] = useState(50000);
   useEffect(() => {
     const t = setInterval(
@@ -88,9 +89,12 @@ export function TopBar({ onSearch }: { onSearch: () => void }) {
             T
           </span>
           <span className="tnum font-odds text-[13px] font-semibold sm:text-[14px]">
-            1,250.00
+            {balance.toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </span>
-          <span className="hidden rounded bg-secondary-a30 px-1 text-[9px] font-bold uppercase text-secondary-25 sm:inline">
+          <span className="rounded bg-secondary-a30 px-1 text-[9px] font-bold uppercase text-secondary-25">
             Demo
           </span>
         </div>
@@ -329,7 +333,9 @@ function PhoneSheet({
                 </Dialog.Close>
               </div>
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+            <div className="min-h-0 flex-1 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
+              {children}
+            </div>
           </motion.div>
         </Dialog.Popup>
       </Dialog.Portal>
@@ -397,7 +403,7 @@ export function BottomBar({ onSearch }: { onSearch: () => void }) {
             </span>
             <span className="ml-auto flex shrink-0 items-center gap-1.5 text-[13px] text-text-secondary">
               <span className="tnum font-odds font-semibold text-brand-400">
-                Pays {total.toFixed(2)}
+                {total > 0 ? `Pays ${total.toFixed(2)}` : "Set a stake"}
               </span>
               <ChevronUp size={16} />
             </span>
@@ -495,7 +501,7 @@ export function BottomBar({ onSearch }: { onSearch: () => void }) {
               setSheet(null);
               setScenarioOpen(true);
             }}
-            className="flex items-center justify-between rounded-xl border border-brand-a30 bg-brand-a10 px-4 py-3 text-[14px] font-semibold text-brand-300"
+            className="flex items-center justify-between rounded-xl border border-brand-a30 bg-secondary-a20 px-4 py-3 text-[14px] font-semibold text-brand-300"
           >
             Demo states <FlaskConical size={15} />
           </button>
@@ -549,7 +555,7 @@ export function BottomBar({ onSearch }: { onSearch: () => void }) {
             <span className="font-semibold text-text-primary">
               State tourer
             </span>{" "}
-            (floating button) to jump straight to suspended, odds-changed,
+            in the Menu sheet to jump straight to suspended, odds-changed,
             cash-out and offline states.
           </p>
           <p className="text-text-tertiary">
@@ -564,6 +570,8 @@ export function BottomBar({ onSearch }: { onSearch: () => void }) {
 export function SlipSheet() {
   const open = useSlip((s) => s.mobileOpen);
   const setOpen = useSlip((s) => s.setMobileOpen);
+  const count = useSlip((s) => s.selections.length);
+  const [tab, setTab] = useState<"slip" | "bets" | "chat">("slip");
   const controls = useDragControls();
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
@@ -589,7 +597,7 @@ export function SlipSheet() {
               <div className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-border-very-strong" />
               <div className="flex items-center justify-between px-4 py-3">
                 <Dialog.Title className="text-[15px] font-bold">
-                  Bet slip
+                  Bet slip & My bets
                 </Dialog.Title>
                 <Dialog.Close
                   className="grid size-8 place-items-center rounded-lg text-text-tertiary hover:bg-surface-secondary"
@@ -599,7 +607,40 @@ export function SlipSheet() {
                 </Dialog.Close>
               </div>
             </div>
-            <BetSlipBody />
+            {/* wireframe's sheet tab strip — slip / bets / chat without closing */}
+            <div
+              className="mx-3 mb-2 flex gap-1 rounded-xl border border-border-soft bg-surface-secondary p-1"
+              role="tablist"
+              aria-label="Slip sheet"
+            >
+              {(
+                [
+                  ["slip", `Bet slip ${count || ""}`],
+                  ["bets", "My bets"],
+                  ["chat", "Chat"],
+                ] as const
+              ).map(([k, label]) => (
+                <button
+                  key={k}
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === k}
+                  onClick={() => setTab(k)}
+                  className={`flex h-8 flex-1 items-center justify-center rounded-lg text-[12.5px] font-semibold transition-colors ${tab === k ? "bg-interactive-primary text-text-inverse" : "text-text-tertiary hover:text-text-secondary"}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
+              {tab === "slip" && <BetSlipBody />}
+              {tab === "bets" && <MyBetsBody />}
+              {tab === "chat" && (
+                <div className="flex h-[52dvh] flex-col">
+                  <ChatBody />
+                </div>
+              )}
+            </div>
           </motion.div>
         </Dialog.Popup>
       </Dialog.Portal>

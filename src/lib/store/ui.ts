@@ -11,7 +11,8 @@ export type Scenario =
   | "cashout-susp"
   | "prefilled"
   | "mixed"
-  | "empty-live";
+  | "empty-live"
+  | "offline";
 
 interface UIState {
   panelTab: "slip" | "bets" | "chat";
@@ -30,6 +31,11 @@ interface UIState {
   setOddsPref: (p: "ask" | "higher" | "any") => void;
   toasts: { id: number; msg: string; kind: "info" | "success" | "error" }[];
   toast: (msg: string, kind?: "info" | "success" | "error") => void;
+  balance: number;
+  debit: (v: number) => void;
+  credit: (v: number) => void;
+  offline: boolean;
+  setOffline: (v: boolean) => void;
 }
 
 const loadFollows = (): Set<string> => {
@@ -119,6 +125,28 @@ export const useUI = create<UIState>()((set, get) => ({
   },
   oddsPref: "ask",
   setOddsPref: (p) => set({ oddsPref: p }),
+  balance:
+    typeof window !== "undefined"
+      ? Number(localStorage.getItem("hb-balance")) || 1250
+      : 1250,
+  debit: (v) =>
+    set((s) => {
+      const balance = +(s.balance - v).toFixed(2);
+      try {
+        localStorage.setItem("hb-balance", String(balance));
+      } catch {}
+      return { balance };
+    }),
+  credit: (v) =>
+    set((s) => {
+      const balance = +(s.balance + v).toFixed(2);
+      try {
+        localStorage.setItem("hb-balance", String(balance));
+      } catch {}
+      return { balance };
+    }),
+  offline: false,
+  setOffline: (v) => set({ offline: v }),
   toasts: [],
   toast: (msg, kind = "info") => {
     const id = ++tid;

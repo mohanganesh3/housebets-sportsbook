@@ -1,6 +1,21 @@
 import { create } from "zustand";
 import { matchById } from "../seed";
 import type { Bet, SlipSelection } from "../types";
+import { useUI } from "./ui";
+
+const BET_KEY = "hb-bets";
+const loadBets = (): Bet[] | null => {
+  try {
+    const raw = localStorage.getItem(BET_KEY);
+    if (raw) return JSON.parse(raw) as Bet[];
+  } catch {}
+  return null;
+};
+const saveBets = (bets: Bet[]) => {
+  try {
+    localStorage.setItem(BET_KEY, JSON.stringify(bets));
+  } catch {}
+};
 
 // bet refs avoid 0/O/1/I — Oxanium has no disambiguating zero glyph.
 // Deterministic: a judge sees the same refs every load.
@@ -23,8 +38,10 @@ const hashOf = (s: string) => {
 };
 const mkBet = (s: SlipSelection): Bet => {
   const stake = parseFloat(s.stake) || 0;
-  const factor = +(0.58 + (hashOf(s.outcomeId) % 28) / 100).toFixed(4);
-  const value = +(stake * s.livePrice * factor).toFixed(2);
+  const factor = +(0.9 + (hashOf(s.outcomeId) % 6) / 100).toFixed(4);
+  // Fair cash-out ≈ stake × (bet price / current price) × book margin.
+  // At placement the offer sits just under stake — real-book behaviour.
+  const value = +(stake * factor).toFixed(2);
   return {
     id: mkRef(),
     placedAt: Date.now(),
@@ -62,9 +79,9 @@ const seedHistory: Bet[] = [
           returns: 36,
           result: "open" as const,
           cashout: {
-            value: 22.1,
-            was: 22.1,
-            factor: 0.85,
+            value: 26.03,
+            was: 26.03,
+            factor: 0.94,
             status: "available" as const,
           },
         },
@@ -176,37 +193,50 @@ interface BetsState {
   bets: Bet[];
   addBets: (sel: SlipSelection[]) => Bet[];
   cashOut: (id: string) => void;
+  settleMatch: (matchId: string, sh: number, sa: number) => void;
   suspendCashout: (matchId: string) => void;
   resumeCashout: (matchId: string) => void;
   tickCashout: (outcomeId: string, newPrice: number) => void;
 }
 
 export const useBets = create<BetsState>()((set) => ({
-  bets: seedHistory,
+  bets:
+    typeof window !== "undefined" ? (loadBets() ?? seedHistory) : seedHistory,
   addBets: (sel) => {
     const made = sel.map(mkBet).reverse();
-    set((s) => ({ bets: [...made, ...s.bets] }));
+    set((s) => {
+      const bets = [...made, ...s.bets];
+      saveBets(bets);
+      return { bets };
+    });
     return made;
   },
   cashOut: (id) =>
-    set((s) => ({
-      bets: s.bets.map((b) => {
+    set((s) => {
+      const bets = s.bets.map((b) => {
         if (b.id !== id || b.cashout?.status !== "available") return b;
         const net = +(b.cashout.value - b.stake).toFixed(2);
+        useUI.getState().credit(b.cashout.value);
         return {
           ...b,
-          result: "cashedout",
+          result: "cashedout" as const,
           settledNote: `Cashed out · net ${net >= 0 ? "+" : "−"}${Math.abs(net).toFixed(2)} USDT`,
           returns: b.cashout.value,
           cashout: undefined,
         };
-      }),
-    })),
+      });
+      saveBets(bets);
+      return { bets };
+    }),
   tickCashout: (outcomeId, newPrice) =>
     set((s) => ({
       bets: s.bets.map((b) => {
         if (b.outcomeId !== outcomeId || !b.cashout) return b;
-        const v = +(b.stake * newPrice * b.cashout.factor).toFixed(2);
+        // Winning (price shortens) lifts the offer toward the full return;
+        // drifting prices sink it toward zero. Never exceeds payout − margin.
+        const raw = (b.stake * b.odds * b.cashout.factor) / newPrice;
+        const cap = b.stake * b.odds * 0.985;
+        const v = +Math.min(cap, Math.max(0, raw)).toFixed(2);
         if (v === b.cashout.value) return b;
         return {
           ...b,
@@ -214,6 +244,39 @@ export const useBets = create<BetsState>()((set) => ({
         };
       }),
     })),
+  settleMatch: (matchId, sh, sa) =>
+    set((s) => {
+      let won = 0;
+      const bets = s.bets.map((b) => {
+        if (b.matchId !== matchId || b.result !== "open") return b;
+        // Only markets we can evaluate honestly settle — match result only
+        if (!b.marketId.endsWith("-h2h")) return b;
+        const mt = matchById(matchId);
+        const hit =
+          (b.pick === mt?.home.name && sh > sa) ||
+          (b.pick === "Draw" && sh === sa) ||
+          (b.pick === mt?.away.name && sa > sh);
+        if (hit) {
+          won += b.returns;
+          return {
+            ...b,
+            result: "won" as const,
+            settledNote: `Settled · FT ${sh}-${sa}`,
+            cashout: undefined,
+          };
+        }
+        return {
+          ...b,
+          result: "lost" as const,
+          returns: 0,
+          settledNote: `Settled · FT ${sh}-${sa}`,
+          cashout: undefined,
+        };
+      });
+      if (won > 0) useUI.getState().credit(+won.toFixed(2));
+      saveBets(bets);
+      return { bets };
+    }),
   suspendCashout: (matchId) =>
     set((s) => ({
       bets: s.bets.map((b) =>

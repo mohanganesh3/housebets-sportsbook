@@ -2,12 +2,15 @@ import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { MATCHES } from "../seed";
 import type { MarketStatus, Match } from "../types";
+import { useBets } from "./bets";
 import { useUI } from "./ui";
 
 interface WorldState {
   matches: Match[];
   goalFlashes: Record<string, number>;
   suspReasons: Record<string, string>;
+  liveEmpty: boolean;
+  setLiveEmpty: (v: boolean) => void;
   setMarketStatus: (
     matchId: string,
     marketId: string,
@@ -17,6 +20,7 @@ interface WorldState {
   setScore: (matchId: string, score: [number, number]) => void;
   goalFlash: (matchId: string) => void;
   bumpMinute: (matchId: string) => void;
+  advance: (matchId: string) => void;
   kickoff: (matchId: string) => void;
 }
 
@@ -25,6 +29,8 @@ export const useWorld = create<WorldState>()(
     matches: MATCHES,
     goalFlashes: {},
     suspReasons: {},
+    liveEmpty: false,
+    setLiveEmpty: (v) => set({ liveEmpty: v }),
     setMarketStatus: (matchId, marketId, status, reason) =>
       set((s) => ({
         suspReasons:
@@ -69,6 +75,30 @@ export const useWorld = create<WorldState>()(
             : mt,
         ),
       })),
+    advance: (matchId) =>
+      set((s) => ({
+        matches: s.matches.map((mt) => {
+          if (mt.id !== matchId || mt.status !== "live") return mt;
+          // HT break ends → second half resumes
+          if (mt.period === "HT" && mt.minute == null)
+            return { ...mt, period: "2nd half", minute: 46 };
+          if (mt.minute == null) return mt;
+          // full time: markets close, open h2h bets settle
+          if (mt.minute >= 90) {
+            useBets.getState().settleMatch(mt.id, mt.score.home, mt.score.away);
+            return {
+              ...mt,
+              status: "finished",
+              period: "FT",
+              markets: mt.markets.map((mk) => ({ ...mk, status: "suspended" })),
+            };
+          }
+          // half time whistle (compressed — demo clock)
+          if (mt.minute >= 45 && mt.period === "1st half")
+            return { ...mt, period: "HT", minute: null };
+          return { ...mt, minute: mt.minute + 1 };
+        }),
+      })),
     kickoff: (matchId) => {
       const mt = get().matches.find((m) => m.id === matchId);
       set((s) => ({
@@ -98,11 +128,10 @@ export const useWorld = create<WorldState>()(
 // matches to live the moment their kickoff time passes.
 if (typeof window !== "undefined") {
   setInterval(() => {
-    const { matches, bumpMinute, kickoff } = useWorld.getState();
+    const { matches, advance, kickoff } = useWorld.getState();
     const now = Date.now();
     for (const mt of matches) {
-      if (mt.status === "live" && mt.minute != null && mt.minute < 90)
-        bumpMinute(mt.id);
+      if (mt.status === "live") advance(mt.id);
       if (mt.status === "scheduled" && mt.kickoffAt <= now) kickoff(mt.id);
     }
   }, 30_000);

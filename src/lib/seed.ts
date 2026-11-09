@@ -840,7 +840,7 @@ function marketsFor(m: Match): Market[] {
   );
   push(
     "scorecast",
-    "Scorecast · scorer Scorecast — scorer & team win team win",
+    "Scorecast · scorer & team to win",
     "goalscorers",
     [sqH[0], sqH[1], sqA[0], sqA[1]].flatMap((nm) => {
       const isH = sqH.includes(nm);
@@ -1307,6 +1307,21 @@ const COMP_SHORT: Record<string, string> = {
   nfl: "NFL",
   lol: "W",
 };
+const COUNTRY_FLAG: Record<string, string> = {
+  England: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+  Europe: "🇪🇺",
+  Spain: "🇪🇸",
+  Italy: "🇮🇹",
+  Germany: "🇩🇪",
+  France: "🇫🇷",
+  Netherlands: "🇳🇱",
+  Portugal: "🇵🇹",
+  USA: "🇺🇸",
+  Esports: "🎮",
+};
+export const countryFlag = (country?: string) =>
+  (country && COUNTRY_FLAG[country]) || "🌍";
+
 export const compShort = (id: string) =>
   COMP_SHORT[id] ?? id.slice(0, 3).toUpperCase();
 export const outcomeById = (id: string) => {

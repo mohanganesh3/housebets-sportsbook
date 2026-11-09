@@ -3,6 +3,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   Lock,
   Search,
   Star,
@@ -52,6 +53,7 @@ function MarketCard({ market, match }: { market: Market; match: Match }) {
   const reason = useWorld((s) => s.suspReasons[market.id]);
   const pinned = useUI((s) => s.favMarkets.has(market.key));
   const togglePin = useUI((s) => s.toggleFavMarket);
+  const [open, setOpen] = useState(true);
   const cols = market.outcomes.length > 4 ? 2 : market.outcomes.length;
   // compact pick labels inside ≤3-outcome cells: team names → shorts
   const tagFor = (nm: string) => {
@@ -67,16 +69,13 @@ function MarketCard({ market, match }: { market: Market; match: Match }) {
       <header
         className={`flex items-center justify-between px-3.5 py-2.5 ${susp ? "bg-warning-a15/50" : "bg-surface-secondary/50"}`}
       >
-        <h3
-          className="flex items-center gap-1 text-[13px] font-semibold text-text-primary"
-          title={
-            market.key === "h2h" ? "Settled on 90 mins + stoppage" : undefined
-          }
-        >
-          {market.name}
+        <div className="flex min-w-0 items-center gap-0.5">
           <button
             type="button"
-            onClick={() => togglePin(market.key)}
+            onClick={(e) => {
+              e.stopPropagation();
+              togglePin(market.key);
+            }}
             aria-label={
               pinned
                 ? `Unpin ${market.name}`
@@ -84,42 +83,65 @@ function MarketCard({ market, match }: { market: Market; match: Match }) {
             }
             aria-pressed={pinned}
             title={pinned ? "Pinned to My markets" : "Pin to My markets"}
-            className="grid size-6 place-items-center rounded-md text-text-disabled transition-colors hover:text-gold-500"
+            className="grid size-6 shrink-0 place-items-center rounded-md text-text-disabled transition-colors hover:text-gold-500"
           >
             <Star
               size={12}
               className={pinned ? "fill-gold-500 text-gold-500" : ""}
             />
           </button>
-        </h3>
+          <button
+            type="button"
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            className="flex min-w-0 items-center gap-1 text-left"
+          >
+            <h3
+              className="truncate text-[13px] font-semibold text-text-primary"
+              title={
+                market.key === "h2h"
+                  ? "Settled on 90 mins + stoppage"
+                  : undefined
+              }
+            >
+              {market.name}
+            </h3>
+            <ChevronUp
+              size={14}
+              className={`shrink-0 text-text-tertiary transition-transform ${open ? "" : "rotate-180"}`}
+            />
+          </button>
+        </div>
         {susp && (
           <span className="suspend-in flex items-center gap-1.5 rounded-md bg-warning-a15 px-2 py-1 text-[11px] font-bold text-warning-400">
             <Lock size={11} /> SUSPENDED{reason ? ` · ${reason}` : ""}
           </span>
         )}
       </header>
-      <div
-        className={`grid gap-1.5 p-2 ${cols === 2 ? "grid-cols-2" : cols === 3 ? "grid-cols-3" : "grid-cols-2 sm:grid-cols-4"}`}
-      >
-        {market.outcomes.map((o) => (
-          <div key={o.id} className="flex min-w-0 flex-col gap-1">
-            {market.outcomes.length > 3 && (
-              <span
-                className="truncate px-1 text-[11px] text-text-tertiary"
-                title={o.name}
-              >
-                {o.name}
-              </span>
-            )}
-            <OddsCell
-              outcome={o}
-              market={market}
-              named={market.outcomes.length <= 3}
-              tag={market.outcomes.length <= 3 ? tagFor(o.name) : undefined}
-            />
-          </div>
-        ))}
-      </div>
+      {open && (
+        <div
+          className={`grid gap-1.5 p-2 ${cols === 2 ? "grid-cols-2" : cols === 3 ? "grid-cols-3" : "grid-cols-2 sm:grid-cols-4"}`}
+        >
+          {market.outcomes.map((o) => (
+            <div key={o.id} className="flex min-w-0 flex-col gap-1">
+              {market.outcomes.length > 3 && (
+                <span
+                  className="truncate px-1 text-[11px] text-text-tertiary"
+                  title={o.name}
+                >
+                  {o.name}
+                </span>
+              )}
+              <OddsCell
+                outcome={o}
+                market={market}
+                named={market.outcomes.length <= 3}
+                tag={market.outcomes.length <= 3 ? tagFor(o.name) : undefined}
+              />
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
@@ -140,7 +162,7 @@ function MatchPage() {
     const t = setTimeout(() => setGoalBanner(null), 7000);
     return () => clearTimeout(t);
   }, [goalEvent]);
-  const [group, setGroup] = useState<(typeof GROUPS)[number]["key"]>("all");
+  const [group, setGroup] = useState<(typeof GROUPS)[number]["key"]>("popular");
   const [mq, setMq] = useState("");
   const favMarkets = useUI((s) => s.favMarkets);
   const follows = useUI((s) => s.follows);
@@ -199,32 +221,32 @@ function MatchPage() {
     <div className="mx-auto max-w-[860px] px-3 pt-3 lg:px-4">
       {/* Breadcrumb pills — wireframe: Sport ▾ / Comp ▾ / Match ▾ */}
       <nav
-        className="mb-3 flex flex-wrap items-center gap-1.5 px-1 text-[12px] font-semibold"
+        className="no-scrollbar -mx-3 mb-3 flex items-center gap-1.5 overflow-x-auto px-4 text-[12px] font-semibold lg:mx-0 lg:flex-wrap lg:px-1"
         aria-label="Breadcrumb"
       >
         <Link
           to="/"
-          className="flex items-center gap-1 rounded-full border border-border-soft bg-surface-primary px-3 py-1.5 text-text-secondary transition-colors hover:text-text-primary"
+          className="flex shrink-0 items-center gap-1 rounded-full border border-border-soft bg-surface-primary px-3 py-1.5 text-text-secondary transition-colors hover:text-text-primary"
         >
           <ChevronLeft size={13} /> Sports
         </Link>
-        <ChevronRight size={12} className="text-text-disabled" />
+        <ChevronRight size={12} className="shrink-0 text-text-disabled" />
         {comp.country && (
           <>
-            <span className="rounded-full border border-border-soft bg-surface-primary px-3 py-1.5 text-text-secondary">
+            <span className="shrink-0 rounded-full border border-border-soft bg-surface-primary px-3 py-1.5 text-text-secondary">
               {comp.country}
             </span>
-            <ChevronRight size={12} className="text-text-disabled" />
+            <ChevronRight size={12} className="shrink-0 text-text-disabled" />
           </>
         )}
         <Link
           to="/football"
-          className="rounded-full border border-border-soft bg-surface-primary px-3 py-1.5 text-text-secondary transition-colors hover:text-text-primary"
+          className="shrink-0 rounded-full border border-border-soft bg-surface-primary px-3 py-1.5 text-text-secondary transition-colors hover:text-text-primary"
         >
           {comp.name}
         </Link>
-        <ChevronRight size={12} className="text-text-disabled" />
-        <label className="relative flex items-center gap-1 rounded-full border border-brand-a30 bg-secondary-a20 py-1.5 pl-3 pr-2 text-brand-300">
+        <ChevronRight size={12} className="shrink-0 text-text-disabled" />
+        <label className="relative flex shrink-0 items-center gap-1 rounded-full border border-brand-a30 bg-secondary-a20 py-1.5 pl-3 pr-2 text-brand-300">
           <select
             value={match.id}
             onChange={(e) =>
@@ -422,54 +444,60 @@ function MatchPage() {
         </p>
       )}
 
-      {/* Market group tabs — sticky */}
-      <div
-        className="no-scrollbar sticky top-[var(--shell-header-h)] z-20 -mx-3 mt-3 flex gap-1.5 overflow-x-auto border-b border-border-soft bg-bg-primary/95 px-3 py-2.5 backdrop-blur-md lg:-mx-4 lg:px-4"
-        role="tablist"
-        aria-label="Market groups"
-      >
-        {favMarkets.size > 0 && (
-          <button
-            type="button"
-            role="tab"
-            aria-selected={group === "mine"}
-            onClick={() => setGroup("mine")}
-            className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors ${
-              group === "mine"
-                ? "border-gold-500/40 bg-gold-500/10 text-gold-500"
-                : "border-border-soft text-text-secondary hover:text-text-primary"
-            }`}
-          >
-            ★ My markets{" "}
-            <span className="tnum text-[10.5px] opacity-60">
-              {match.markets.filter((m) => favMarkets.has(m.key)).length}
-            </span>
-          </button>
-        )}
-        {GROUPS.map((g) => {
-          const n =
-            g.key === "all"
-              ? match.markets.length
-              : match.markets.filter((m) => m.group === g.key).length;
-          if (n === 0) return null;
-          return (
+      {/* Market group tabs — sticky, edge-fade signals more offscreen */}
+      <div className="sticky top-[var(--shell-header-h)] z-20 -mx-3 mt-3 border-b border-border-soft bg-bg-primary/95 backdrop-blur-md lg:-mx-4">
+        <div
+          className="no-scrollbar flex gap-1.5 overflow-x-auto px-3 py-2.5 [mask-image:linear-gradient(to_right,black_calc(100%-48px),transparent)] lg:px-4"
+          role="tablist"
+          aria-label="Market groups"
+        >
+          {favMarkets.size > 0 && (
             <button
-              key={g.key}
               type="button"
               role="tab"
-              aria-selected={group === g.key}
-              onClick={() => setGroup(g.key)}
+              aria-selected={group === "mine"}
+              onClick={() => setGroup("mine")}
               className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors ${
-                group === g.key
-                  ? "border-brand-a30 bg-secondary-a20 text-brand-300"
+                group === "mine"
+                  ? "border-gold-500/40 bg-gold-500/10 text-gold-500"
                   : "border-border-soft text-text-secondary hover:text-text-primary"
               }`}
             >
-              {g.label}{" "}
-              <span className="tnum text-[10.5px] opacity-60">{n}</span>
+              <Star
+                size={11}
+                className="mr-0.5 inline fill-gold-500 text-gold-500"
+              />
+              My markets{" "}
+              <span className="tnum text-[10.5px] opacity-60">
+                {match.markets.filter((m) => favMarkets.has(m.key)).length}
+              </span>
             </button>
-          );
-        })}
+          )}
+          {GROUPS.map((g) => {
+            const n =
+              g.key === "all"
+                ? match.markets.length
+                : match.markets.filter((m) => m.group === g.key).length;
+            if (n === 0) return null;
+            return (
+              <button
+                key={g.key}
+                type="button"
+                role="tab"
+                aria-selected={group === g.key}
+                onClick={() => setGroup(g.key)}
+                className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors ${
+                  group === g.key
+                    ? "border-brand-a30 bg-secondary-a20 text-brand-300"
+                    : "border-border-soft text-text-secondary hover:text-text-primary"
+                }`}
+              >
+                {g.label}{" "}
+                <span className="tnum text-[10.5px] opacity-60">{n}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Markets */}

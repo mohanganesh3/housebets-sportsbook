@@ -172,7 +172,7 @@ function BetCard({ b }: { b: import("../lib/types").Bet }) {
           >
             {b.result === "lost" ? "0.00" : b.returns.toFixed(2)} USDT
           </span>
-          {" · Net "}
+          {b.result !== "open" && b.result !== "void" && " · Net "}
           <NetLine b={b} />
         </span>
       </div>
@@ -312,8 +312,14 @@ function BetRow({ b }: { b: import("../lib/types").Bet }) {
                   </span>
                 )}
                 <p className="mt-1">
-                  Net <NetLine b={b} />
-                  {b.settledNote ? ` · ${b.settledNote}` : ""}
+                  {b.result !== "open" && b.result !== "void" && (
+                    <>
+                      Net <NetLine b={b} />
+                    </>
+                  )}
+                  {b.settledNote
+                    ? `${b.result !== "open" && b.result !== "void" ? " · " : ""}${b.settledNote}`
+                    : ""}
                 </p>
               </div>
               {open && b.cashout && (

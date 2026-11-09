@@ -168,7 +168,12 @@ function SlipItem({
           <input
             value={sel.stake}
             onChange={(e) =>
-              setStake(sel.outcomeId, e.target.value.replace(/[^0-9.]/g, ""))
+              setStake(
+                sel.outcomeId,
+                e.target.value
+                  .replace(/[^0-9.]/g, "")
+                  .replace(/(\..*)\./g, "$1"),
+              )
             }
             placeholder="0.00"
             inputMode="decimal"
@@ -233,9 +238,11 @@ export function BetSlipBody() {
     acceptAll,
     place,
     resetStatus,
+    placingUntil,
   } = useSlip();
   const toast = useUI((s) => s.toast);
   const oddsPref = useUI((s) => s.oddsPref);
+  const balance = useUI((s) => s.balance);
   const [taps, setTaps] = useState(0);
   const netPL = useBets((s) =>
     s.bets.reduce((a, b) => {
@@ -465,7 +472,7 @@ export function BetSlipBody() {
                 <span className="text-text-tertiary">
                   Balance after bet{" "}
                   <span className="tnum text-text-secondary">
-                    {(1250 - totalStake).toFixed(2)}
+                    {(balance - totalStake).toFixed(2)}
                   </span>
                 </span>
               </div>
@@ -503,7 +510,13 @@ export function BetSlipBody() {
                   className="absolute inset-y-0 left-0 bg-white/15"
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
-                  transition={{ duration: 2.9, ease: "linear" }}
+                  transition={{
+                    duration: Math.max(
+                      0.3,
+                      ((placingUntil ?? 0) - Date.now()) / 1000,
+                    ),
+                    ease: "linear",
+                  }}
                   style={{ transformOrigin: "left" }}
                   aria-hidden
                 />
@@ -536,7 +549,9 @@ export function BetSlipBody() {
                   ? "Market suspended while confirming · nothing was placed"
                   : failReason === "odds-moved"
                     ? "Odds moved during confirmation · review and retry"
-                    : "Placement failed · your balance is unchanged"}
+                    : failReason === "funds"
+                      ? "Not enough balance · reduce the stake"
+                      : "Placement failed · your balance is unchanged"}
               </p>
             )}
             {changed.length > 0 && oddsPref === "ask" && (

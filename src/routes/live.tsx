@@ -19,7 +19,8 @@ const FILTERS = [
 function Live() {
   const [f, setF] = useState<(typeof FILTERS)[number]>("All");
   const matches = useWorld((s) => s.matches);
-  const live = matches.filter((m) => m.status === "live");
+  const liveEmpty = useWorld((s) => s.liveEmpty);
+  const live = liveEmpty ? [] : matches.filter((m) => m.status === "live");
   const soon = matches
     .filter((m) => m.status === "scheduled")
     .sort((a, b) => a.kickoffAt - b.kickoffAt)
@@ -45,22 +46,37 @@ function Live() {
         role="tablist"
         aria-label="Sport filter"
       >
-        {FILTERS.map((k) => (
-          <button
-            key={k}
-            type="button"
-            role="tab"
-            aria-selected={f === k}
-            onClick={() => setF(k)}
-            className={`shrink-0 rounded-full border px-4 py-2 text-[13px] font-semibold transition-colors ${
-              f === k
-                ? "border-brand-a30 bg-secondary-a20 text-brand-300"
-                : "border-border-soft bg-surface-primary text-text-secondary hover:text-text-primary"
-            }`}
-          >
-            {k}
-          </button>
-        ))}
+        {FILTERS.map((k) => {
+          const n =
+            k === "All"
+              ? live.length
+              : live.filter(
+                  (m) => m.sport === k.toLowerCase().replace(" ", "-"),
+                ).length;
+          return (
+            <button
+              key={k}
+              type="button"
+              role="tab"
+              aria-selected={f === k}
+              onClick={() => setF(k)}
+              className={`shrink-0 rounded-full border px-4 py-2 text-[13px] font-semibold transition-colors ${
+                f === k
+                  ? "border-brand-a30 bg-secondary-a20 text-brand-300"
+                  : "border-border-soft bg-surface-primary text-text-secondary hover:text-text-primary"
+              }`}
+            >
+              {k}
+              {n > 0 && (
+                <span
+                  className={`ml-1.5 font-odds text-[11px] ${f === k ? "text-brand-200" : "text-text-tertiary"}`}
+                >
+                  {n}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {filtered.length === 0 ? (

@@ -19,8 +19,8 @@ export function LiveBadge({
   period: string | null;
 }) {
   const clock =
-    period === "HT"
-      ? "HT"
+    period === "HT" || period === "FT"
+      ? period
       : period === "1st half" && (minute ?? 0) > 45
         ? `45+${(minute ?? 45) - 45}′`
         : period === "2nd half" && (minute ?? 0) > 90
@@ -43,6 +43,7 @@ export function FollowStar({ id, size = 16 }: { id: string; size?: number }) {
     <button
       type="button"
       onClick={(e) => {
+        e.preventDefault();
         e.stopPropagation();
         toggle(id);
       }}
@@ -212,20 +213,6 @@ export function OddsCell({
         </>
       )}
     </motion.button>
-  );
-}
-
-export function SkeletonRows({ n = 6 }: { n?: number }) {
-  return (
-    <div className="space-y-2.5" role="status" aria-busy aria-label="Loading">
-      {Array.from({ length: n }).map((_, i) => (
-        <div
-          key={i}
-          className="skeleton h-[52px] rounded-xl"
-          style={{ animationDelay: `${i * 80}ms` }}
-        />
-      ))}
-    </div>
   );
 }
 
