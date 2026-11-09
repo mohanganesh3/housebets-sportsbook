@@ -45,13 +45,7 @@ const GROUPS: { key: MarketGroupKey | "all" | "mine"; label: string }[] = [
   { key: "all", label: "All markets" },
 ];
 
-function MarketCard({
-  market,
-  match,
-}: {
-  market: Market;
-  match: Match;
-}) {
+function MarketCard({ market, match }: { market: Market; match: Match }) {
   const susp = market.status === "suspended";
   const reason = useWorld((s) => s.suspReasons[market.id]);
   const pinned = useUI((s) => s.favMarkets.has(market.key));
@@ -118,9 +112,7 @@ function MarketCard({
             <OddsCell
               outcome={o}
               market={market}
-              tag={
-                market.outcomes.length <= 3 ? tagFor(o.name) : undefined
-              }
+              tag={market.outcomes.length <= 3 ? tagFor(o.name) : undefined}
             />
           </div>
         ))}

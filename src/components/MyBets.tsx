@@ -1,5 +1,6 @@
 import {
   CheckCircle2,
+  ChevronDown,
   CircleDollarSign,
   Lock,
   TrendingDown,
@@ -8,7 +9,7 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { matchById, useBets } from "../lib/store/bets";
+import { useBets } from "../lib/store/bets";
 import { useSlip } from "../lib/store/slip";
 import { useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
@@ -33,14 +34,91 @@ function NetLine({ b }: { b: import("../lib/types").Bet }) {
   );
 }
 
-function BetCard({ b }: { b: import("../lib/types").Bet }) {
-  const mt = matchById(b.matchId);
+function CashOutBlock({ b }: { b: import("../lib/types").Bet }) {
   const cashOut = useBets((s) => s.cashOut);
   const suspReason = useWorld((s) => s.suspReasons[b.marketId]);
   const [confirming, setConfirming] = useState(false);
+  const co = b.cashout;
+  if (!co) return null;
+  const moved = co.value !== co.was;
+  if (co.status !== "available")
+    return (
+      <div className="suspend-in flex items-center justify-center gap-1.5 rounded-lg bg-surface-tertiary py-2 text-[13px] font-medium text-text-disabled">
+        <Lock size={12} className="text-warning-400" /> Cash out suspended
+        {suspReason ? ` · ${suspReason}` : ""}
+      </div>
+    );
+  if (confirming)
+    return (
+      <div className="flex items-center gap-2">
+        <p className="min-w-0 flex-1 text-[11px] leading-tight text-text-secondary">
+          Lock in{" "}
+          <span className="tnum font-odds font-semibold text-text-primary">
+            {co.value.toFixed(2)}
+          </span>{" "}
+          now?
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            cashOut(b.id);
+            setConfirming(false);
+          }}
+          className="btn-primary h-8 shrink-0 rounded-lg px-3 text-[12px] font-bold"
+        >
+          Confirm
+        </button>
+        <button
+          type="button"
+          onClick={() => setConfirming(false)}
+          className="h-8 shrink-0 rounded-lg bg-secondary-a20 px-3 text-[12px] font-semibold text-text-secondary transition-colors hover:bg-secondary-a30"
+        >
+          Wait
+        </button>
+      </div>
+    );
+  return (
+    <button
+      type="button"
+      onClick={() => setConfirming(true)}
+      className="w-full rounded-lg bg-secondary-a30 py-2 text-[13px] font-semibold text-secondary-25 transition-colors hover:bg-secondary-a30/80 active:scale-[0.98]"
+    >
+      <span className="flex items-center justify-center gap-1.5">
+        Cash out ·{" "}
+        <span className="tnum font-odds">{co.value.toFixed(2)} USDT</span>
+        {moved &&
+          (co.value > co.was ? (
+            <TrendingUp
+              size={12}
+              className="text-tick-up"
+              aria-label="Value rose"
+            />
+          ) : (
+            <TrendingDown
+              size={12}
+              className="text-error-300"
+              aria-label="Value dropped"
+            />
+          ))}
+      </span>
+      {moved && (
+        <span className="mt-0.5 block text-[10px] font-normal text-text-tertiary">
+          was {co.was.toFixed(2)}
+        </span>
+      )}
+      {co.value < b.stake && (
+        <span className="mt-0.5 block text-[10px] font-normal text-text-tertiary">
+          Below stake {b.stake.toFixed(2)} — settles immediately
+        </span>
+      )}
+    </button>
+  );
+}
+
+function BetCard({ b }: { b: import("../lib/types").Bet }) {
+  const mt = useWorld((s) => s.matches.find((x) => x.id === b.matchId));
   const open = b.result === "open";
   const co = b.cashout;
-  const moved = co && co.value !== co.was;
   return (
     <motion.div
       layout
@@ -100,78 +178,7 @@ function BetCard({ b }: { b: import("../lib/types").Bet }) {
       </div>
       {open && co && (
         <div className="mt-2.5">
-          {co.status === "available" ? (
-            confirming ? (
-              <div className="flex items-center gap-2">
-                <p className="min-w-0 flex-1 text-[11px] leading-tight text-text-secondary">
-                  Lock in{" "}
-                  <span className="tnum font-odds font-semibold text-text-primary">
-                    {co.value.toFixed(2)}
-                  </span>{" "}
-                  now?
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    cashOut(b.id);
-                    setConfirming(false);
-                  }}
-                  className="btn-primary h-8 shrink-0 rounded-lg px-3 text-[12px] font-bold"
-                >
-                  Confirm
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setConfirming(false)}
-                  className="h-8 shrink-0 rounded-lg bg-secondary-a20 px-3 text-[12px] font-semibold text-text-secondary transition-colors hover:bg-secondary-a30"
-                >
-                  Wait
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setConfirming(true)}
-                className="w-full rounded-lg bg-secondary-a30 py-2 text-[13px] font-semibold text-secondary-25 transition-colors hover:bg-secondary-a30/80 active:scale-[0.98]"
-              >
-                <span className="flex items-center justify-center gap-1.5">
-                  Cash out ·{" "}
-                  <span className="tnum font-odds">
-                    {co.value.toFixed(2)} USDT
-                  </span>
-                  {moved &&
-                    (co.value > co.was ? (
-                      <TrendingUp
-                        size={12}
-                        className="text-tick-up"
-                        aria-label="Value rose"
-                      />
-                    ) : (
-                      <TrendingDown
-                        size={12}
-                        className="text-error-300"
-                        aria-label="Value dropped"
-                      />
-                    ))}
-                </span>
-                {moved && (
-                  <span className="mt-0.5 block text-[10px] font-normal text-text-tertiary">
-                    was {co.was.toFixed(2)}
-                  </span>
-                )}
-                {co.value < b.stake && (
-                  <span className="mt-0.5 block text-[10px] font-normal text-text-tertiary">
-                    Below stake {b.stake.toFixed(2)} — settles immediately
-                  </span>
-                )}
-              </button>
-            )
-          ) : (
-            <div className="suspend-in flex items-center justify-center gap-1.5 rounded-lg bg-surface-tertiary py-2 text-[13px] font-medium text-text-disabled">
-              <Lock size={12} className="text-warning-400" /> Cash out suspended
-              {suspReason ? ` · ${suspReason}` : ""}
-            </div>
-          )}
+          <CashOutBlock b={b} />
         </div>
       )}
       {!open && (
@@ -217,17 +224,136 @@ function BetCard({ b }: { b: import("../lib/types").Bet }) {
   );
 }
 
-export function MyBetsBody() {
+const RESULT_LABEL: Record<string, string> = {
+  open: "Open",
+  won: "Won",
+  lost: "Lost",
+  void: "Void",
+  cashedout: "Cashed out",
+};
+
+const fmtPlaced = (ts: number) => {
+  const d = new Date(ts);
+  return `${d.toLocaleDateString([], { day: "numeric", month: "short" })} · ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })}`;
+};
+
+function BetRow({ b }: { b: import("../lib/types").Bet }) {
+  const mt = useWorld((s) => s.matches.find((x) => x.id === b.matchId));
+  const [expanded, setExpanded] = useState(false);
+  const open = b.result === "open";
+  return (
+    <>
+      <tr
+        className="cursor-pointer border-b border-border-soft transition-colors last:border-0 hover:bg-surface-secondary/60"
+        onClick={() => setExpanded((v) => !v)}
+      >
+        <td className="whitespace-nowrap px-3 py-2.5 text-[12px] text-text-tertiary">
+          {fmtPlaced(b.placedAt)}
+        </td>
+        <td className="min-w-0 px-3 py-2.5">
+          <p className="truncate text-[13px] font-semibold text-text-primary">
+            {b.pick}
+          </p>
+          <p className="truncate text-[11.5px] text-text-tertiary">
+            {b.marketName} ·{" "}
+            {mt ? `${mt.home.short} v ${mt.away.short}` : b.matchId}
+            {mt?.status === "live" && (
+              <span className="tnum ml-1.5 rounded bg-error-500/15 px-1.5 py-0.5 font-odds text-[10px] font-bold text-error-300">
+                {mt.minute ?? "HT"}′ {mt.score.home}–{mt.score.away}
+              </span>
+            )}
+          </p>
+        </td>
+        <td className="tnum whitespace-nowrap px-3 py-2.5 text-right font-odds text-[13px] font-semibold text-brand-400">
+          {b.odds.toFixed(2)}
+        </td>
+        <td className="tnum whitespace-nowrap px-3 py-2.5 text-right font-odds text-[13px]">
+          {b.stake.toFixed(2)}
+        </td>
+        <td className="tnum whitespace-nowrap px-3 py-2.5 text-right font-odds text-[13px]">
+          {b.result === "lost" ? "0.00" : b.returns.toFixed(2)}
+        </td>
+        <td className="whitespace-nowrap px-3 py-2.5 text-right">
+          <span
+            className={`rounded-md px-2 py-0.5 text-[11px] font-bold ${
+              b.result === "open"
+                ? "bg-secondary-a20 text-brand-300"
+                : b.result === "won"
+                  ? "bg-tick-up/15 text-tick-up"
+                  : b.result === "lost"
+                    ? "bg-error-500/15 text-error-300"
+                    : "bg-surface-tertiary text-text-secondary"
+            }`}
+          >
+            {RESULT_LABEL[b.result]}
+          </span>
+        </td>
+        <td className="w-8 px-2 py-2.5 text-right text-text-tertiary">
+          <ChevronDown
+            size={14}
+            className={`transition-transform ${expanded ? "rotate-180" : ""}`}
+          />
+        </td>
+      </tr>
+      {expanded && (
+        <tr className="border-b border-border-soft bg-surface-secondary/40 last:border-0">
+          <td colSpan={7} className="px-3 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="text-[12px] text-text-tertiary">
+                {mt && (
+                  <span className="flex items-center gap-1.5 text-text-secondary">
+                    <TeamLogo team={mt.home} size={14} />
+                    {mt.home.name} v {mt.away.name} ·{" "}
+                    {mt.status === "live"
+                      ? `Live ${mt.minute}′`
+                      : mt.status === "finished"
+                        ? "Finished"
+                        : "Scheduled"}
+                  </span>
+                )}
+                <p className="mt-1">
+                  Net <NetLine b={b} />
+                  {b.settledNote ? ` · ${b.settledNote}` : ""}
+                </p>
+              </div>
+              {open && b.cashout && (
+                <div className="w-full max-w-xs sm:w-64">
+                  <CashOutBlock b={b} />
+                </div>
+              )}
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
+  );
+}
+
+export function MyBetsBody({ full = false }: { full?: boolean }) {
   const bets = useBets((s) => s.bets);
   const open = bets.filter((b) => b.result === "open");
   const settled = bets.filter((b) => b.result !== "open");
   const coAvail = open.filter((b) => b.cashout?.status === "available");
   const [tab, setTab] = useState<"open" | "settled">("open");
-  const shown = tab === "open" ? open : settled;
+  const [period, setPeriod] = useState<"all" | "today" | "7d" | "30d">("all");
+  const since = (ts: number) => {
+    const day = 86_400_000;
+    if (period === "today") {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      return ts >= d.getTime();
+    }
+    if (period === "7d") return ts >= Date.now() - 7 * day;
+    if (period === "30d") return ts >= Date.now() - 30 * day;
+    return true;
+  };
+  const shown = (tab === "open" ? open : settled).filter((b) =>
+    since(b.placedAt),
+  );
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-3 pb-4">
       <div
-        className="sticky top-0 z-10 -mx-3 flex gap-1 bg-surface-primary px-3 pb-2 pt-2"
+        className="sticky top-0 z-10 -mx-3 flex flex-wrap items-center gap-1 bg-surface-primary px-3 pb-2 pt-2"
         role="tablist"
         aria-label="Bet filter"
       >
@@ -252,19 +378,70 @@ export function MyBetsBody() {
             {label}
           </button>
         ))}
-      </div>
-      <div className="space-y-2 pt-1">
-        {shown.length === 0 && (
-          <p className="rounded-lg border border-dashed border-border-very-strong px-3 py-5 text-center text-[12px] text-text-tertiary">
-            {tab === "open"
-              ? "No open bets — placed bets appear here live."
-              : "Nothing settled yet — results land here."}
-          </p>
+        {full && (
+          <>
+            <select
+              value={period}
+              onChange={(e) => setPeriod(e.target.value as typeof period)}
+              aria-label="Time period"
+              className="ml-auto h-8 rounded-lg border border-border-soft bg-surface-secondary px-2 text-[12px] font-semibold text-text-secondary outline-none"
+            >
+              <option value="all">All time</option>
+              <option value="today">Today</option>
+              <option value="7d">Last 7 days</option>
+              <option value="30d">Last 30 days</option>
+            </select>
+            <select
+              aria-label="Sport"
+              className="h-8 rounded-lg border border-border-soft bg-surface-secondary px-2 text-[12px] font-semibold text-text-secondary outline-none"
+            >
+              <option>All sports</option>
+              <option>Soccer</option>
+            </select>
+          </>
         )}
-        {shown.map((b) => (
-          <BetCard key={b.id} b={b} />
-        ))}
       </div>
+      {full ? (
+        <>
+          {/* wireframe: Placed | Bet | Odds | Stake | Returns | Result | ⌄ */}
+          <table className="mt-1 hidden w-full border-collapse lg:table">
+            <thead>
+              <tr className="border-b border-border-soft text-left text-[10.5px] font-bold uppercase tracking-wider text-text-tertiary">
+                <th className="px-3 py-2 font-semibold">Placed</th>
+                <th className="px-3 py-2 font-semibold">Bet</th>
+                <th className="px-3 py-2 text-right font-semibold">Odds</th>
+                <th className="px-3 py-2 text-right font-semibold">Stake</th>
+                <th className="px-3 py-2 text-right font-semibold">Returns</th>
+                <th className="px-3 py-2 text-right font-semibold">Result</th>
+                <th className="w-8 px-2 py-2" aria-label="Expand" />
+              </tr>
+            </thead>
+            <tbody>
+              {shown.map((b) => (
+                <BetRow key={b.id} b={b} />
+              ))}
+            </tbody>
+          </table>
+          <div className="space-y-2 pt-1 lg:hidden">
+            {shown.map((b) => (
+              <BetCard key={b.id} b={b} />
+            ))}
+          </div>
+        </>
+      ) : (
+        <div className="space-y-2 pt-1">
+          {shown.map((b) => (
+            <BetCard key={b.id} b={b} />
+          ))}
+        </div>
+      )}
+      {shown.length === 0 && (
+        <p className="rounded-lg border border-dashed border-border-very-strong px-3 py-5 text-center text-[12px] text-text-tertiary">
+          {tab === "open"
+            ? "No open bets — placed bets appear here live."
+            : "Nothing settled yet — results land here."}
+        </p>
+      )}
       {tab === "open" && coAvail.length > 0 && (
         <p className="px-1 pt-3 text-[11px] text-text-tertiary">
           Cash-out values track live odds — they can fall as well as rise.

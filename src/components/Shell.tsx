@@ -2,7 +2,10 @@ import { Dialog } from "@base-ui/react/dialog";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
   ChevronUp,
+  Dices,
   House,
+  LifeBuoy,
+  Menu,
   MessageCircle,
   RadioTower,
   ReceiptText,
@@ -15,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import { type ReactNode, useState } from "react";
 import { useSlip } from "../lib/store/slip";
 import { useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
@@ -48,10 +52,19 @@ export function TopBar({ onSearch }: { onSearch: () => void }) {
           $50,000
         </span>
       </Link>
+      {/* Search: icon on phone (space is for money chrome), pill on desktop */}
       <button
         type="button"
         onClick={onSearch}
-        className="mx-auto flex h-10 w-full max-w-md items-center gap-2.5 rounded-xl border border-border-strong bg-surface-secondary px-3.5 text-[14px] text-text-tertiary transition-colors hover:border-border-very-strong hover:text-text-secondary lg:mx-0 lg:ml-10 lg:max-w-[300px] xl:max-w-xs"
+        aria-label="Search teams, players, competitions"
+        className="ml-auto grid size-10 shrink-0 place-items-center rounded-xl border border-border-strong bg-surface-secondary text-text-tertiary transition-colors hover:text-text-secondary lg:hidden"
+      >
+        <Search size={17} />
+      </button>
+      <button
+        type="button"
+        onClick={onSearch}
+        className="mx-auto hidden h-10 w-full max-w-md items-center gap-2.5 rounded-xl border border-border-strong bg-surface-secondary px-3.5 text-[14px] text-text-tertiary transition-colors hover:border-border-very-strong hover:text-text-secondary lg:mx-0 lg:ml-10 lg:flex lg:max-w-[300px] xl:max-w-xs"
       >
         <Search size={16} />
         <span className="truncate">Search teams, players, competitions…</span>
@@ -59,21 +72,22 @@ export function TopBar({ onSearch }: { onSearch: () => void }) {
           ⌘K
         </kbd>
       </button>
-      <div className="ml-auto flex items-center gap-2">
-        <div className="hidden items-center gap-2 rounded-xl border border-border-strong bg-surface-secondary px-3 py-2 sm:flex">
+      <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-auto">
+        <div className="flex items-center gap-1.5 rounded-xl border border-border-strong bg-surface-secondary px-2 py-2 sm:gap-2 sm:px-3">
           <span className="grid size-5 place-items-center rounded-full bg-usdt text-[10px] font-bold text-white">
             T
           </span>
-          <span className="tnum font-odds text-[14px] font-semibold">
+          <span className="tnum font-odds text-[13px] font-semibold sm:text-[14px]">
             1,250.00
           </span>
-          <span className="rounded bg-secondary-a30 px-1 text-[9px] font-bold uppercase text-secondary-25">
+          <span className="hidden rounded bg-secondary-a30 px-1 text-[9px] font-bold uppercase text-secondary-25 sm:inline">
             Demo
           </span>
         </div>
         <button
           type="button"
-          className="btn-primary flex h-10 items-center gap-2 rounded-xl px-4 text-[14px] font-bold"
+          className="btn-primary flex h-10 shrink-0 items-center gap-2 rounded-xl px-2.5 text-[14px] font-bold sm:px-4"
+          aria-label="Deposit"
         >
           <Wallet size={16} className="sm:hidden" />
           <span className="hidden sm:inline">Deposit</span>
@@ -260,28 +274,76 @@ function ChatBody() {
   );
 }
 
+function PhoneSheet({
+  open,
+  onOpenChange,
+  title,
+  children,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+      <Dialog.Portal>
+        <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/60 backdrop-blur-[2px] transition-opacity data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 lg:hidden" />
+        <Dialog.Popup className="fixed inset-x-0 bottom-0 z-50 flex max-h-[72dvh] flex-col rounded-t-3xl border-t border-border-very-strong bg-surface-primary shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] data-[ending-style]:translate-y-full data-[starting-style]:translate-y-full lg:hidden">
+          <div className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-border-very-strong" />
+          <div className="flex items-center justify-between px-4 py-3">
+            <Dialog.Title className="text-[15px] font-bold">
+              {title}
+            </Dialog.Title>
+            <Dialog.Close
+              className="grid size-8 place-items-center rounded-lg text-text-tertiary hover:bg-surface-secondary"
+              aria-label="Close"
+            >
+              <X size={18} />
+            </Dialog.Close>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
+
 export function BottomBar({ onSearch }: { onSearch: () => void }) {
   const loc = useLocation();
   const count = useSlip((s) => s.selections.length);
   const setOpen = useSlip((s) => s.setMobileOpen);
   const sel = useSlip((s) => s.selections);
+  const [sheet, setSheet] = useState<
+    "menu" | "casino" | "chat" | "support" | null
+  >(null);
+  const followCount = useUI((s) => s.follows.size);
   const liveCount = useWorld(
     (s) => s.matches.filter((m) => m.status === "live").length,
   );
-  const followCount = useUI((s) => s.follows.size);
   const total = sel.reduce(
     (a, s) => a + (parseFloat(s.stake) || 0) * s.livePrice,
     0,
   );
-  const items = [
-    { to: "/", icon: House, label: "Home", badge: 0 },
-    { to: "/live", icon: RadioTower, label: "Live", badge: liveCount },
-    { to: "/following", icon: Star, label: "Following", badge: followCount },
-    { to: "/football", icon: Volleyball, label: "Football", badge: 0 },
-  ] as const;
+  const sportsActive =
+    loc.pathname === "/" ||
+    loc.pathname.startsWith("/match") ||
+    loc.pathname === "/football" ||
+    loc.pathname === "/live";
+  const MENU: {
+    to: "/" | "/live" | "/football" | "/following" | "/bets";
+    label: string;
+    badge?: number;
+  }[] = [
+    { to: "/", label: "Home" },
+    { to: "/live", label: "Live now", badge: liveCount },
+    { to: "/football", label: "Football" },
+    { to: "/following", label: "Following", badge: followCount },
+    { to: "/bets", label: "My bets & slip" },
+  ];
   return (
     <>
-      {/* Floating slip bar */}
+      {/* Floating slip bar — wireframe: cyan pill above tab bar */}
       <AnimatePresence>
         {count > 0 && (
           <motion.button
@@ -313,51 +375,146 @@ export function BottomBar({ onSearch }: { onSearch: () => void }) {
           </motion.button>
         )}
       </AnimatePresence>
-      {/* Tab bar */}
+      {/* Housebets phone shell: Menu | Sports | Casino | Chat | Support FAB */}
       <nav
         className="fixed inset-x-0 bottom-0 z-40 flex h-[calc(var(--shell-bottombar-h)+env(safe-area-inset-bottom))] items-stretch border-t border-border-soft bg-bg-primary/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden"
         aria-label="Main"
       >
-        {items.map(({ to, icon: Icon, label, badge }) => {
-          const active = loc.pathname === to;
-          return (
-            <Link
-              key={to}
-              to={to}
-              className={`relative flex flex-1 flex-col items-center justify-center gap-1 text-[10px] font-medium ${active ? "text-brand-400" : "text-text-tertiary"}`}
-            >
-              <span className="relative">
-                <Icon size={21} strokeWidth={active ? 2.2 : 1.8} />
-                {badge != null && badge > 0 && (
-                  <span
-                    className={`absolute -right-2 -top-1.5 grid min-w-3.5 place-items-center rounded-full px-0.5 font-odds text-[8px] font-bold ${
-                      to === "/live"
-                        ? "bg-error-500 text-white"
-                        : "bg-warning-400 text-text-inverse"
-                    }`}
-                  >
-                    {badge}
-                  </span>
-                )}
-              </span>
-              {label}
-              {active && (
-                <motion.span
-                  layoutId="tabbar"
-                  className="absolute -top-px h-0.5 w-10 rounded-full bg-brand-500"
-                />
-              )}
-            </Link>
-          );
-        })}
         <button
           type="button"
-          onClick={onSearch}
+          onClick={() => setSheet("menu")}
           className="flex flex-1 flex-col items-center justify-center gap-1 text-[10px] font-medium text-text-tertiary"
         >
-          <Search size={21} /> Search
+          <Menu size={21} /> Menu
+        </button>
+        <Link
+          to="/"
+          aria-current={sportsActive ? "page" : undefined}
+          className={`relative flex flex-1 flex-col items-center justify-center gap-1 text-[10px] font-medium ${sportsActive ? "text-brand-400" : "text-text-tertiary"}`}
+        >
+          <Volleyball size={21} strokeWidth={sportsActive ? 2.2 : 1.8} />
+          Sports
+          {sportsActive && (
+            <motion.span
+              layoutId="tabbar"
+              className="absolute -top-px h-0.5 w-10 rounded-full bg-brand-500"
+            />
+          )}
+        </Link>
+        <button
+          type="button"
+          onClick={() => setSheet("casino")}
+          className="flex flex-1 flex-col items-center justify-center gap-1 text-[10px] font-medium text-text-tertiary"
+        >
+          <Dices size={21} /> Casino
+        </button>
+        <button
+          type="button"
+          onClick={() => setSheet("chat")}
+          className="flex flex-1 flex-col items-center justify-center gap-1 text-[10px] font-medium text-text-tertiary"
+        >
+          <MessageCircle size={21} /> Chat
+        </button>
+        {/* Support as raised palm FAB — wireframe signature */}
+        <button
+          type="button"
+          onClick={() => setSheet("support")}
+          aria-label="Support"
+          className="relative -top-3 mx-1 grid size-12 shrink-0 place-items-center rounded-full border border-brand-a30 bg-surface-secondary text-brand-300 shadow-[0_6px_20px_rgba(0,0,0,0.45)]"
+        >
+          <LifeBuoy size={22} />
         </button>
       </nav>
+
+      <PhoneSheet
+        open={sheet === "menu"}
+        onOpenChange={(v) => !v && setSheet(null)}
+        title="Menu"
+      >
+        <nav className="flex flex-col gap-1 px-3 pb-6">
+          {MENU.map((it) => (
+            <Link
+              key={it.to}
+              to={it.to}
+              onClick={() => setSheet(null)}
+              className="flex items-center justify-between rounded-xl border border-border-soft bg-surface-secondary px-4 py-3 text-[14px] font-semibold text-text-primary transition-colors hover:border-border-very-strong"
+            >
+              {it.label}
+              {it.badge != null && it.badge > 0 && (
+                <span className="tnum rounded-full bg-error-500/15 px-2 py-0.5 font-odds text-[11px] font-bold text-error-300">
+                  {it.badge}
+                </span>
+              )}
+            </Link>
+          ))}
+          <button
+            type="button"
+            onClick={() => {
+              setSheet(null);
+              onSearch();
+            }}
+            className="flex items-center justify-between rounded-xl border border-border-soft bg-surface-secondary px-4 py-3 text-[14px] font-semibold text-text-primary"
+          >
+            Search <Search size={15} className="text-text-tertiary" />
+          </button>
+        </nav>
+      </PhoneSheet>
+
+      <PhoneSheet
+        open={sheet === "casino"}
+        onOpenChange={(v) => !v && setSheet(null)}
+        title="Casino"
+      >
+        <div className="px-5 pb-8 pt-2 text-center">
+          <p className="text-[14px] font-semibold text-text-primary">
+            Casino isn't part of this prototype
+          </p>
+          <p className="mt-1.5 text-[12.5px] leading-relaxed text-text-tertiary">
+            This contest entry covers the sportsbook only — same shell, sports
+            content. The tab stays here because that's where it lives on
+            Housebets.
+          </p>
+          <Link
+            to="/"
+            onClick={() => setSheet(null)}
+            className="btn-primary mt-4 inline-flex h-10 items-center rounded-xl px-5 text-[13px] font-bold"
+          >
+            Back to sports
+          </Link>
+        </div>
+      </PhoneSheet>
+
+      <PhoneSheet
+        open={sheet === "chat"}
+        onOpenChange={(v) => !v && setSheet(null)}
+        title="Chat"
+      >
+        <div className="flex h-[52dvh] flex-col">
+          <ChatBody />
+        </div>
+      </PhoneSheet>
+
+      <PhoneSheet
+        open={sheet === "support"}
+        onOpenChange={(v) => !v && setSheet(null)}
+        title="Support"
+      >
+        <div className="space-y-3 px-5 pb-8 pt-1 text-[12.5px] leading-relaxed text-text-secondary">
+          <p>
+            This is a design prototype — there's no live support desk. Every
+            control in the demo is real, though: tap odds to build a slip, watch
+            prices tick, and use the{" "}
+            <span className="font-semibold text-text-primary">
+              State tourer
+            </span>{" "}
+            (floating button) to jump straight to suspended, odds-changed,
+            cash-out and offline states.
+          </p>
+          <p className="text-text-tertiary">
+            Sample data only · no real money · singles only.
+          </p>
+        </div>
+      </PhoneSheet>
     </>
   );
 }

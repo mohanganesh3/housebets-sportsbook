@@ -41,7 +41,7 @@ function BetsPage() {
           <BetSlipBody />
         ) : (
           <div className="pt-3">
-            <MyBetsBody />
+            <MyBetsBody full />
           </div>
         )}
       </div>
