@@ -32,7 +32,7 @@ function FollowingPage() {
       <div className="mb-4 flex items-center gap-3">
         <h1 className="font-display text-[20px] font-bold">Following</h1>
         <span className="rounded-full bg-warning-a15 px-2 py-0.5 font-odds text-[11px] font-bold text-warning-400">
-          {follows.size}
+          {mine.length} matches · {follows.size} starred
         </span>
         <p className="ml-auto hidden text-[12px] text-text-tertiary sm:block">
           Star teams, matches or leagues · they live here

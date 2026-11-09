@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion, useDragControls } from "motion/react";
 import { type ReactNode, useEffect, useState } from "react";
+import { isMatchFollowed } from "../lib/selectors";
 import { useSlip } from "../lib/store/slip";
 import { useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
@@ -232,7 +233,12 @@ export function LeftRail() {
   const liveCount = useWorld((s) =>
     s.liveEmpty ? 0 : s.matches.filter((m) => m.status === "live").length,
   );
-  const followCount = useUI((s) => s.follows.size);
+  // badge previews the Following page: matches covered by any starred
+  // entity (match, team, or competition)
+  const follows = useUI((s) => s.follows);
+  const followCount = useWorld(
+    (s) => s.matches.filter((m) => isMatchFollowed(m, follows)).length,
+  );
   return (
     <nav
       className="fixed bottom-0 left-0 top-[var(--shell-header-h)] z-30 hidden w-[var(--shell-rail-w)] flex-col items-center gap-1 border-r border-border-soft bg-bg-primary py-3 lg:flex"
@@ -246,11 +252,12 @@ export function LeftRail() {
             key={to}
             to={to}
             title={label}
+            aria-current={active ? "page" : undefined}
             className={`relative grid size-11 place-items-center rounded-xl transition-colors ${active ? "bg-secondary-a20 text-brand-300" : "text-text-tertiary hover:bg-surface-secondary hover:text-text-secondary"}`}
           >
             <Icon size={20} strokeWidth={active ? 2.2 : 1.8} />
             <span className="sr-only">{label}</span>
-            {badge && (
+            {badge && n > 0 && (
               <span className="absolute -right-0.5 -top-0.5 grid min-w-4 place-items-center rounded-full bg-error-500 px-1 font-odds text-[9px] font-bold text-white">
                 {n}
               </span>
@@ -267,6 +274,7 @@ export function LeftRail() {
         <Link
           to="/bets"
           title="My bets"
+          aria-current={loc.pathname === "/bets" ? "page" : undefined}
           className={`relative grid size-11 place-items-center rounded-xl transition-colors ${loc.pathname === "/bets" ? "bg-secondary-a20 text-brand-300" : "text-text-tertiary hover:bg-surface-secondary"}`}
         >
           <ReceiptText size={20} />
@@ -455,7 +463,10 @@ export function BottomBar({ onSearch }: { onSearch: () => void }) {
   const [sheet, setSheet] = useState<
     "menu" | "casino" | "chat" | "support" | null
   >(null);
-  const followCount = useUI((s) => s.follows.size);
+  const follows = useUI((s) => s.follows);
+  const followCount = useWorld(
+    (s) => s.matches.filter((m) => isMatchFollowed(m, follows)).length,
+  );
   const setScenarioOpen = useUI((s) => s.setScenarioOpen);
   const liveCount = useWorld((s) =>
     s.liveEmpty ? 0 : s.matches.filter((m) => m.status === "live").length,

@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-router";
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
 import { useEffect, useState } from "react";
+import { HouseGlyph } from "../components/BetSlip";
 import { ScenarioDock, SearchPalette, Toaster } from "../components/Overlays";
 import {
   BottomBar,
@@ -19,7 +20,27 @@ import { useUI } from "../lib/store/ui";
 
 export const Route = createRootRoute({
   component: Root,
+  notFoundComponent: NotFound,
 });
+
+function NotFound() {
+  return (
+    <div className="mx-auto flex max-w-md flex-col items-center gap-3 px-4 pt-24 text-center">
+      <HouseGlyph className="text-brand-300/70" size={44} />
+      <h1 className="text-[18px] font-bold">This market doesn't exist</h1>
+      <p className="text-[13px] leading-relaxed text-text-tertiary">
+        The page you asked for was voided before it priced. Head back to the
+        live board.
+      </p>
+      <Link
+        to="/"
+        className="btn-primary mt-1 rounded-lg px-4 py-2 text-[13px] font-bold"
+      >
+        Back to the action
+      </Link>
+    </div>
+  );
+}
 
 function OfflineBanner() {
   const offline = useUI((s) => s.offline);
