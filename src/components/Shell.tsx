@@ -3,6 +3,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import {
   ChevronUp,
   Dices,
+  FlaskConical,
   House,
   LifeBuoy,
   Menu,
@@ -346,6 +347,7 @@ export function BottomBar({ onSearch }: { onSearch: () => void }) {
     "menu" | "casino" | "chat" | "support" | null
   >(null);
   const followCount = useUI((s) => s.follows.size);
+  const setScenarioOpen = useUI((s) => s.setScenarioOpen);
   const liveCount = useWorld(
     (s) => s.matches.filter((m) => m.status === "live").length,
   );
@@ -487,6 +489,16 @@ export function BottomBar({ onSearch }: { onSearch: () => void }) {
             className="flex items-center justify-between rounded-xl border border-border-soft bg-surface-secondary px-4 py-3 text-[14px] font-semibold text-text-primary"
           >
             Search <Search size={15} className="text-text-tertiary" />
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setSheet(null);
+              setScenarioOpen(true);
+            }}
+            className="flex items-center justify-between rounded-xl border border-brand-a30 bg-brand-a10 px-4 py-3 text-[14px] font-semibold text-brand-300"
+          >
+            Demo states <FlaskConical size={15} />
           </button>
         </nav>
       </PhoneSheet>

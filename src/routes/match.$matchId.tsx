@@ -144,6 +144,7 @@ function MatchPage() {
   const [mq, setMq] = useState("");
   const favMarkets = useUI((s) => s.favMarkets);
   const follows = useUI((s) => s.follows);
+  const toggleFollow = useUI((s) => s.toggleFollow);
   const navigate = useNavigate();
   const allMatches = useWorld((s) => s.matches);
   const match = mt ?? matchById(matchId);
@@ -271,13 +272,23 @@ function MatchPage() {
             <TeamLogo team={match.home} size={52} />
             <span className="flex items-center gap-1 text-[13px] font-semibold leading-tight sm:text-[14px]">
               {match.home.name}
-              <FollowStar id={match.home.id} size={13} />
             </span>
-            {follows.has(match.home.id) && (
-              <span className="flex items-center gap-1 rounded-full border border-gold-500/40 bg-warning-a15 px-2 py-0.5 text-[10px] font-bold text-gold-500">
-                <Star size={9} className="fill-gold-500" /> Following
-              </span>
-            )}
+            <button
+              type="button"
+              onClick={() => toggleFollow(match.home.id)}
+              aria-pressed={follows.has(match.home.id)}
+              className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold transition-colors ${
+                follows.has(match.home.id)
+                  ? "border-gold-500/40 bg-warning-a15 text-gold-500"
+                  : "border-border-strong bg-transparent text-text-tertiary hover:border-gold-500/40 hover:text-gold-500"
+              }`}
+            >
+              <Star
+                size={9}
+                className={follows.has(match.home.id) ? "fill-gold-500" : ""}
+              />
+              {follows.has(match.home.id) ? "Following" : "Follow"}
+            </button>
           </div>
           <div className="flex flex-col items-center gap-1.5">
             {live ? (
@@ -300,7 +311,12 @@ function MatchPage() {
                     </span>
                   </motion.span>
                 </AnimatePresence>
-                <LiveBadge minute={match.minute} period={match.period} />
+                <span className="flex items-center gap-1.5">
+                  <span className="rounded-[4px] bg-error-500/20 px-1.5 py-px text-[9px] font-bold tracking-wider text-error-300">
+                    LIVE
+                  </span>
+                  <LiveBadge minute={match.minute} period={match.period} />
+                </span>
                 <span className="text-[11px] text-text-tertiary">
                   {match.period}
                 </span>
@@ -332,13 +348,23 @@ function MatchPage() {
             <TeamLogo team={match.away} size={52} />
             <span className="flex items-center gap-1 text-[13px] font-semibold leading-tight sm:text-[14px]">
               {match.away.name}
-              <FollowStar id={match.away.id} size={13} />
             </span>
-            {follows.has(match.away.id) && (
-              <span className="flex items-center gap-1 rounded-full border border-gold-500/40 bg-warning-a15 px-2 py-0.5 text-[10px] font-bold text-gold-500">
-                <Star size={9} className="fill-gold-500" /> Following
-              </span>
-            )}
+            <button
+              type="button"
+              onClick={() => toggleFollow(match.away.id)}
+              aria-pressed={follows.has(match.away.id)}
+              className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold transition-colors ${
+                follows.has(match.away.id)
+                  ? "border-gold-500/40 bg-warning-a15 text-gold-500"
+                  : "border-border-strong bg-transparent text-text-tertiary hover:border-gold-500/40 hover:text-gold-500"
+              }`}
+            >
+              <Star
+                size={9}
+                className={follows.has(match.away.id) ? "fill-gold-500" : ""}
+              />
+              {follows.has(match.away.id) ? "Following" : "Follow"}
+            </button>
           </div>
         </div>
         {/* GOAL banner — transient, names the scorer */}

@@ -126,10 +126,16 @@ export function OddsCell({
       whileTap={suspended ? undefined : { scale: 0.94 }}
       transition={{ type: "spring", stiffness: 500, damping: 30 }}
       aria-pressed={selected}
-      aria-label={`${tag ? `${tag} ` : ""}${fmt(price)} · ${outcome.name}${suspended ? " · suspended" : ""}`}
+      aria-label={
+        named
+          ? `${outcome.name} ${fmt(price)}${suspended ? " · suspended" : ""}`
+          : `${tag ? `${tag} ` : ""}${fmt(price)} · ${outcome.name}${suspended ? " · suspended" : ""}`
+      }
       className={[
         "relative flex h-full min-h-10 items-center gap-1.5 rounded-[10px] font-odds text-[15px] font-semibold tnum transition-colors duration-150",
-        named ? "justify-between" : "justify-center",
+        named
+          ? "min-h-12 flex-col items-start justify-center gap-0.5"
+          : "justify-center",
         compact ? "min-w-0 px-1 py-2 sm:px-2.5" : "min-w-0 px-3 py-2.5",
         suspended
           ? "suspend-in cursor-not-allowed bg-surface-secondary text-text-disabled"
@@ -147,60 +153,62 @@ export function OddsCell({
         <>
           {named && (
             <span
-              className={`min-w-0 truncate font-sans text-[12.5px] font-semibold ${selected ? "text-text-inverse/80" : "text-text-secondary"}`}
+              className={`min-w-0 max-w-full truncate font-sans text-[11px] font-medium leading-tight ${selected ? "text-text-inverse/75" : "text-text-tertiary"}`}
             >
               {outcome.name}
             </span>
           )}
-          {!named && tag && (
-            <span
-              className={`font-sans text-[10px] font-bold ${selected ? "text-text-inverse/60" : "text-text-tertiary"}`}
+          <span className="flex items-center gap-1.5">
+            {!named && tag && (
+              <span
+                className={`font-sans text-[10px] font-bold ${selected ? "text-text-inverse/60" : "text-text-tertiary"}`}
+              >
+                {tag}
+              </span>
+            )}
+            <motion.span
+              key={price}
+              initial={
+                flash ? { y: flash.dir === "up" ? 5 : -5, opacity: 0.3 } : false
+              }
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.16, ease: "easeOut" }}
             >
-              {tag}
-            </span>
-          )}
-          <motion.span
-            key={price}
-            initial={
-              flash ? { y: flash.dir === "up" ? 5 : -5, opacity: 0.3 } : false
-            }
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.16, ease: "easeOut" }}
-          >
-            {fmt(price)}
-          </motion.span>
-          <AnimatePresence>
-            {flash?.dir === "up" && (
-              <motion.span
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
-              >
-                <TrendingUp
-                  size={13}
-                  className={selected ? "text-text-inverse" : "text-tick-up"}
-                  aria-hidden
-                />
-              </motion.span>
-            )}
-            {flash?.dir === "down" && (
-              <motion.span
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
-              >
-                <TrendingDown
-                  size={13}
-                  className={
-                    selected ? "text-text-inverse" : "text-tick-down-text"
-                  }
-                  aria-hidden
-                />
-              </motion.span>
-            )}
-          </AnimatePresence>
+              {fmt(price)}
+            </motion.span>
+            <AnimatePresence>
+              {flash?.dir === "up" && (
+                <motion.span
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <TrendingUp
+                    size={13}
+                    className={selected ? "text-text-inverse" : "text-tick-up"}
+                    aria-hidden
+                  />
+                </motion.span>
+              )}
+              {flash?.dir === "down" && (
+                <motion.span
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <TrendingDown
+                    size={13}
+                    className={
+                      selected ? "text-text-inverse" : "text-tick-down-text"
+                    }
+                    aria-hidden
+                  />
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </span>
         </>
       )}
     </motion.button>

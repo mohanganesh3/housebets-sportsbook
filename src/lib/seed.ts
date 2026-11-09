@@ -418,9 +418,9 @@ function marketsFor(m: Match): Market[] {
     [a, P(p.A, "h2h")],
   ]);
   push("dc", "Double chance", "popular", [
-    [`${hs} or draw`, P(p.H + p.D, "dc")],
-    [`${hs} or ${as}`, P(p.H + p.A, "dc")],
-    [`Draw or ${as}`, P(p.D + p.A, "dc")],
+    [`${h}/Draw`, P(p.H + p.D, "dc")],
+    [`${h}/${a}`, P(p.H + p.A, "dc")],
+    [`Draw/${a}`, P(p.D + p.A, "dc")],
   ]);
   const pBtts =
     (gH > 0 ? 1 : 1 - Math.exp(-lh)) * (gA > 0 ? 1 : 1 - Math.exp(-la));

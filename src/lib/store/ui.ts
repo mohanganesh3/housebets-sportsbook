@@ -37,7 +37,7 @@ const loadFollows = (): Set<string> => {
     const raw = localStorage.getItem("hb-follows");
     if (raw) return new Set(JSON.parse(raw) as string[]);
   } catch {}
-  return new Set(["epl"]);
+  return new Set(["epl", "ars", "rma", "int"]);
 };
 const saveFollows = (f: Set<string>) => {
   try {
@@ -72,7 +72,10 @@ export const useUI = create<UIState>()((set, get) => ({
   setPanelTab: (t) => set({ panelTab: t }),
   setScenario: (s) => set({ scenario: s }),
   setScenarioOpen: (v) => set({ scenarioOpen: v }),
-  follows: typeof window !== "undefined" ? loadFollows() : new Set(["epl"]),
+  follows:
+    typeof window !== "undefined"
+      ? loadFollows()
+      : new Set(["epl", "ars", "rma", "int"]),
   toggleFollow: (id) => {
     const f = new Set(get().follows);
     if (f.has(id)) {

@@ -444,7 +444,7 @@ export function MyBetsBody({ full = false }: { full?: boolean }) {
       )}
       {tab === "open" && coAvail.length > 0 && (
         <p className="px-1 pt-3 text-[11px] text-text-tertiary">
-          Cash-out values track live odds — they can fall as well as rise.
+          Cash-out values track live odds · they can fall as well as rise.
           Sample data.
         </p>
       )}
