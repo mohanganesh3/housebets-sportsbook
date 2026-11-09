@@ -9,6 +9,7 @@ import {
   FollowStar,
   LiveBadge,
   OddsCell,
+  Reveal,
   TeamLogo,
 } from "./primitives";
 
@@ -75,11 +76,13 @@ export function MatchRow({
                   {t.name}
                 </span>
                 {showScore && (
-                  <span
-                    key={goalFlash}
-                    className={`tnum ml-auto pl-3 font-odds text-[14px] font-semibold ${goalFlash ? "ticker-in text-warning-400" : "text-text-primary"}`}
-                  >
-                    {i === 0 ? mt.score.home : mt.score.away}
+                  <span className="tnum ml-auto overflow-hidden pl-3">
+                    <span
+                      key={i === 0 ? mt.score.home : mt.score.away}
+                      className={`roll-in inline-block font-odds text-[14px] font-semibold ${goalFlash ? "text-warning-400" : "text-text-primary"}`}
+                    >
+                      {i === 0 ? mt.score.home : mt.score.away}
+                    </span>
                   </span>
                 )}
               </div>
@@ -188,47 +191,49 @@ export function LeagueSection({
   const [open, setOpen] = useState(defaultOpen);
   if (!comp || matches.length === 0) return null;
   return (
-    <section className="overflow-hidden rounded-xl border border-border-soft bg-surface-primary">
-      <div className="flex items-center gap-2.5 px-4 py-3">
-        <button
-          type="button"
-          onClick={() => setOpen(!open)}
-          aria-expanded={open}
-          className="flex min-w-0 flex-1 items-center gap-2.5 text-left transition-colors hover:text-brand-200"
-        >
-          <span aria-hidden className="text-[15px] leading-none">
-            {countryFlag(comp.country)}
-          </span>
-          <span className="grid size-6 shrink-0 place-items-center rounded-md bg-secondary-a30 font-odds text-[10px] font-bold uppercase text-brand-300">
-            {compShort(comp.id)}
-          </span>
-          <span className="hidden text-[12px] text-text-tertiary sm:inline">
-            {comp.country}
-          </span>
-          <span className="truncate text-[14px] font-semibold">
-            {comp.name}
-          </span>
-          <ChevronRight
-            size={15}
-            className={`shrink-0 text-text-tertiary transition-transform ${open ? "rotate-90" : ""}`}
-          />
-        </button>
-        <Link
-          to="/football"
-          className="shrink-0 text-[11.5px] font-semibold text-brand-300 transition-colors hover:text-brand-200"
-        >
-          View all
-        </Link>
-        <FollowStar id={comp.id} size={15} />
-      </div>
-      {open && (
-        <div className="border-t border-border-soft px-1.5 py-1.5">
-          {matches.map((mt) => (
-            <MatchRow key={mt.id} match={mt} marketKey={marketKey} />
-          ))}
+    <Reveal>
+      <section className="overflow-hidden rounded-xl border border-border-soft bg-surface-primary">
+        <div className="flex items-center gap-2.5 px-4 py-3">
+          <button
+            type="button"
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            className="flex min-w-0 flex-1 items-center gap-2.5 text-left transition-colors hover:text-brand-200"
+          >
+            <span aria-hidden className="text-[15px] leading-none">
+              {countryFlag(comp.country)}
+            </span>
+            <span className="grid size-6 shrink-0 place-items-center rounded-md bg-secondary-a30 font-odds text-[10px] font-bold uppercase text-brand-300">
+              {compShort(comp.id)}
+            </span>
+            <span className="hidden text-[12px] text-text-tertiary sm:inline">
+              {comp.country}
+            </span>
+            <span className="truncate text-[14px] font-semibold">
+              {comp.name}
+            </span>
+            <ChevronRight
+              size={15}
+              className={`shrink-0 text-text-tertiary transition-transform ${open ? "rotate-90" : ""}`}
+            />
+          </button>
+          <Link
+            to="/football"
+            className="shrink-0 text-[11.5px] font-semibold text-brand-300 transition-colors hover:text-brand-200"
+          >
+            View all
+          </Link>
+          <FollowStar id={comp.id} size={15} />
         </div>
-      )}
-    </section>
+        {open && (
+          <div className="border-t border-border-soft px-1.5 py-1.5">
+            {matches.map((mt) => (
+              <MatchRow key={mt.id} match={mt} marketKey={marketKey} />
+            ))}
+          </div>
+        )}
+      </section>
+    </Reveal>
   );
 }
 

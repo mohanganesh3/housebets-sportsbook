@@ -484,18 +484,29 @@ function MatchPage() {
               role="tab"
               aria-selected={effGroup === "mine"}
               onClick={() => setGroup("mine")}
-              className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors ${
+              className={`relative shrink-0 rounded-full border px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors ${
                 effGroup === "mine"
                   ? "border-gold-500/40 bg-gold-500/10 text-gold-500"
                   : "border-border-soft text-text-secondary hover:text-text-primary"
               }`}
             >
-              <Star
-                size={11}
-                className="mr-0.5 inline fill-gold-500 text-gold-500"
-              />
-              My markets{" "}
-              <span className="tnum text-[10.5px] opacity-60">{mineCount}</span>
+              {effGroup === "mine" && (
+                <motion.span
+                  layoutId="mkt-tab-pill"
+                  className="absolute inset-0 rounded-full border border-gold-500/40 bg-gold-500/10"
+                  transition={{ type: "spring", stiffness: 500, damping: 38 }}
+                />
+              )}
+              <span className="relative">
+                <Star
+                  size={11}
+                  className="mr-0.5 inline fill-gold-500 text-gold-500"
+                />
+                My markets{" "}
+                <span className="tnum text-[10.5px] opacity-60">
+                  {mineCount}
+                </span>
+              </span>
             </button>
           )}
           {GROUPS.map((g) => {
@@ -511,14 +522,27 @@ function MatchPage() {
                 role="tab"
                 aria-selected={effGroup === g.key}
                 onClick={() => setGroup(g.key)}
-                className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors ${
+                className={`relative shrink-0 rounded-full border px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors ${
                   effGroup === g.key
-                    ? "border-brand-a30 bg-secondary-a20 text-brand-300"
+                    ? "border-transparent text-brand-300"
                     : "border-border-soft text-text-secondary hover:text-text-primary"
                 }`}
               >
-                {g.label}{" "}
-                <span className="tnum text-[10.5px] opacity-60">{n}</span>
+                {effGroup === g.key && (
+                  <motion.span
+                    layoutId="mkt-tab-pill"
+                    className="absolute inset-0 rounded-full border border-brand-a30 bg-secondary-a20"
+                    transition={{
+                      type: "spring",
+                      stiffness: 500,
+                      damping: 38,
+                    }}
+                  />
+                )}
+                <span className="relative">
+                  {g.label}{" "}
+                  <span className="tnum text-[10.5px] opacity-60">{n}</span>
+                </span>
               </button>
             );
           })}
