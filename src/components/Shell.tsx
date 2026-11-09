@@ -11,6 +11,7 @@ import {
   RadioTower,
   ReceiptText,
   Search,
+  Send,
   Star,
   Ticket,
   Trophy,
@@ -18,7 +19,7 @@ import {
   X,
 } from "lucide-react";
 import { AnimatePresence, motion, useDragControls } from "motion/react";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { isMatchFollowed } from "../lib/selectors";
 import { useSlip } from "../lib/store/slip";
 import { useUI } from "../lib/store/ui";
@@ -127,6 +128,17 @@ function ChromeModal({
   const credit = useUI((s) => s.credit);
   const toast = useUI((s) => s.toast);
   const pot = 50000 + Math.floor((Date.now() / 60000) % 500);
+  const panelRef = useRef<HTMLDivElement>(null);
+  // hand-rolled modal still owes keyboard users: Esc closes, focus lands
+  // inside the dialog on open
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    panelRef.current?.querySelector("button")?.focus();
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
   return (
     <div className="fixed inset-0 z-[60] grid place-items-center p-4">
       <button
@@ -136,6 +148,7 @@ function ChromeModal({
         className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"
       />
       <motion.div
+        ref={panelRef}
         initial={{ opacity: 0, scale: 0.95, y: 8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         role="dialog"
@@ -389,7 +402,16 @@ function ChatBody() {
                   .toast("Chat is read-only in this demo", "info");
             }}
           />
-          <MessageCircle size={15} className="shrink-0 text-text-tertiary" />
+          <button
+            type="button"
+            aria-label="Send message"
+            onClick={() =>
+              useUI.getState().toast("Chat is read-only in this demo", "info")
+            }
+            className="shrink-0 rounded-md p-1 text-text-tertiary transition-colors hover:bg-surface-tertiary hover:text-brand-300"
+          >
+            <Send size={15} />
+          </button>
         </div>
       </div>
     </div>

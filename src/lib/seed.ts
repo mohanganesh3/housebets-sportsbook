@@ -1101,6 +1101,11 @@ const m = (
     featured,
   };
   mt.markets = marketsFor(mt);
+  if (status === "finished")
+    for (const mk of mt.markets) {
+      mk.status = "suspended";
+      for (const o of mk.outcomes) o.status = "suspended";
+    }
   return mt;
 };
 
@@ -1253,6 +1258,30 @@ export const MATCHES: Match[] = [
     null,
     [0, 0],
     600,
+  ),
+  // Seeded full-time matches: the settled seed bets (liv-tot, int-psg) need real
+  // fixtures, and the terminal state must be visible without waiting ~20 min.
+  m(
+    "liv-tot",
+    "epl",
+    TEAMS.liv,
+    TEAMS.tot,
+    "finished",
+    90,
+    "FT",
+    [3, 1],
+    -2880,
+  ),
+  m(
+    "int-psg",
+    "ucl",
+    TEAMS.int,
+    TEAMS.psg,
+    "finished",
+    90,
+    "FT",
+    [2, 0],
+    -4320,
   ),
 ];
 

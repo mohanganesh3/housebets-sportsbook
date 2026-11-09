@@ -72,6 +72,13 @@ const mkBet = (s: SlipSelection): Bet => {
 const arsHome = matchById("ars-bha")?.markets.find((m) => m.key === "h2h")
   ?.outcomes[0];
 
+// Settled bets also keep real outcome ids so "Same again" resolves to the
+// actual market outcome instead of a fabricated slug.
+const ocId = (matchId: string, marketKey: string, pick: string): string =>
+  matchById(matchId)
+    ?.markets.find((mk) => mk.key === marketKey)
+    ?.outcomes.find((o) => o.name === pick)?.id ?? "";
+
 const seedHistory: Bet[] = [
   ...(arsHome
     ? [
@@ -101,7 +108,7 @@ const seedHistory: Bet[] = [
     placedAt: Date.now() - 86400000,
     matchId: "juv-rom",
     marketId: "juv-rom-h2h",
-    outcomeId: "juv-rom-h2h-draw",
+    outcomeId: ocId("juv-rom", "h2h", "Draw"),
     pick: "Draw",
     marketName: "Match result",
     odds: 3.4,
@@ -122,14 +129,14 @@ const seedHistory: Bet[] = [
     result: "lost",
     settledNote: "Settled · FT 2-0",
     marketId: "nap-mil-h2h",
-    outcomeId: "nap-mil-h2h-draw",
+    outcomeId: ocId("nap-mil", "h2h", "Milan"),
   },
   {
     id: "HB-075",
     placedAt: Date.now() - 259200000,
     matchId: "atm-sev",
-    marketId: "atm-sev-total",
-    outcomeId: "atm-sev-total-over",
+    marketId: "atm-sev-tg25",
+    outcomeId: ocId("atm-sev", "tg25", "Over"),
     pick: "Over 2.5",
     marketName: "Total goals",
     odds: 2.1,
@@ -144,7 +151,7 @@ const seedHistory: Bet[] = [
     placedAt: Date.now() - 345600000,
     matchId: "rma-bay",
     marketId: "rma-bay-btts",
-    outcomeId: "rma-bay-btts-yes",
+    outcomeId: ocId("rma-bay", "btts", "Yes"),
     pick: "Yes",
     marketName: "Both teams to score",
     odds: 1.95,
@@ -158,7 +165,7 @@ const seedHistory: Bet[] = [
     placedAt: Date.now() - 432000000,
     matchId: "liv-tot",
     marketId: "liv-tot-h2h",
-    outcomeId: "liv-tot-h2h-home",
+    outcomeId: ocId("liv-tot", "h2h", "Liverpool"),
     pick: "Liverpool",
     marketName: "Match result",
     odds: 1.65,
@@ -172,7 +179,7 @@ const seedHistory: Bet[] = [
     placedAt: Date.now() - 518400000,
     matchId: "new-eve",
     marketId: "new-eve-tg25",
-    outcomeId: "new-eve-tg25-under",
+    outcomeId: ocId("new-eve", "tg25", "Under"),
     pick: "Under 2.5",
     marketName: "Total goals 2.5",
     odds: 2.0,
@@ -186,7 +193,7 @@ const seedHistory: Bet[] = [
     placedAt: Date.now() - 604800000,
     matchId: "int-psg",
     marketId: "int-psg-h2h",
-    outcomeId: "int-psg-h2h-home",
+    outcomeId: ocId("int-psg", "h2h", "Inter"),
     pick: "Inter",
     marketName: "Match result",
     odds: 2.4,
@@ -210,7 +217,16 @@ interface BetsState {
 
 export const useBets = create<BetsState>()((set) => ({
   bets:
-    typeof window !== "undefined" ? (loadBets() ?? seedHistory) : seedHistory,
+    typeof window !== "undefined"
+      ? (loadBets()?.map((b) => {
+          // heal bets persisted by earlier builds whose seed carried
+          // fabricated outcome ids — real ids make "Same again" resolve
+          const seeded = seedHistory.find((s) => s.id === b.id);
+          return seeded && b.outcomeId !== seeded.outcomeId
+            ? { ...b, outcomeId: seeded.outcomeId, marketId: seeded.marketId }
+            : b;
+        }) ?? seedHistory)
+      : seedHistory,
   addBets: (sel) => {
     const made = sel.map(mkBet).reverse();
     set((s) => {
@@ -277,9 +293,23 @@ export const useBets = create<BetsState>()((set) => ({
       const mt = matchById(matchId);
       if (!mt) return s;
       let credit = 0;
+      const notes: { msg: string; kind: "success" | "info" }[] = [];
       const bets = s.bets.map((b) => {
         if (b.matchId !== matchId || b.result !== "open") return b;
         const verdict = evalSettle(b, mt, sh, sa);
+        notes.push(
+          verdict === "won"
+            ? {
+                msg: `${b.id} won · +${b.returns.toFixed(2)} USDT paid to balance`,
+                kind: "success",
+              }
+            : verdict === "lost"
+              ? { msg: `${b.id} settled · lost (FT ${sh}-${sa})`, kind: "info" }
+              : {
+                  msg: `${b.id} void · ${b.stake.toFixed(2)} USDT stake returned`,
+                  kind: "info",
+                },
+        );
         if (verdict === "won") {
           credit += b.returns;
           return {
@@ -309,6 +339,10 @@ export const useBets = create<BetsState>()((set) => ({
         };
       });
       if (credit > 0) useUI.getState().credit(+credit.toFixed(2));
+      // settlement must never be silent — each graded bet announces itself
+      notes.forEach((n, i) =>
+        setTimeout(() => useUI.getState().toast(n.msg, n.kind), 300 + i * 900),
+      );
       saveBets(bets);
       return { bets };
     }),

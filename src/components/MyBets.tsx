@@ -201,20 +201,38 @@ function BetCard({ b }: { b: import("../lib/types").Bet }) {
           {b.settledNote}
           <button
             type="button"
+            disabled={mt?.status === "finished"}
+            title={
+              mt?.status === "finished"
+                ? "This fixture has ended — its markets are closed"
+                : undefined
+            }
             onClick={() => {
               const slip = useSlip.getState();
-              if (!slip.selections.some((x) => x.outcomeId === b.outcomeId)) {
-                slip.toggle(b.outcomeId);
+              if (slip.selections.some((x) => x.outcomeId === b.outcomeId)) {
+                useUI.getState().setPanelTab("slip");
+                useUI.getState().toast("Already on the slip", "info");
+                return;
               }
-              useUI.getState().setPanelTab("slip");
-              useUI
+              slip.toggle(b.outcomeId);
+              const landed = useSlip
                 .getState()
-                .toast(
-                  "Same pick added · review the price before placing",
-                  "info",
-                );
+                .selections.some((x) => x.outcomeId === b.outcomeId);
+              if (landed) {
+                useUI.getState().setPanelTab("slip");
+                useUI
+                  .getState()
+                  .toast(
+                    "Same pick added · review the price before placing",
+                    "info",
+                  );
+              } else {
+                useUI
+                  .getState()
+                  .toast("That market is closed for this fixture", "info");
+              }
             }}
-            className="ml-auto shrink-0 rounded-md px-2 py-0.5 text-[11px] font-semibold text-text-tertiary underline decoration-dotted underline-offset-2 transition-colors hover:text-brand-300"
+            className="ml-auto shrink-0 rounded-md px-2 py-0.5 text-[11px] font-semibold text-text-tertiary underline decoration-dotted underline-offset-2 transition-colors hover:text-brand-300 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-text-tertiary"
           >
             Same again
           </button>

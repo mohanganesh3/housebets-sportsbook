@@ -12,6 +12,7 @@ export type Scenario =
   | "prefilled"
   | "mixed"
   | "empty-live"
+  | "ft"
   | "offline";
 
 interface UIState {
@@ -38,6 +39,9 @@ interface UIState {
   credit: (v: number) => void;
   offline: boolean;
   setOffline: (v: boolean) => void;
+  breakUntil: number;
+  takeBreak: (mins: number) => void;
+  endBreak: () => void;
 }
 
 const loadFollows = (): Set<string> => {
@@ -168,6 +172,26 @@ export const useUI = create<UIState>()((set, get) => ({
     }),
   offline: false,
   setOffline: (v) => set({ offline: v }),
+  // "Take a break" is real, not theatre: placements lock until the
+  // timestamp passes and the state survives reload
+  breakUntil:
+    typeof window !== "undefined"
+      ? Number(localStorage.getItem("hb-break-until") ?? 0) || 0
+      : 0,
+  takeBreak: (mins) => {
+    const until = Date.now() + mins * 60_000;
+    try {
+      localStorage.setItem("hb-break-until", String(until));
+    } catch {}
+    set({ breakUntil: until });
+    get().toast(`Taking a break · betting locked for ${mins} min`, "success");
+  },
+  endBreak: () => {
+    try {
+      localStorage.removeItem("hb-break-until");
+    } catch {}
+    set({ breakUntil: 0 });
+  },
   toasts: [],
   toast: (msg, kind = "info") => {
     const id = ++tid;

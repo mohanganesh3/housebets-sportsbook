@@ -6,6 +6,7 @@ import { useEngine } from "../lib/engine";
 import { COMPS, compShort, MATCHES } from "../lib/seed";
 import { isMatchFollowed } from "../lib/selectors";
 import { useBets } from "../lib/store/bets";
+import { useOdds } from "../lib/store/odds";
 import { armFailOnce, useSlip } from "../lib/store/slip";
 import { type Scenario, useUI } from "../lib/store/ui";
 import { useWorld } from "../lib/store/world";
@@ -45,19 +46,23 @@ export function SearchPalette({
 
   const follows = useUI((s) => s.follows);
   const [recents, setRecents] = useState<string[]>(loadRecents);
+  // world matches — badges/statuses must reflect live state, not the seed
+  const wMatches = useWorld((s) => s.matches);
 
   const results = useMemo(() => {
     const needle = q.trim().toLowerCase();
     const rank = (m: (typeof MATCHES)[number]) =>
       (isMatchFollowed(m, follows) ? 0 : 1) + (m.status === "live" ? 0 : 0.5);
-    const matches = MATCHES.filter(
-      (m) =>
-        !needle ||
-        m.home.name.toLowerCase().includes(needle) ||
-        m.away.name.toLowerCase().includes(needle) ||
-        m.home.short.toLowerCase().includes(needle) ||
-        m.away.short.toLowerCase().includes(needle),
-    ).sort((a, b) => rank(a) - rank(b));
+    const matches = wMatches
+      .filter(
+        (m) =>
+          !needle ||
+          m.home.name.toLowerCase().includes(needle) ||
+          m.away.name.toLowerCase().includes(needle) ||
+          m.home.short.toLowerCase().includes(needle) ||
+          m.away.short.toLowerCase().includes(needle),
+      )
+      .sort((a, b) => rank(a) - rank(b));
     const comps = Object.values(COMPS).filter(
       (c) =>
         !needle ||
@@ -66,25 +71,28 @@ export function SearchPalette({
     );
     const markets =
       needle.length > 1
-        ? MATCHES.flatMap((m) =>
-            m.markets
-              .filter((mk) => mk.name.toLowerCase().includes(needle))
-              .map((mk) => ({ m, mk })),
-          ).slice(0, 5)
+        ? wMatches
+            .flatMap((m) =>
+              m.markets
+                .filter((mk) => mk.name.toLowerCase().includes(needle))
+                .map((mk) => ({ m, mk })),
+            )
+            .slice(0, 5)
         : [];
     // players are indexed via goalscorer market outcomes — every
     // scorer outcome carries a squad name in this seed
     const players =
       needle.length > 1
-        ? MATCHES.flatMap((m) =>
-            m.markets
-              .filter((mk) => mk.group === "goalscorers")
-              .flatMap((mk) =>
-                mk.outcomes
-                  .filter((o) => o.name.toLowerCase().includes(needle))
-                  .map((o) => ({ m, mk, o })),
-              ),
-          )
+        ? wMatches
+            .flatMap((m) =>
+              m.markets
+                .filter((mk) => mk.group === "goalscorers")
+                .flatMap((mk) =>
+                  mk.outcomes
+                    .filter((o) => o.name.toLowerCase().includes(needle))
+                    .map((o) => ({ m, mk, o })),
+                ),
+            )
             .filter(
               (v, i, a) => a.findIndex((x) => x.o.name === v.o.name) === i,
             )
@@ -96,7 +104,7 @@ export function SearchPalette({
       markets,
       players,
     };
-  }, [q, follows]);
+  }, [q, follows, wMatches]);
 
   const go = (term: string, fn: () => void) => {
     saveRecent(term);
@@ -366,6 +374,11 @@ const SCEN: { key: Scenario; label: string; hint: string }[] = [
     hint: "Starting-soon empty state",
   },
   {
+    key: "ft",
+    label: "Full time",
+    hint: "ARS-BHA ends · bets settle",
+  },
+  {
     key: "offline",
     label: "Go offline",
     hint: "Odds freeze · placement fails",
@@ -402,6 +415,7 @@ export function ScenarioDock() {
         "suspended",
         "mixed",
         "empty-live",
+        "ft",
       ].includes(s)
     ) {
       toast("Board frozen · reconnect first", "info");
@@ -443,7 +457,12 @@ export function ScenarioDock() {
               .getState()
               .selections.find((x) => x.outcomeId === id)!;
             const np = +(cur.livePrice + (i === 0 ? 0.25 : -0.18)).toFixed(2);
+            // move the board price too — the slip and the cell must agree
+            useOdds
+              .getState()
+              .applyChange(id, np, np > cur.livePrice ? "up" : "down");
             useSlip.getState().onOddsChange(id, np);
+            useBets.getState().tickCashout(id, np);
           });
         }, 400);
         toast("Odds moved on 2 selections · accept to place", "info");
@@ -539,13 +558,12 @@ export function ScenarioDock() {
         pickSome();
         setTimeout(() => {
           const sels = useSlip.getState().selections;
-          if (sels[0])
-            useSlip
-              .getState()
-              .onOddsChange(
-                sels[0].outcomeId,
-                +(sels[0].livePrice + 0.22).toFixed(2),
-              );
+          if (sels[0]) {
+            const np = +(sels[0].livePrice + 0.22).toFixed(2);
+            useOdds.getState().applyChange(sels[0].outcomeId, np, "up");
+            useSlip.getState().onOddsChange(sels[0].outcomeId, np);
+            useBets.getState().tickCashout(sels[0].outcomeId, np);
+          }
           const last = sels[sels.length - 1];
           if (last) {
             world.setMarketStatus(
@@ -564,6 +582,29 @@ export function ScenarioDock() {
         world.setLiveEmpty(true);
         toast("Live list emptied · 'Starting soon' takes over", "info");
         break;
+      case "ft": {
+        // walk a live match to full time so settlement is demoable on demand:
+        // jump to stoppage time, then let the normal advance path whistle,
+        // close every market and grade all open bets.
+        const ft =
+          world.matches.find(
+            (m) => m.id === "ars-bha" && m.status === "live",
+          ) ?? world.matches.find((m) => m.status === "live");
+        if (!ft) {
+          toast("No live match to finish", "info");
+          break;
+        }
+        world.setMinute(ft.id, 92);
+        toast(
+          `${ft.home.short} v ${ft.away.short} → 90'+ · full time lands in a moment`,
+          "info",
+        );
+        setTimeout(() => {
+          useWorld.getState().advance(ft.id);
+          setTimeout(() => useWorld.getState().advance(ft.id), 900);
+        }, 1_200);
+        break;
+      }
       case "offline":
         useUI.getState().setOffline(!useUI.getState().offline);
         toast(

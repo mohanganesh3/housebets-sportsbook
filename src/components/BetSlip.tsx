@@ -7,6 +7,7 @@ import {
   X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useState } from "react";
 import { matchById } from "../lib/seed";
 import { useBets } from "../lib/store/bets";
 import { useSlip } from "../lib/store/slip";
@@ -258,6 +259,15 @@ export function BetSlipBody() {
     1,
     Math.floor((Date.now() - SESSION_START) / 60_000),
   );
+  const breakUntil = useUI((s) => s.breakUntil);
+  // tick so the button unlocks itself the moment the break expires
+  const [, setNowTick] = useState(0);
+  useEffect(() => {
+    if (breakUntil <= Date.now()) return;
+    const iv = setInterval(() => setNowTick((n) => n + 1), 15_000);
+    return () => clearInterval(iv);
+  }, [breakUntil]);
+  const onBreak = breakUntil > Date.now();
   const changed = selections.filter((s) => s.status === "changed");
   const suspended = selections.filter((s) => s.status === "suspended");
   const totalStake = selections.reduce(
@@ -500,15 +510,22 @@ export function BetSlipBody() {
               type="button"
               whileTap={ready ? { scale: 0.97 } : undefined}
               onClick={place}
-              disabled={!ready || suspended.length > 0 || status === "placing"}
+              disabled={
+                !ready ||
+                suspended.length > 0 ||
+                status === "placing" ||
+                onBreak
+              }
               className={`relative flex h-11 w-full items-center justify-center gap-2 overflow-hidden rounded-xl text-[14px] font-bold transition-colors ${
                 status === "failed"
                   ? "fail-shake bg-error-500 text-white"
-                  : suspended.length > 0
-                    ? "cursor-not-allowed bg-warning-a15 text-warning-400"
-                    : ready
-                      ? "btn-primary shadow-[0_0_20px_#c4f4f12e]"
-                      : "cursor-not-allowed bg-surface-tertiary text-text-disabled"
+                  : onBreak
+                    ? "cursor-not-allowed bg-surface-tertiary text-text-disabled"
+                    : suspended.length > 0
+                      ? "cursor-not-allowed bg-warning-a15 text-warning-400"
+                      : ready
+                        ? "btn-primary shadow-[0_0_20px_#c4f4f12e]"
+                        : "cursor-not-allowed bg-surface-tertiary text-text-disabled"
               }`}
             >
               {status === "placing" && (
@@ -542,6 +559,8 @@ export function BetSlipBody() {
                 </>
               ) : status === "failed" ? (
                 "Tap to retry"
+              ) : onBreak ? (
+                `On a break · back ${new Date(breakUntil).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
               ) : suspended.length > 0 ? (
                 `${suspended.length} suspended · remove it or wait for markets`
               ) : (
@@ -571,16 +590,13 @@ export function BetSlipBody() {
               <button
                 type="button"
                 onClick={() =>
-                  useUI
-                    .getState()
-                    .toast(
-                      "Session reminder · take a break anytime. Bets never expire in demo.",
-                      "info",
-                    )
+                  onBreak
+                    ? useUI.getState().endBreak()
+                    : useUI.getState().takeBreak(10)
                 }
                 className="underline decoration-dotted underline-offset-2 hover:text-text-secondary"
               >
-                Take a break
+                {onBreak ? "End break early" : "Take a break"}
               </button>
             </p>
           </div>

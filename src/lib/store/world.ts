@@ -19,6 +19,7 @@ interface WorldState {
     reason?: string,
   ) => void;
   setScore: (matchId: string, score: [number, number]) => void;
+  setMinute: (matchId: string, minute: number) => void;
   goalFlash: (matchId: string) => void;
   bumpMinute: (matchId: string) => void;
   advance: (matchId: string) => void;
@@ -72,6 +73,14 @@ export const useWorld = create<WorldState>()(
       set((s) => ({
         matches: s.matches.map((mt) =>
           mt.id === matchId ? { ...mt, score: { home: h, away: a } } : mt,
+        ),
+      })),
+    setMinute: (matchId, minute) =>
+      set((s) => ({
+        matches: s.matches.map((mt) =>
+          mt.id === matchId && mt.status === "live"
+            ? { ...mt, minute, period: "2nd half" }
+            : mt,
         ),
       })),
     goalFlash: (matchId) => {
@@ -163,6 +172,8 @@ export const useWorld = create<WorldState>()(
 // matches to live the moment their kickoff time passes.
 if (typeof window !== "undefined") {
   setInterval(() => {
+    // offline freeze is honest: the whole board — clock included — holds
+    if (useUI.getState().offline) return;
     const { matches, advance, kickoff } = useWorld.getState();
     const now = Date.now();
     for (const mt of matches) {
@@ -172,6 +183,7 @@ if (typeof window !== "undefined") {
   }, 30_000);
   // fast pass for kickoff flips so countdowns land crisply
   setInterval(() => {
+    if (useUI.getState().offline) return;
     const { matches, kickoff } = useWorld.getState();
     const now = Date.now();
     for (const mt of matches)

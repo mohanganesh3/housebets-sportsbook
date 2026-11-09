@@ -113,11 +113,41 @@ export const useEngine = create<EngineState>()(
       set({ started: true, events: buildScript() });
       let idx = 0;
       const t0 = Date.now();
+      let ambientAt = 0;
       const tick = () => {
         const evs = get().events;
         while (idx < evs.length && evs[idx].at <= Date.now() - t0) {
           get().pushEvent(evs[idx]);
           idx++;
+        }
+        // the scripted feed ends ~5min in — keep the board breathing with a
+        // low-frequency ambient random walk on whatever is still live
+        if (idx >= evs.length) {
+          if (ambientAt === 0) ambientAt = Date.now() + 9_000;
+          if (Date.now() >= ambientAt) {
+            ambientAt = Date.now() + 7_000 + Math.floor(rand() * 9_000);
+            const liveNow = useWorld
+              .getState()
+              .matches.filter((m) => m.status === "live");
+            if (liveNow.length && !useUI.getState().offline) {
+              const mt = liveNow[Math.floor(rand() * liveNow.length)];
+              const open = mt.markets.filter((mk) => mk.status === "open");
+              if (open.length) {
+                const mk = open[Math.floor(rand() * open.length)];
+                const oc = mk.outcomes[Math.floor(rand() * mk.outcomes.length)];
+                const dir = rand() > 0.5 ? 1 : -1;
+                get().pushEvent({
+                  kind: "odds-change",
+                  at: Date.now() - t0,
+                  matchId: mt.id,
+                  marketId: mk.id,
+                  outcomeId: oc.id,
+                  dir: (dir > 0 ? "up" : "down") as OddsDir,
+                  delta: +(dir * (0.02 + rand() * 0.1)).toFixed(2),
+                });
+              }
+            }
+          }
         }
         timer = setTimeout(tick, 500);
       };
@@ -215,8 +245,9 @@ function applyEvent(e: EngineEvent) {
     useUI.getState().toast(`Market suspended · ${reason}`, "info");
     if (e.resumeDelay) {
       setTimeout(() => {
-        // the match may have gone FT inside the delay — never resurrect
-        if (!isLive(e.matchId)) return;
+        // the match may have gone FT inside the delay — never resurrect;
+        // and a market can't reopen while the board is frozen
+        if (!isLive(e.matchId) || useUI.getState().offline) return;
         useWorld.getState().setMarketStatus(e.matchId, e.marketId!, "open");
         useSlip.getState().onMarketResumed(e.marketId!);
         useBets.getState().resumeCashout(e.matchId);
@@ -242,7 +273,7 @@ function applyEvent(e: EngineEvent) {
       );
     setTimeout(() => {
       const mt = useWorld.getState().matches.find((m) => m.id === e.matchId);
-      if (mt?.status !== "live") return;
+      if (mt?.status !== "live" || useUI.getState().offline) return;
       const open = mt.markets.filter((mk) => mk.status === "open");
       // remember which markets THIS cascade closed — trader suspensions
       // that predate the goal stay closed when we reopen
@@ -255,7 +286,7 @@ function applyEvent(e: EngineEvent) {
       }
       setTimeout(() => {
         const mt2 = useWorld.getState().matches.find((m) => m.id === e.matchId);
-        if (mt2?.status !== "live") return;
+        if (mt2?.status !== "live" || useUI.getState().offline) return;
         // reprice h2h toward the scoring side before reopening
         const h2h = mt2.markets.find((mk) => mk.key === "h2h");
         if (h2h) {
