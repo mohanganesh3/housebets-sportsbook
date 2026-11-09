@@ -8,16 +8,16 @@ import { useWorld } from "../lib/store/world";
 export const Route = createFileRoute("/live")({ component: Live });
 
 const FILTERS = [
-  "All",
-  "Soccer",
-  "Tennis",
-  "Basketball",
-  "Baseball",
-  "Esports",
+  { label: "All", sport: null },
+  { label: "Football", sport: "soccer" },
+  { label: "Tennis", sport: "tennis" },
+  { label: "Basketball", sport: "basketball" },
+  { label: "Baseball", sport: "baseball" },
+  { label: "Esports", sport: "esports" },
 ] as const;
 
 function Live() {
-  const [f, setF] = useState<(typeof FILTERS)[number]>("All");
+  const [f, setF] = useState<(typeof FILTERS)[number]["label"]>("All");
   const matches = useWorld((s) => s.matches);
   const liveEmpty = useWorld((s) => s.liveEmpty);
   const live = liveEmpty ? [] : matches.filter((m) => m.status === "live");
@@ -25,10 +25,8 @@ function Live() {
     .filter((m) => m.status === "scheduled")
     .sort((a, b) => a.kickoffAt - b.kickoffAt)
     .slice(0, 6);
-  const filtered =
-    f === "All"
-      ? live
-      : live.filter((m) => m.sport === f.toLowerCase().replace(" ", "-"));
+  const sport = FILTERS.find((x) => x.label === f)?.sport ?? null;
+  const filtered = sport ? live.filter((m) => m.sport === sport) : live;
 
   return (
     <div className="mx-auto max-w-[860px] space-y-4 px-3 pt-4 lg:px-4">
@@ -46,30 +44,27 @@ function Live() {
         role="tablist"
         aria-label="Sport filter"
       >
-        {FILTERS.map((k) => {
-          const n =
-            k === "All"
-              ? live.length
-              : live.filter(
-                  (m) => m.sport === k.toLowerCase().replace(" ", "-"),
-                ).length;
+        {FILTERS.map(({ label, sport: sp }) => {
+          const n = sp
+            ? live.filter((m) => m.sport === sp).length
+            : live.length;
           return (
             <button
-              key={k}
+              key={label}
               type="button"
               role="tab"
-              aria-selected={f === k}
-              onClick={() => setF(k)}
+              aria-selected={f === label}
+              onClick={() => setF(label)}
               className={`shrink-0 rounded-full border px-4 py-2 text-[13px] font-semibold transition-colors ${
-                f === k
+                f === label
                   ? "border-brand-a30 bg-secondary-a20 text-brand-300"
                   : "border-border-soft bg-surface-primary text-text-secondary hover:text-text-primary"
               }`}
             >
-              {k}
+              {label}
               {n > 0 && (
                 <span
-                  className={`ml-1.5 font-odds text-[11px] ${f === k ? "text-brand-200" : "text-text-tertiary"}`}
+                  className={`ml-1.5 font-odds text-[11px] ${f === label ? "text-brand-200" : "text-text-tertiary"}`}
                 >
                   {n}
                 </span>
@@ -82,7 +77,9 @@ function Live() {
       {filtered.length === 0 ? (
         <EmptyState
           icon={<Clock size={20} />}
-          title={`No live ${f === "All" ? "matches" : `${f} matches`} right now`}
+          title={
+            f === "All" ? "No live matches right now" : `No live ${f} right now`
+          }
           hint="New events go in-play continuously. Here's what's teeing up next."
         />
       ) : (
